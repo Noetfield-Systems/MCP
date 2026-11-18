@@ -126,6 +126,9 @@ export function oauthRouter({auth}){
   const server=await ownedServer(req.params.id,req.user.id);if(!server)return res.status(404).json({error:'SERVER_NOT_FOUND'});
   const {rows}=await q("SELECT 1 FROM oauth_connections WHERE account_id=$1 AND provider='github'",[req.user.id]);
   if(!rows.length)return res.status(409).json({error:'CONNECT_GITHUB_FIRST'});
+  const targets=await q('SELECT url FROM tools WHERE server_id=$1',[server.id]);
+  if(targets.rows.some(t=>{try{return new URL(t.url).hostname!=='api.github.com';}catch{return true;}}))
+    return res.status(400).json({error:'GITHUB_OAUTH_REQUIRES_API_GITHUB_COM_TOOLS'});
   const c=await pool.connect();try{
    await c.query('BEGIN');
    await c.query("UPDATE servers SET status='draft',visibility='private',updated_at=now() WHERE id=$1 AND owner_id=$2",[server.id,req.user.id]);
