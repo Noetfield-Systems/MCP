@@ -114,7 +114,7 @@ app.post('/api/pilot-interest',async(req,res)=>{
   // Honeypot is ignored without creating any stored prospect record.
   if(req.body?.nickname)return res.status(202).json({received:true});
   if(req.body?.contact_consent!==true)return j(res,400,'CONTACT_CONSENT_REQUIRED');
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||!contact_name||project_brief.length<20)return j(res,400,'NAME_EMAIL_AND_PROJECT_BRIEF_REQUIRED');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!contact_name||project_brief.length<20)return j(res,400,'NAME_EMAIL_AND_PROJECT_BRIEF_REQUIRED');
   if(website){try{const parsed=new URL(website);if(parsed.protocol!=='https:')return j(res,400,'HTTPS_WEBSITE_REQUIRED');}catch{return j(res,400,'VALID_WEBSITE_REQUIRED');}}
   try{
     const {rows}=await q(`INSERT INTO pilot_leads(id,email,contact_name,company,website,project_brief,marketing_consent)
