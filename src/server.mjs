@@ -1,6 +1,6 @@
 import express from 'express';
 import Stripe from 'stripe';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,timingSafeEqual} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {q,initDb,requireAuth,ownedServer,pool} from './db.mjs';
@@ -127,11 +127,35 @@ app.post('/api/pilot-interest',async(req,res)=>{
     return res.status(202).json({received:true,reference:rows[0].id,kind:'pilot_enquiry',payment_collected:false});
   }catch(error){console.error('pilot_lead_write_failed',error?.code||'UNKNOWN');return j(res,503,'ENQUIRY_SAVE_UNAVAILABLE');}
 });
-app.get('/api/admin/pilot-interest',auth,async(req,res)=>{
-  const admins=(process.env.FOUNDRY_ADMIN_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  if(!admins.includes(req.user.email))return j(res,403,'ADMIN_ACCESS_REQUIRED');
+// Admin access is an independent operator secret: public account emails
+// are not verified identities and must never authorize lead data access.
+const operator=(req,res,next)=>{
+ const expected=process.env.FOUNDRY_ADMIN_TOKEN||'';
+ if(expected.length<40)return j(res,503,'OPERATOR_TOKEN_NOT_CONFIGURED');
+ const token=req.get('authorization')?.replace(/^Bearer /i,'')||'';
+ const a=Buffer.from(sha(token),'hex'),b=Buffer.from(sha(expected),'hex');
+ if(!token||token.length>512||!timingSafeEqual(a,b))return j(res,403,'OPERATOR_AUTH_REQUIRED');
+ next();
+};
+app.get('/api/admin/pilot-interest',operator,async(req,res)=>{
   const {rows}=await q('SELECT id,contact_name,email,company,website,project_brief,marketing_consent,status,created_at,updated_at FROM pilot_leads ORDER BY updated_at DESC LIMIT 100');
   res.json({leads:rows});
+});
+app.patch('/api/admin/pilot-interest/:id',operator,async(req,res)=>{
+  const allowed=new Set(['new','contacted','qualified','closed']);
+  if(!allowed.has(req.body?.status))return j(res,400,'INVALID_LEAD_STATUS');
+  const {rows}=await q('UPDATE pilot_leads SET status=$1,updated_at=now() WHERE id=$2 RETURNING id,status,updated_at',[req.body.status,req.params.id]);
+  if(!rows.length)return j(res,404,'LEAD_NOT_FOUND');
+  res.json({lead:rows[0]});
+});
+app.get('/api/admin/overview',operator,async(req,res)=>{
+  const [leads,accounts,servers,events]=await Promise.all([
+    q('SELECT status,count(*)::int AS count FROM pilot_leads GROUP BY status ORDER BY status'),
+    q('SELECT count(*)::int AS n FROM accounts'),
+    q("SELECT count(*)::int total,count(*) FILTER (WHERE status='published')::int published FROM servers"),
+    q("SELECT count(*)::int AS calls,count(*) FILTER(WHERE success)::int AS successes FROM tool_events WHERE created_at>now()-interval '7 days'")
+  ]);
+  res.json({pilot_leads:leads.rows,accounts:accounts.rows[0].n,servers:servers.rows[0],observed_7d_calls:events.rows[0]});
 });
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
@@ -172,6 +196,19 @@ app.post('/api/servers/from-template',auth,async(req,res)=>{
   }catch(error){await client.query('ROLLBACK');console.error('template_create_failed',error?.code||'UNKNOWN');j(res,500,'TEMPLATE_CREATE_FAILED');}
   finally{client.release();}
 });
+app.patch('/api/servers/:id',auth,async(req,res)=>{
+ const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
+ const name=string(req.body?.name,100),description=string(req.body?.description,400);
+ if(!name)return j(res,400,'SERVER_NAME_REQUIRED');
+ const {rows}=await q('UPDATE servers SET name=$1,description=$2,updated_at=now() WHERE id=$3 AND owner_id=$4 RETURNING *',
+ [name,description,server.id,req.user.id]);
+ res.json({server:rows[0]});
+});
+app.delete('/api/servers/:id',auth,async(req,res)=>{
+ const {rows}=await q('DELETE FROM servers WHERE id=$1 AND owner_id=$2 RETURNING id,slug',[req.params.id,req.user.id]);
+ if(!rows.length)return j(res,404,'SERVER_NOT_FOUND');
+ res.json({deleted:true,server:rows[0],endpoint_revoked:true});
+});
 app.get('/api/servers/:id',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
  const tools=(await q('SELECT * FROM tools WHERE server_id=$1 ORDER BY name',[server.id])).rows;res.json({server,tools});
@@ -210,6 +247,11 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
  if(added)await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
  res.json({found:entries.length,added});
 });
+app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
+ const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
+ await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+ res.json({status:'draft',endpoint_disabled:true,slug:server.slug});
+});
 app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
@@ -217,6 +259,25 @@ app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  const visibility=req.body?.visibility==='private'?'private':'public';
  const {rows}=await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2 RETURNING *",[visibility,server.id]);
  res.json({server:rows[0],endpoint:(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'')+'/mcp/'+server.slug});
+});
+app.patch('/api/tools/:id',auth,async(req,res)=>{
+ const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);
+ const tool=rows[0];if(!tool)return j(res,404,'TOOL_NOT_FOUND');
+ const input={name:req.body?.name??tool.name,description:req.body?.description??tool.description,
+   url:req.body?.url??tool.url,method:'GET',params:req.body?.params??tool.params};
+ const error=validateTool(input);if(error)return j(res,400,error);
+ try{
+   const updated=await q('UPDATE tools SET name=$1,description=$2,url=$3,params=$4 WHERE id=$5 RETURNING *',
+     [input.name,input.description,input.url,JSON.stringify(input.params),tool.id]);
+   await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[tool.server_id]);
+   res.json({tool:updated.rows[0],server_status:'draft'});
+ }catch(e){j(res,e.code==='23505'?409:500,e.code==='23505'?'DUPLICATE_TOOL_NAME':'TOOL_UPDATE_FAILED');}
+});
+app.delete('/api/tools/:id',auth,async(req,res)=>{
+ const {rows}=await q('DELETE FROM tools t USING servers s WHERE t.id=$1 AND t.server_id=s.id AND s.owner_id=$2 RETURNING t.id,t.server_id',[req.params.id,req.user.id]);
+ if(!rows.length)return j(res,404,'TOOL_NOT_FOUND');
+ await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[rows[0].server_id]);
+ res.json({deleted:true,tool_id:rows[0].id,server_status:'draft'});
 });
 app.post('/api/tools/:id/test',auth,async(req,res)=>{
  const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);const tool=rows[0];if(!tool)return j(res,404,'TOOL_NOT_FOUND');
