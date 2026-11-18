@@ -13,15 +13,20 @@ Company visits /#implementation -> consents and submits specific API use case ->
 ### Portfolio cross-distribution
 Each venture has its own product, customers, treasury and access rights. It can elect to expose a separate read-only API endpoint through the Foundry gateway. The Foundry records its own connector receipt, not the venture's customer payment or user identity.
 
-## Offer strategy
-Initial **hypotheses**, not active bills:
-- Self-serve free tier: 2 draft/published servers; 10 tools each; 500 daily executions per server.
-- One-time custom setup pilot: evaluate a $199 starting quote for a very narrow GET-only existing API, delivered with external MCP SDK receipt. Larger OAuth, private data, production SLA and write tools require a larger scoped proposal.
-- Managed hosting experiment: $29/month for small usage, not yet configured as a live Stripe plan. Prices and usage must be adjusted to proven infra costs and customer interest.
-- Later premium: volume/enterprise plans, OAuth delegation, private service connectivity, verification, white-label and marketplace creator payouts.
+## Offer strategy and actual merchant products
 
-## Current checkout boundary
-The connected Noetfield Stripe account has existing unrelated portfolio products and Payment Links; these are **not MCP Foundry products** and must not be relabeled. Direct account readback on 2026-11-17 showed Tax settings status `pending` with a missing head-office field and no Tax registrations. Do not claim that automatic tax, a new MCP Stripe Price, or a new collection flow is configured. The implementation enquiry form collects no money. Production subscription checkout stays disabled without dedicated Stripe credentials, a Price ID and a signed webhook. This is a specific real configuration gap, not a reason to pause the free product or buyer discovery.
+- Self-serve free tier: two draft/published servers; up to ten tools each; 500 managed executions per day per server.
+- **Active one-time paid offer:** MCP Foundry — Public API Quickstart at **CA$199 total**, for one supported public HTTPS API, at most three read-only GET tools, one real upstream test and basic remote client handoff. Excludes private upstream keys, OAuth, write operations and enterprise SLAs. Unsupported sources receive a scope discussion or refund before delivery.
+- Dedicated live Stripe Product ID `prod_VeLnamHWsrtYRA`, one-time Price ID `price_1Ud35uJ03eJkL57Jl6ZGx6LY` (19900 CAD minor units, price tax_behavior inclusive), live Payment Link ID `plink_1Ud36QJ03eJkL57J0AE4NTHo`. Independently read back as **active/livemode**: https://buy.stripe.com/5kQ7sMaLm81SeWSfPu1Nu0j.
+- This Stripe-hosted Payment Link collects the customer's billing address and optional public documentation URL. No API secrets are requested. The external Stripe receipt is the source of truth for paid status. This Payment Link is separate from the app's per-lead quote checkout and does **not** automatically record a `pilot_orders` row without a configured and signed webhook. Do not count clicks as payments or fulfillment.
+- Exact per-lead custom quotes: operator may create bespoke CAD/USD service orders via `/operator` and share opaque `/order/<token>` links. Automatic Checkout for these quote links requires dedicated Foundry Stripe restricted API credentials and signed webhook in Railway; until then the page accurately shows unavailable.
+- Managed hosting subscription: not configured for production Checkout, no claimed $29/month subscriber. For high-value custom/private/OAuth work, use a separately priced scoped proposal.
+
+## Tax and payment setup — observed gap, not a pretext to block free building
+
+Stripe Tax readback on 2026-11-17 remained `pending` because the merchant's actual head-office address is missing. No active registration was established in this review. The public payment link has **automatic_tax disabled**, and the one-time amount is CA$199 as a fixed inclusive price; **do not** claim Stripe Tax is calculating, collecting or filing taxes. Company bookkeeping must identify whether and where GST/HST/PST registration and tax reporting are legally applicable, based on real corporate facts—not an invented registration. Future payment flows requiring automatic tax need live account address/registration verification. Free product, GitHub onboarding and real sales outreach continue.
+
+All transactions must be independently verified in the Noetfield Stripe account. **No completed customer purchase, net revenue, tax remittance or service fulfillment has been verified yet**.
 
 ## Enquiry operations
 - `POST /api/pilot-interest` requires contact consent, a valid work email and a real project brief; sends `202` with reference ID only after persistence, not on Stripe success.
