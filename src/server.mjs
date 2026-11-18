@@ -9,6 +9,7 @@ import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl
 import {managedMcp,foundryMcp} from './mcp.mjs';
 import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
+import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
@@ -66,6 +67,7 @@ app.post('/api/stripe/webhook',express.raw({type:'application/json'}),async(req,
       const active=event.type!=='customer.subscription.deleted'&&['active','trialing'].includes(s.status);
       await client.query('UPDATE accounts SET plan=$1 WHERE stripe_customer_id=$2',[active?'pro':'free',s.customer]);
     }
+    await applyPilotWebhook(client,event);
     await client.query('COMMIT');return res.json({received:true});
   }catch(e){await client.query('ROLLBACK');return j(res,500,'WEBHOOK_WRITE_FAILED');}finally{client.release();}
 });
@@ -80,6 +82,7 @@ app.post('/api/auth/register',async(req,res)=>{
   try{await q('INSERT INTO accounts(id,email,password_hash) VALUES($1,$2,$3)',[uid,email,hash]);
     await q("INSERT INTO sessions(token_hash,account_id,expires_at) VALUES($1,$2,now()+interval '14 days')",[sha(sid),uid]);
     await recordActivation('account_created',uid);
+    try{if(req.body?.referral_code)await attachReferral(uid,req.body.referral_code);}catch(e){console.error('signup_referral_write_failed',e?.code||'UNKNOWN');}
     cookie(res,sid);res.status(201).json({account:{id:uid,email,plan:'free'}});
   }catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'EMAIL_ALREADY_EXISTS':'REGISTER_FAILED');}
 });
@@ -194,6 +197,7 @@ app.get('/api/admin/funnel',operator,async(req,res)=>{
    caveat:'Verified observed events only; test accounts are excluded. No website visits, externally distinct people or paid revenue inferred.'
  });
 });
+app.use(expansionRouter({auth,operator,stripe}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
@@ -310,6 +314,7 @@ app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
  if(!count.rows[0].n)return j(res,400,'ADD_A_TOOL_FIRST');
  const visibility=req.body?.visibility==='private'?'private':'public';
+ await snapshotServer(server.id);
  const {rows}=await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2 RETURNING *",[visibility,server.id]);
  await recordActivation('server_published',req.user.id,server.id);
  res.json({server:rows[0],endpoint:(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'')+'/mcp/'+server.slug});
