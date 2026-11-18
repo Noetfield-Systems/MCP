@@ -85,6 +85,24 @@ try{
    assert.ok(evidence.redacted,'no raw arguments or credential logging');
    const other=await fetch(base+'/api/servers/'+server.id+'/diagnostics',{signal:AbortSignal.timeout(9000)});
    assert.equal(other.status,401,'no anonymous access to diagnostics');
+   // A newly staged tool must not affect the live published MCP tool list.
+   const staged=await post('/api/servers/'+server.id+'/tools',{
+     name:'draft_probe',description:'Staged draft-only Hacker News read probe',
+     url:'https://hacker-news.firebaseio.com/v0/maxitem.json',params:[]
+   });
+   assert.equal(staged.tool.name,'draft_probe');
+   const dirty=await get('/api/servers/'+server.id);
+   assert.equal(dirty.server.status,'published','staged tool does not unpublish');
+   assert.equal(dirty.server.has_unpublished_changes,true);
+   const liveList=await privateClient.listTools();
+   assert.ok(liveList.tools.some(t=>t.name==='max_hn_item'));
+   assert.ok(!liveList.tools.some(t=>t.name==='draft_probe'),'draft tool is not remotely visible');
+   const continued=await privateClient.callTool({name:'max_hn_item',arguments:{}});
+   assert.ok(!continued.isError,'old published tool remains callable during edit');
+   const nextPublish=result(await client.callTool({name:'publish_server',arguments:{server_id:server.id,visibility:'private'}}));
+   assert.ok(nextPublish.published_revision>published.published_revision,'new immutable revision cutover');
+   const nextList=await privateClient.listTools();
+   assert.ok(nextList.tools.some(t=>t.name==='draft_probe'),'new tool appears only after published cutover');
    const stopped=await post('/api/servers/'+server.id+'/unpublish',{});
    assert.equal(stopped.status,'draft');
    const disabled=await fetch(base+'/mcp/'+slug,{method:'GET',signal:AbortSignal.timeout(8000)});
