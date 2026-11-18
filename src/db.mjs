@@ -51,6 +51,30 @@ export async function initDb(){
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS pilot_leads_created_idx ON pilot_leads(created_at DESC);
+  CREATE TABLE IF NOT EXISTS opportunity_applications (
+    id uuid PRIMARY KEY,
+    email text NOT NULL,
+    contact_name text NOT NULL,
+    track text NOT NULL CHECK (track IN (
+      'api_business','web3_builder','agency_partner',
+      'developer_contributor','community_distribution','strategic_partner'
+    )),
+    organization text NOT NULL DEFAULT '',
+    website text NOT NULL DEFAULT '',
+    github_url text NOT NULL DEFAULT '',
+    project_brief text NOT NULL,
+    source text NOT NULL DEFAULT 'direct',
+    contact_consent boolean NOT NULL DEFAULT true,
+    updates_consent boolean NOT NULL DEFAULT false,
+    status text NOT NULL DEFAULT 'new' CHECK (status IN ('new','contacted','qualified','collaborating','closed')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE(email,track)
+  );
+  CREATE INDEX IF NOT EXISTS opportunity_applications_status_date
+    ON opportunity_applications(status,created_at DESC);
+  CREATE INDEX IF NOT EXISTS opportunity_applications_track_date
+    ON opportunity_applications(track,created_at DESC);
   CREATE TABLE IF NOT EXISTS activation_events (
     id bigserial PRIMARY KEY,
     account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
