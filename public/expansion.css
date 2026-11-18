@@ -55,3 +55,12 @@
 .order-summary p{line-height:1.85}
 @media(max-width:950px){.connect-layout,.market-split,.team-columns{grid-template-columns:1fr}.market-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.expansion-main{padding-top:60px;padding-bottom:75px}.expansion-main>h1{font-size:clamp(44px,11vw,62px)}.product-panel{padding:20px}.market-list{grid-template-columns:1fr}.market-search select{width:100%}.market-search input{min-width:100%}.installer-destination{flex-direction:column}.team-item{flex-wrap:wrap}}
+
+.builder-growth{display:flex;justify-content:space-between;gap:17px;align-items:center;padding:18px 19px;margin:15px 0 16px;border:1px solid #4a5a79;border-radius:12px;background:linear-gradient(115deg,#212743,#14243b)}
+.builder-growth>div:first-child{flex:1}
+.builder-growth p{font-size:12px;color:#b6c5dd;line-height:1.75;margin:8px 0}
+.builder-growth .hint{font-size:11px;color:#a9dccc}
+.growth-actions{display:flex;gap:8px;flex-wrap:wrap;max-width:360px}
+.growth-actions .btn{font-size:11px;white-space:normal;text-align:center}
+@media(max-width:800px){.builder-growth{display:block}.growth-actions{max-width:none;margin-top:16px}}
+@media(max-width:480px){.growth-actions .btn{width:100%}}
