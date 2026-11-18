@@ -1,0 +1,25 @@
+name: Production MCP external acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "scripts/live-smoke.mjs"
+      - ".github/workflows/live-acceptance.yml"
+jobs:
+  live-mcp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: External production SDK v2 + website + DB acceptance
+        env:
+          FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
+        run: node scripts/live-smoke.mjs
