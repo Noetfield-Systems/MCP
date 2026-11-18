@@ -21,5 +21,8 @@
     "stripe": "^23.0.0",
     "undici": "^7.16.0",
     "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0"
   }
 }
