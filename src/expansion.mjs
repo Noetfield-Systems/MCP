@@ -2,6 +2,7 @@ import express from 'express';
 import {randomUUID,randomBytes,createHash} from 'node:crypto';
 import {q,pool,ownedServer} from './db.mjs';
 import {validatedTarget} from './security.mjs';
+import {publishDraftServer} from './publication.mjs';
 
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const str=(v,max=200)=>typeof v==='string'?v.trim().slice(0,max):'';
@@ -72,9 +73,9 @@ export function expansionRouter({auth,operator,stripe}){
  router.get('/api/marketplace',async(req,res)=>{
   const term=str(req.query.q,80),category=str(req.query.category,40);
   const {rows}=await q(`SELECT s.slug,s.name,s.description,l.tagline,l.category,l.docs_url,l.verified_at,l.updated_at,
-    (SELECT count(*)::int FROM tools t WHERE t.server_id=s.id) AS tools
+    jsonb_array_length(s.published_snapshot->'tools')::int AS tools
     FROM marketplace_listings l JOIN servers s ON s.id=l.server_id
-    WHERE s.visibility='public' AND s.status='published'
+    WHERE s.visibility='public' AND s.status='published' AND s.published_snapshot IS NOT NULL
       AND ($1='' OR s.name ILIKE '%'||$1||'%' OR l.tagline ILIKE '%'||$1||'%')
       AND ($2='' OR l.category=$2)
     ORDER BY l.verified_at DESC NULLS LAST,l.updated_at DESC LIMIT 60`,[term,category]);
@@ -85,7 +86,8 @@ export function expansionRouter({auth,operator,stripe}){
     FROM marketplace_listings l JOIN servers s ON s.id=l.server_id
     WHERE s.slug=$1 AND s.visibility='public' AND s.status='published'`,[req.params.slug]);
   if(!rows.length)return fail(res,404,'LISTING_NOT_FOUND');
-  const tools=(await q('SELECT name,description,params FROM tools WHERE server_id=(SELECT id FROM servers WHERE slug=$1)',[req.params.slug])).rows;
+  const snapshot=(await q('SELECT published_snapshot FROM servers WHERE slug=$1',[req.params.slug])).rows[0]?.published_snapshot;
+  const tools=(snapshot?.tools||[]).map(t=>({name:t.name,description:t.description,params:t.params}));
   res.json({listing:rows[0],tools});
  });
  router.put('/api/servers/:id/listing',auth,async(req,res)=>{
@@ -110,7 +112,7 @@ export function expansionRouter({auth,operator,stripe}){
  router.get('/api/servers/:id/revisions',auth,async(req,res)=>{
   const server=await ownedServer(req.params.id,req.user.id);if(!server)return fail(res,404,'SERVER_NOT_FOUND');
   const {rows}=await q('SELECT id,version,created_at,jsonb_array_length(snapshot->\'tools\') AS tools FROM server_revisions WHERE server_id=$1 ORDER BY version DESC LIMIT 50',[server.id]);
-  res.json({revisions:rows,note:'Restoring creates an unpublished draft; publish separately after review.'});
+  res.json({revisions:rows,active_revision:server.published_revision,has_unpublished_changes:server.has_unpublished_changes,note:'Restoring changes only draft tools. The active published endpoint remains unchanged until republished.'});
  });
  router.post('/api/servers/:id/revisions/:revisionId/restore',auth,async(req,res)=>{
   const server=await ownedServer(req.params.id,req.user.id);if(!server)return fail(res,404,'SERVER_NOT_FOUND');
@@ -184,9 +186,10 @@ export function expansionRouter({auth,operator,stripe}){
   if(!rows.length)return fail(res,403,'TEAM_EDITOR_REQUIRED');
   const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[rows[0].id]);
   if(!count.rows[0].n)return fail(res,400,'ADD_A_TOOL_FIRST');
-  await snapshotServer(rows[0].id);
-  await q("UPDATE servers SET status='published',updated_at=now() WHERE id=$1",[rows[0].id]);
-  res.json({published:true,slug:rows[0].slug,collaborator_role:'editor'});
+  const current=(await q('SELECT visibility FROM servers WHERE id=$1',[rows[0].id])).rows[0];
+  let published;try{published=await publishDraftServer(rows[0].id,current?.visibility||'public');}
+  catch(e){return fail(res,409,e.message||'PUBLISH_FAILED');}
+  res.json({published:true,slug:rows[0].slug,published_revision:published.version,collaborator_role:'editor'});
  });
  router.get('/api/admin/pilot-orders',operator,async(_req,res)=>{
   const {rows}=await q(`SELECT o.id,o.lead_id,o.amount_cents,o.currency,o.description,o.status,o.created_at,o.completed_at,
