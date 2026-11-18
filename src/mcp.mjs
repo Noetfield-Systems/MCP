@@ -8,6 +8,7 @@ import {recordActivation} from './activation.mjs';
 import {parseOpenapi,openapiPreview} from './openapi.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
 import {guardedManagedGet} from './oauth.mjs';
+import {classifyToolError} from './diagnostics.mjs';
 import {randomUUID} from 'node:crypto';
 
 function schemaFor(params){
@@ -19,19 +20,20 @@ function schemaFor(params){
   return z.object(shape);
 }
 async function executeTool(server,tool,args,principal){
-  const start=Date.now();let success=false;
+  const start=Date.now();let success=false,errorCode=null,upstreamStatus=null;
   try {
     if(tool.method!=='GET')throw new Error('Only read-only GET tools are enabled');
     const count=await q('SELECT count(*)::int AS n FROM tool_events WHERE server_id=$1 AND created_at>now()-interval \'1 day\'',[server.id]);
     if(count.rows[0].n >= (server.owner_plan==='pro'?25000:500))throw new Error('Daily execution quota reached');
     const target=toolUrl(tool,args);
     const result=await guardedManagedGet(server,principal,target);
-    success=true;
+    success=true;upstreamStatus=result.status;
     return {content:[{type:'text',text:result.body}],structuredContent:{status:result.status,contentType:result.contentType,source:target}};
   } catch(error){
-    return {isError:true,content:[{type:'text',text:String(error.message||error).slice(0,250)}]};
+    errorCode=classifyToolError(error);
+    return {isError:true,content:[{type:'text',text:errorCode}]};
   } finally {
-    await q('INSERT INTO tool_events(server_id,tool_name,account_id,success,duration_ms) VALUES($1,$2,$3,$4,$5)',[server.id,tool.name,principal?.id||null,success,Date.now()-start]).catch(()=>{});
+    await q('INSERT INTO tool_events(server_id,tool_name,account_id,success,duration_ms,error_code,upstream_status) VALUES($1,$2,$3,$4,$5,$6,$7)',[server.id,tool.name,principal?.id||null,success,Date.now()-start,errorCode,upstreamStatus]).catch(()=>{});
   }
 }
 export function managedMcp(server,tools,principal){
