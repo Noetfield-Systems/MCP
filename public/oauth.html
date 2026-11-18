@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1121"><title>OAuth Connections — MCP Foundry</title>
+<meta name="description" content="Connect a GitHub account to a private MCP Foundry server through OAuth authorization-code PKCE, with encrypted server-side credentials."><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"></head>
+<body><header class="nav"><a class="brand" href="/"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a><nav><a href="/">Platform</a><a href="/connect">Connect</a><a href="/team">Teams</a><a href="/marketplace">Marketplace</a></nav><div class="nav-actions"><a class="btn btn-small btn-primary" href="/#studio">Open Studio</a></div></header>
+<main class="wrap expansion-main"><div class="section-kicker">P1 / AUTHENTICATED API CONNECTIONS</div><h1>Your APIs.<br><em>Your authorization.</em></h1>
+<p class="expansion-intro">Connect GitHub with an authorization-code and PKCE flow. Foundry stores access credentials encrypted on the server and only sends them to <code>api.github.com</code> for explicitly private, owner-authenticated MCP server calls.</p>
+<div class="connect-layout"><section class="product-panel"><span class="workspace-eyebrow">GITHUB / PROVIDER CONNECTION</span><h3 id="oauth-heading">Checking OAuth configuration…</h3>
+<p id="oauth-description">Loading your account-specific connection state…</p><button class="btn btn-primary" id="oauth-connect" disabled>Connect GitHub securely</button>
+<button class="btn btn-outline" id="oauth-disconnect" disabled>Disconnect from Foundry</button><p class="status-readout" id="oauth-feedback" role="status"></p>
+<div id="oauth-scopes" class="expansion-note"></div>
+<div class="inner-title" style="margin-top:32px"><h4>Bind to a private MCP server</h4><p>This switches any selected server into a private draft before OAuth is applied. It cannot be published publicly while bound.</p></div>
+<label class="expansion-label">Server you own<select id="oauth-server"></select></label><button class="btn btn-outline" id="oauth-bind" disabled>Bind GitHub token to server</button>
+<div id="oauth-bindings" class="team-list"></div></section>
+<aside class="product-panel"><span class="workspace-eyebrow">HOW PERMISSIONS WORK</span><h3>A constrained OAuth route.</h3><div class="connect-checklist">
+<div><span>01</span> Authenticate to your existing Foundry workspace</div><div><span>02</span> Approve GitHub's limited user-profile read scope</div><div><span>03</span> Assign the connection only to a private MCP server</div><div><span>04</span> Execute HTTPS GET requests only to api.github.com</div><div><span>05</span> Disconnect locally and revoke remote access in GitHub if needed</div>
+</div><p class="expansion-note">GitHub OAuth application credentials must be configured by the Foundry operator before this connector can authorize a user. The presence of this page does not mean a GitHub account is connected. OAuth for arbitrary third-party providers is not enabled here.</p>
+<a class="btn btn-outline" href="/developers">Read developer docs</a></aside></div>
+</main><footer class="footer wrap"><span>MCP FOUNDRY · OWNER-CONTROLLED CONNECTIONS</span><a href="/privacy">Privacy</a></footer><script type="module" src="/oauth.js"></script></body></html>
