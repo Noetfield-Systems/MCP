@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1121">
+<meta name="description" content="MCP Foundry: turn existing APIs into production MCP servers. Build, test, publish, connect, and measure real usage.">
+<title>MCP Foundry — Your API. Everywhere AI Works.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<div class="page-bg" aria-hidden="true"></div>
+<header class="nav">
+ <a href="#home" class="brand"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a>
+ <nav aria-label="Main navigation"><a href="#capabilities">Platform</a><a href="#catalog">Explore servers</a><a href="#studio">Studio</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></nav>
+ <div class="nav-actions"><span class="live-indicator"><span class="pulse"></span> Public directory</span><button class="btn btn-small btn-outline" id="nav-login">Sign in</button><a class="btn btn-small btn-primary" href="#studio">Launch studio <span>↗</span></a></div>
+ <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">☰</button>
+</header>
+<main>
+<section id="home" class="hero wrap">
+ <div class="hero-copy">
+  <div class="eyebrow"><span class="tiny-star">✦</span> MODEL CONTEXT PROTOCOL INFRASTRUCTURE <span class="eyebrow-rule"></span> SPEC 2026-07-28</div>
+  <h1>Your API.<br><em>Everywhere</em><br>AI works<span class="period">.</span></h1>
+  <p>Build a real MCP server from an existing API. Test tools against live endpoints. Publish once, connect from compatible AI clients, and understand every invocation.</p>
+  <div class="hero-actions"><a href="#studio" class="btn btn-primary btn-large">Build your first server <span>↗</span></a><a href="#developers" class="btn btn-ghost btn-large">Explore documentation <span>↗</span></a></div>
+  <div class="hero-proof"><span class="proof-icon">✓</span> Open protocol <span class="proof-separator"></span> Portable endpoints <span class="proof-separator"></span> No vendor lock-in</div>
+ </div>
+ <div class="hero-art">
+  <div class="art-grid"></div>
+  <div class="orbit orbit-outer"></div><div class="orbit orbit-inner"></div>
+  <div class="node node-api"><span class="node-symbol">{ }</span><div><b>Your API</b><small>HTTPS · OpenAPI</small></div></div>
+  <div class="node node-core"><span class="core-mark"><span class="core-hex">◆</span></span><div><small>BUILT WITH</small><b>MCP FOUNDRY</b></div></div>
+  <div class="node node-mcp"><span class="node-symbol">⌘</span><div><b>MCP Server</b><small>Remote · v2</small></div></div>
+  <div class="node node-client-a"><span>✳</span><div><b>AI Clients</b><small>Portable access</small></div></div>
+  <div class="node node-client-b"><span>↗</span><div><b>Developer Apps</b><small>SDK ready</small></div></div>
+  <div class="pathline path-one"></div><div class="pathline path-two"></div><div class="pathline path-three"></div>
+  <div class="hero-art-caption"><span class="dot-green"></span> STANDARD-NATIVE TOOL DELIVERY <span class="label-right">FIG. 01 — THE FOUNDRY</span></div>
+ </div>
+</section>
+<section class="trustbar wrap"><span>ONE WORKSPACE. THE FULL MCP LIFECYCLE.</span><div><strong>01</strong> Create</div><div><strong>02</strong> Connect</div><div><strong>03</strong> Publish</div><div><strong>04</strong> Operate</div></section>
+<section id="capabilities" class="section wrap">
+ <div class="section-kicker">THE PLATFORM <span>01 / 05</span></div>
+ <div class="section-head"><h2>Everything between<br>your API and <em>the agent economy.</em></h2><p>A real developer product, not a list of links. Turn endpoints into usable tools and operate them from a single workspace.</p></div>
+ <div class="feature-grid">
+  <article class="feature-card large-feature"><div class="feature-index">01 — BUILD</div><div class="api-preview"><div class="file-tabs"><span class="active-tab">openapi.yaml</span><span>tools/list</span></div><pre><span class="code-purple">paths:</span>
+  <span class="code-amber">/v1/products:</span>
+    <span class="code-purple">get:</span>
+      <span class="code-muted">operationId:</span> list_products
+      <span class="code-muted">summary:</span> List available products
+      <span class="code-muted">parameters:</span>
+        - name: category
+          in: query
+          schema: { type: string }</pre><div class="code-success"><span>✓</span> Discover and import read-only tools</div></div><h3>From OpenAPI to MCP.</h3><p>Import existing GET operations, validate their schemas and generate a usable MCP tool catalog without hand-building a second API.</p></article>
+  <article class="feature-card"><div class="feature-index">02 — TEST</div><div class="feature-visual test-lines"><span>INPUT → FETCH → RESPONSE</span><div class="test-row"><i></i><b>DNS protection</b><span>ENABLED</span></div><div class="test-row"><i></i><b>Timeout limits</b><span>8 SEC</span></div><div class="test-row"><i></i><b>Response budget</b><span>256 KB</span></div></div><h3>Run it before you ship.</h3><p>Real HTTPS requests with bounded execution, explicit errors, and no simulated responses.</p></article>
+  <article class="feature-card"><div class="feature-index">03 — DEPLOY</div><div class="feature-visual deploy-visual"><span class="endpoint-label">SERVER ENDPOINT</span><div>/mcp/<strong>your-server</strong></div><span class="deploy-tag">Streamable HTTP · 2026</span></div><h3>One publish. Many hosts.</h3><p>Portable remote endpoints compatible with the official MCP SDK, including modern and legacy stateless clients.</p></article>
+  <article class="feature-card"><div class="feature-index">04 — OBSERVE</div><div class="feature-visual visual-bars"><span>INVOCATION TELEMETRY</span><div class="bars"><i style="height:30%"></i><i style="height:70%"></i><i style="height:44%"></i><i style="height:82%"></i><i style="height:60%"></i><i style="height:92%"></i><i style="height:73%"></i></div><small>Illustrative chart — workspace shows real calls</small></div><h3>Measure what actually runs.</h3><p>Track successful invocations, latency and limits. Real traffic is counted; directory views are not treated as customers.</p></article>
+ </div>
+</section>
+<section class="section section-catalog" id="catalog"><div class="wrap">
+ <div class="section-kicker">DISCOVER <span>02 / 05</span></div>
+ <div class="section-head"><h2>A directory of<br><em>usable MCP servers.</em></h2><p>Only customer-published servers appear here. No manufactured ratings, businesses, or usage counts.</p></div>
+ <div class="catalog-top"><label class="search"><span>⌕</span><input id="catalog-search" placeholder="Search published servers" aria-label="Search servers"></label><div class="catalog-filter">Public · Published</div></div>
+ <div id="catalog-list" class="catalog-list"><div class="empty-state">Loading live directory…</div></div>
+ <div class="catalog-bottom"><span id="catalog-count">Live registry</span><a href="#studio">Publish your own <span>↗</span></a></div>
+</div></section>
+<section id="studio" class="section wrap">
+ <div class="section-kicker">BUILD & MANAGE <span>03 / 05</span></div>
+ <div class="section-head"><h2>Meet your<br><em>MCP workspace.</em></h2><p>Create, import, test and publish from one focused interface. Your tools and usage are persisted against your account.</p></div>
+ <div class="workspace-shell">
+  <div class="workspace-sidebar"><div class="workspace-sidebar-title">WORKSPACE <span class="side-light">/ FOUNDRY</span></div>
+   <button class="side-item active" data-panel="servers"><span>▦</span> Servers</button><button class="side-item" data-panel="keys"><span>⌑</span> API keys</button><button class="side-item" data-panel="billing"><span>◫</span> Billing</button>
+   <div class="sidebar-bottom"><div class="side-avatar">F</div><div><b id="sidebar-account">Guest access</b><small id="sidebar-plan">Sign in to create servers</small></div></div>
+  </div>
+  <div class="workspace-content">
+   <div id="studio-auth" class="studio-auth"><div class="auth-header"><div class="auth-icon">⌘</div><span>YOUR BUILDER ACCOUNT</span></div><h3>Start building MCP servers.</h3><p>Create a workspace to generate portable endpoints and test real tool calls.</p>
+    <form id="auth-form" class="auth-form"><label>Email address<input required type="email" id="auth-email" autocomplete="email" placeholder="you@company.com"></label><label>Password<input required type="password" id="auth-password" minlength="12" autocomplete="current-password" placeholder="12+ characters"></label><button type="submit" class="btn btn-primary btn-large" id="auth-submit">Create workspace <span>↗</span></button></form>
+    <button class="auth-switch" id="auth-switch">Already have an account? Sign in</button><p class="form-feedback" id="auth-feedback" role="status"></p>
+   </div>
+   <div id="studio-app" class="studio-app hidden">
+    <div class="workspace-title"><div><span class="workspace-eyebrow">MY WORKSPACE</span><h3 id="workspace-heading">Your MCP servers</h3></div><button class="btn btn-primary btn-small" id="new-server">+ New server</button></div>
+    <p class="form-feedback" id="workspace-feedback" role="status"></p>
+    <div id="panel-servers" class="app-panel"><div id="server-list" class="server-list"><div class="empty-state">No servers yet. Create one to get started.</div></div><div id="server-detail" class="server-detail hidden"></div></div>
+    <div id="panel-keys" class="app-panel hidden"><div class="inner-title"><h4>Personal API keys</h4><p>Private MCP endpoints require a bearer key. Keys are shown once and stored as hashes.</p></div><div class="inline-form"><input id="key-label" placeholder="e.g. Cursor workstation"><button class="btn btn-primary btn-small" id="create-key">Generate key</button></div><div id="key-reveal" class="key-reveal hidden"></div><div id="key-list"></div></div>
+    <div id="panel-billing" class="app-panel hidden"><div class="inner-title"><h4>Workspace billing</h4><p>Free workspaces include two servers, ten tools per server, and 500 daily tool executions. Upgrade only when billing is configured.</p></div><div id="billing-panel"></div></div>
+   </div>
+  </div>
+ </div>
+</section>
+<section class="section developers-section" id="developers"><div class="wrap">
+ <div class="section-kicker">FOR DEVELOPERS <span>04 / 05</span></div><div class="section-head"><h2>Standard first.<br><em>Fully portable.</em></h2><p>Our built-in MCP directory uses the official TypeScript SDK v2. Publish your own endpoints or integrate Foundry with an existing MCP client.</p></div>
+ <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>The public endpoint lists genuine published servers and their tools. No account is needed for discovery; protected customer servers use bearer authentication.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" class="text-link">Read the MCP specification ↗</a></div>
+ <div class="dev-code"><div class="code-top"><span><i></i><i></i><i></i></span><b>mcp-client.json</b><button data-copy="mcp-url" class="copy-btn">COPY URL</button></div><pre id="dev-code">{
+  "mcpServers": {
+    "foundry": {
+      "type": "http",
+      "url": "<span id="public-mcp-url">/mcp/foundry</span>"
+    }
+  }
+}</pre><div class="code-foot"><span>◈</span> Remote discovery · Source-backed tools only</div></div></div>
+</div></section>
+<section class="section wrap" id="pricing"><div class="section-kicker">PRICING <span>05 / 05</span></div><div class="section-head"><h2>Start building.<br><em>Pay when you grow.</em></h2><p>Transparent limits. Paid checkout becomes available when the production Stripe account and webhook are configured.</p></div>
+ <div class="pricing-grid"><article class="price-card"><span class="plan-type">FREE / BUILD</span><h3>$0 <small>/ month</small></h3><p>For developers validating their first integrations.</p><ul><li>2 published or draft servers</li><li>10 tools per server</li><li>500 tool executions / day</li><li>Public or private endpoints</li><li>OpenAPI import and live testing</li></ul><a href="#studio" class="btn btn-outline btn-wide">Start for free ↗</a></article>
+ <article class="price-card featured-price"><div class="plan-ribbon">FOR TEAMS & PRODUCTION</div><span class="plan-type">PRO / SCALE</span><h3>Custom <small>/ contact us</small></h3><p>Higher limits and production operations for API businesses.</p><ul><li>Expanded servers and tool catalogs</li><li>25,000 executions / day per server</li><li>Usage visibility and private API keys</li><li>Integration engineering support</li><li>Billing-enabled upgrade when configured</li></ul><a href="#studio" class="btn btn-primary btn-wide">View upgrade options ↗</a></article></div>
+</section>
+<section class="final-cta wrap"><div><div class="eyebrow">FROM ENDPOINT TO ECOSYSTEM</div><h2>Make your software<br><em>agent-ready.</em></h2></div><a href="#studio" class="btn btn-light btn-large">Open the Foundry <span>↗</span></a></section>
+</main>
+<footer class="footer wrap"><div class="footer-brand"><span class="mark small"><i></i><i></i><i></i><i></i></span><span>MCP FOUNDRY</span><small>Built for the open agent ecosystem.</small></div><div class="footer-links"><a href="#capabilities">Platform</a><a href="#catalog">Directory</a><a href="#developers">Developers</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Independent product in the Noetfield portfolio.</div></footer>
+<div class="toast hidden" role="status" id="toast"></div>
+<script type="module" src="/app.js"></script>
+</body></html>
