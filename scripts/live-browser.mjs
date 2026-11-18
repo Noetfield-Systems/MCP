@@ -13,6 +13,7 @@ const page=await context.newPage();
 let registered=false;
 const errors=[];
 page.on('pageerror',error=>errors.push(error.message));
+page.on('response',response=>{if(response.url().endsWith('/api/auth/register')&&response.status()===201)registered=true;});
 async function click(selector){await page.locator(selector).click({timeout:15000});}
 try{
  const opened=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:30000});
@@ -21,7 +22,6 @@ try{
  await page.locator('#auth-password').fill(password);
  await click('#auth-submit');
  await page.locator('#studio-app').waitFor({state:'visible',timeout:15000});
- registered=true;
  await page.locator('[data-template="hacker_news"]').waitFor({state:'visible',timeout:15000});
  await click('[data-template="hacker_news"]');
  await page.locator('#server-detail').waitFor({state:'visible',timeout:15000});
@@ -33,13 +33,13 @@ try{
  await page.waitForFunction(()=>{
    const result=document.querySelector('#test-result');
    return result&&result.textContent.includes('"ok": true');
- },{timeout:20000});
+ },undefined,{timeout:20000});
  await click('[data-tab="overview"]');
  await click('#publish-server');
  await page.waitForFunction(()=>{
    const target=document.querySelector('#server-detail');
    return target&&target.textContent.includes('SELECTED SERVER · published');
- },{timeout:15000});
+ },undefined,{timeout:15000});
  await context.grantPermissions(['clipboard-read','clipboard-write'],{origin:base});
  await click('[data-copy="mcp-config"]');
  const copied=await page.evaluate(()=>navigator.clipboard.readText());
