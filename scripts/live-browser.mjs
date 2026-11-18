@@ -20,8 +20,11 @@ try{
  const opened=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:30000});
  assert.equal(opened.status(),200);
  await mkdir('artifacts',{recursive:true});
- await page.locator('.console-panel').waitFor({state:'visible',timeout:15000});
- assert.equal(await page.locator('.console-panel .chain-step').count(),3);
+ await page.locator('.preview-shell').waitFor({state:'visible',timeout:15000});
+ assert.equal(await page.locator('.preview-shell [data-wb-tab]').count(),3,'approved Builder tabs are present');
+  await page.locator('[data-wb-tab="result"]').click();
+  assert.equal(await page.locator('#wb-code-kind').innerText(),'ILLUSTRATIVE JSON','Builder preview tabs work without claiming live requests');
+  await page.locator('[data-wb-tab="definition"]').click();
  assert.equal(await page.locator('.showcase-card').count(),3);
  assert.equal(await page.locator('.faq-item').count(),10);
  await page.locator('.faq-item').first().locator('summary').click();
@@ -32,7 +35,7 @@ try{
  await page.screenshot({path:'artifacts/foundry-desktop.png',fullPage:true,animations:'disabled'});
  const priceLink=page.locator('.featured-price .btn');
  assert.equal(await priceLink.getAttribute('href'),'#implementation','custom plan CTA uses an active commercial funnel');
- assert.ok((await page.locator('.hero-proof').innerText()).includes('Open MCP standard'),'avoid unsupported self-host portability claim');
+ assert.ok((await page.locator('.hero-proof').innerText()).includes('Official MCP Registry'),'avoid unsupported self-host portability claim');
  assert.equal(await page.locator('.quickstart-offer').count(),1,'fixed-scope commercial offer is visible');
  const link=page.locator('.quickstart-purchase .btn');
  assert.equal(await link.getAttribute('href'),'https://buy.stripe.com/5kQ7sMaLm81SeWSfPu1Nu0j','real account-specific live Stripe Checkout link');
@@ -75,8 +78,8 @@ try{
      };
    });
    assert.deepEqual(values.links,expectedNav,'same navigation across '+route);
-   assert.equal(values.headerHeight,72,'same mobile header height on '+route);
-   assert.ok(values.font.includes('DM Sans'),'consistent brand body font '+route);
+   assert.equal(values.headerHeight,64,'same mobile header height on '+route);
+   assert.ok(values.font.includes('Inter'),'consistent brand body font '+route);
    assert.ok(values.theme,'shared design tokens loaded on '+route);
    if(values.scroll>values.width+3){
      const offenders=await page.evaluate(()=>[...document.querySelectorAll('body *')]
@@ -123,7 +126,7 @@ try{
      header:Math.round(document.querySelector('header.foundry-nav').getBoundingClientRect().height),
      headerBg:getComputedStyle(document.querySelector('header.foundry-nav')).backgroundColor
    }));
-   assert.equal(metrics.header,82,'consistent desktop header height on '+route);
+   assert.equal(metrics.header,70,'consistent desktop header height on '+route);
    assert.ok(metrics.scroll<=metrics.viewport+3,'no desktop horizontal overflow on '+route+': '+JSON.stringify(metrics));
    if(['/solutions','/web3','/collaborate','/connect'].includes(route)){
      await page.screenshot({path:'artifacts/foundry-'+route.slice(1)+'-desktop.png',fullPage:true,animations:'disabled'});
