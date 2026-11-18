@@ -9,6 +9,7 @@ import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl
 import {managedMcp,foundryMcp} from './mcp.mjs';
 import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
+import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -268,9 +269,24 @@ app.post('/api/servers/:id/tools',auth,async(req,res)=>{
   await q('UPDATE servers SET status=$1,updated_at=now() WHERE id=$2',['draft',server.id]);await recordActivation('tool_added',req.user.id,server.id);res.status(201).json({tool:rows[0]});
  }catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'DUPLICATE_TOOL_NAME':'TOOL_SAVE_FAILED');}
 });
+app.post('/api/servers/:id/preview-openapi',auth,async(req,res)=>{
+ const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
+ try{
+  const {document,origin}=await resolveOpenapiInput(req.body);
+  const preview=openapiPreview(document,req.body?.baseUrl);
+  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
+  const available=Math.max(0,(req.user.plan==='pro'?50:10)-count.rows[0].n);
+  return res.json({...preview,available,origin,note:'Preview only: no server tools or published endpoints changed.'});
+ }catch(e){return j(res,400,String(e?.message||'PREVIEW_FAILED').slice(0,120));}
+});
 app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
- let entries;try{entries=specTools(req.body?.document,req.body?.baseUrl);}catch(e){return j(res,400,e.message);}
+ let entries,origin;
+ try{
+   const resolved=await resolveOpenapiInput(req.body);
+   ({origin}=resolved);
+   entries=openapiPreview(resolved.document,req.body?.baseUrl).tools;
+ }catch(e){return j(res,400,String(e?.message||'IMPORT_FAILED').slice(0,120));}
  if(!entries.length)return j(res,400,'NO_GET_OPERATIONS_FOUND');
  let added=0;
  const existing=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
@@ -282,7 +298,7 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    if(added>= (req.user.plan==='pro'?50:10))break;
  }
  if(added){await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);await recordActivation('tool_added',req.user.id,server.id);}
- res.json({found:entries.length,added});
+ res.json({found:entries.length,added,origin,skipped:entries.length-added});
 });
 app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
