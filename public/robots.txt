@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /operator
+Disallow: /order/
 Disallow: /api/
 Disallow: /mcp/
 Sitemap: https://mcp-foundry-web-production.up.railway.app/sitemap.xml
