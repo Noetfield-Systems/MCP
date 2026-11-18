@@ -2,6 +2,7 @@ import {McpServer,createMcpHandler} from '@modelcontextprotocol/server';
 import {toNodeHandler} from '@modelcontextprotocol/node';
 import * as z from 'zod/v4';
 import {q} from './db.mjs';
+import {recordActivation} from './activation.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
 import {randomUUID} from 'node:crypto';
 
@@ -73,7 +74,7 @@ export function foundryMcp(principal=null){
         if(slug==='foundry')throw Error('Reserved server slug');
         const total=await q('SELECT count(*)::int n FROM servers WHERE owner_id=$1',[principal.id]);
         if(principal.plan!=='pro'&&total.rows[0].n>=2)throw Error('Free server limit reached');
-        try{const {rows}=await q('INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING id,name,slug,status',[randomUUID(),principal.id,slug,name,description]);return {server:rows[0]};}
+        try{const {rows}=await q('INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING id,name,slug,status',[randomUUID(),principal.id,slug,name,description]);await recordActivation('server_created',principal.id,rows[0].id,'native_mcp');return {server:rows[0]};}
         catch(e){if(e.code==='23505')throw Error('Slug is already taken');throw e;}
       }));
       const param=z.object({
@@ -97,6 +98,7 @@ export function foundryMcp(principal=null){
         try{
           const {rows}=await q("INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,name",[randomUUID(),server.id,name,description,url,JSON.stringify(params)]);
           await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+          await recordActivation('tool_added',principal.id,server.id,'native_mcp');
           return {tool:rows[0],status:'draft'};
         }catch(e){if(e.code==='23505')throw Error('Duplicate tool name');throw e;}
       }));
@@ -117,7 +119,7 @@ export function foundryMcp(principal=null){
           const out=await q('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(server_id,name) DO NOTHING RETURNING id',[randomUUID(),server.id,tool.name,tool.description,tool.url,JSON.stringify(tool.params)]);
           added+=out.rowCount;
         }
-        if(added)await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+        if(added){await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);await recordActivation('tool_added',principal.id,server.id,'native_mcp');}
         return {found:entries.length,added,status:added?'draft':server.status};
       }));
       mcp.registerTool('test_readonly_tool',{
@@ -130,6 +132,7 @@ export function foundryMcp(principal=null){
         let args;try{args=JSON.parse(arguments_json);}catch{throw Error('Invalid tool argument JSON');}
         const source=toolUrl(rows[0],args);
         const data=await safeGet(source);
+        await recordActivation('tool_test_succeeded',principal.id,server.id,'native_mcp');
         return {ok:true,source,status:data.status,content_type:data.contentType,response:data.body.slice(0,16000)};
       }));
       mcp.registerTool('publish_server',{
@@ -140,6 +143,7 @@ export function foundryMcp(principal=null){
         const count=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
         if(!count.rows[0].n)throw Error('Add a tool before publishing');
         await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2",[visibility,server.id]);
+        await recordActivation('server_published',principal.id,server.id,'native_mcp');
         const base=(process.env.PUBLIC_URL||'').replace(/\/$/,'');
         return {status:'published',slug:server.slug,endpoint:base+'/mcp/'+server.slug,visibility};
       }));

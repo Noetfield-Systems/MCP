@@ -48,6 +48,19 @@ export async function initDb(){
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS pilot_leads_created_idx ON pilot_leads(created_at DESC);
+  CREATE TABLE IF NOT EXISTS activation_events (
+    id bigserial PRIMARY KEY,
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    server_id uuid REFERENCES servers(id) ON DELETE SET NULL,
+    name text NOT NULL CHECK(name IN (
+      'account_created','server_created','template_started','tool_added',
+      'tool_test_succeeded','server_published','api_key_created'
+    )),
+    source text NOT NULL CHECK(source IN ('studio','native_mcp')),
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS activation_events_account_date_idx ON activation_events(account_id,created_at DESC);
+  CREATE INDEX IF NOT EXISTS activation_events_name_date_idx ON activation_events(name,created_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }

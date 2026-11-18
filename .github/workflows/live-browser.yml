@@ -1,0 +1,36 @@
+name: Real Browser Production Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "scripts/live-browser.mjs"
+      - ".github/workflows/live-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Real browser external acceptance after Railway convergence
+        env:
+          FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/live-browser.mjs; then exit 0; fi
+            echo "Browser acceptance pending or failed (${attempt}/6)"
+            sleep 15
+          done
+          exit 1

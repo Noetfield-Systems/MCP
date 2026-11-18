@@ -8,6 +8,7 @@ import {q,initDb,requireAuth,ownedServer,pool} from './db.mjs';
 import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl,safeGet,enforceOrigin,throttle} from './security.mjs';
 import {managedMcp,foundryMcp} from './mcp.mjs';
 import {publicTemplates,findTemplate} from './templates.mjs';
+import {recordActivation} from './activation.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -77,6 +78,7 @@ app.post('/api/auth/register',async(req,res)=>{
   const uid=randomUUID(),sid=token();
   try{await q('INSERT INTO accounts(id,email,password_hash) VALUES($1,$2,$3)',[uid,email,hash]);
     await q("INSERT INTO sessions(token_hash,account_id,expires_at) VALUES($1,$2,now()+interval '14 days')",[sha(sid),uid]);
+    await recordActivation('account_created',uid);
     cookie(res,sid);res.status(201).json({account:{id:uid,email,plan:'free'}});
   }catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'EMAIL_ALREADY_EXISTS':'REGISTER_FAILED');}
 });
@@ -94,6 +96,14 @@ app.post('/api/auth/logout',async(req,res)=>{
  res.clearCookie('mcpf_session',{path:'/'});res.json({ok:true});
 });
 app.get('/api/me',auth,(req,res)=>res.json({account:req.user}));
+app.get('/api/me/activation',auth,async(req,res)=>{
+ const [events,live]=await Promise.all([
+   q("SELECT name,max(created_at) AS latest FROM activation_events WHERE account_id=$1 GROUP BY name",[req.user.id]),
+   q("SELECT count(*)::int AS successful_calls FROM tool_events te JOIN servers s ON s.id=te.server_id WHERE s.owner_id=$1 AND te.success=true",[req.user.id])
+ ]);
+ const completed=Object.fromEntries(events.rows.map(row=>[row.name,row.latest]));
+ res.json({completed,successful_managed_calls:live.rows[0].successful_calls,source:'observed_account_operations',payments_collected:null});
+});
 app.delete('/api/account',auth,async(req,res)=>{
   // Account owner must re-enter the password. This also makes temporary live
   // conformance accounts safely removable without leaving test traffic behind.
@@ -158,6 +168,31 @@ app.get('/api/admin/overview',operator,async(req,res)=>{
   ]);
   res.json({pilot_leads:leads.rows,accounts:accounts.rows[0].n,servers:servers.rows[0],observed_7d_calls:events.rows[0]});
 });
+// Distinct verified workspace stages; no pageviews, inferred humans or payment claims.
+app.get('/api/admin/funnel',operator,async(req,res)=>{
+ const [registrations,stageRows,tools,paidLeads]=await Promise.all([
+   q("SELECT count(*)::int n FROM accounts WHERE created_at>now()-interval '30 days' AND email NOT LIKE 'conformance-%@foundry.invalid'"),
+   q("SELECT ae.name,count(DISTINCT ae.account_id)::int AS accounts FROM activation_events ae JOIN accounts a ON a.id=ae.account_id WHERE ae.created_at>now()-interval '30 days' AND a.email NOT LIKE 'conformance-%@foundry.invalid' GROUP BY ae.name"),
+   q("SELECT count(DISTINCT s.owner_id)::int AS workspaces,count(*)::int AS successful_calls FROM tool_events te JOIN servers s ON s.id=te.server_id JOIN accounts a ON a.id=s.owner_id WHERE te.success=true AND te.created_at>now()-interval '30 days' AND a.email NOT LIKE 'conformance-%@foundry.invalid'"),
+   q("SELECT count(*)::int AS n FROM pilot_leads WHERE created_at>now()-interval '30 days'")
+ ]);
+ const stages=Object.fromEntries(stageRows.rows.map(r=>[r.name,r.accounts]));
+ return res.json({
+   window:'rolling_30_days',
+   accounts_created:registrations.rows[0].n,
+   template_started:stages.template_started||0,
+   created_server:stages.server_created||0,
+   added_tool:stages.tool_added||0,
+   first_live_test:stages.tool_test_succeeded||0,
+   published:stages.server_published||0,
+   minted_api_key:stages.api_key_created||0,
+   executed_managed_tool:tools.rows[0].workspaces,
+   successful_managed_calls:tools.rows[0].successful_calls,
+   scoped_pilot_enquiries:paidLeads.rows[0].n,
+   payments_collected:null,
+   caveat:'Verified observed events only; test accounts are excluded. No website visits, externally distinct people or paid revenue inferred.'
+ });
+});
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
@@ -170,7 +205,7 @@ app.post('/api/servers',auth,async(req,res)=>{
  if(!name||!validSlug(slug))return j(res,400,'VALID_NAME_AND_SLUG_REQUIRED');
  const count=await q('SELECT count(*)::int AS n FROM servers WHERE owner_id=$1',[req.user.id]);
  if(req.user.plan!=='pro'&&count.rows[0].n>=2)return j(res,403,'FREE_SERVER_LIMIT_REACHED');
- try{const {rows}=await q("INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING *",[randomUUID(),req.user.id,slug,name,description]);res.status(201).json({server:rows[0]});}
+ try{const {rows}=await q("INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING *",[randomUUID(),req.user.id,slug,name,description]);await recordActivation('server_created',req.user.id,rows[0].id);res.status(201).json({server:rows[0]});}
  catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'SLUG_TAKEN':'SERVER_CREATE_FAILED');}
 });
 app.post('/api/servers/from-template',auth,async(req,res)=>{
@@ -193,6 +228,7 @@ app.post('/api/servers/from-template',auth,async(req,res)=>{
         [randomUUID(),id,tool.name,tool.description,tool.url,JSON.stringify(tool.params)]);
     }
     await client.query('COMMIT');
+    await recordActivation('template_started',req.user.id,id);
     res.status(201).json({server:created.rows[0],template_id:template.id,sample_args:template.sampleArgs,tools_added:template.tools.length,source:template.source});
   }catch(error){await client.query('ROLLBACK');console.error('template_create_failed',error?.code||'UNKNOWN');j(res,500,'TEMPLATE_CREATE_FAILED');}
   finally{client.release();}
@@ -229,7 +265,7 @@ app.post('/api/servers/:id/tools',auth,async(req,res)=>{
  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
  if(req.user.plan!=='pro'&&count.rows[0].n>=10)return j(res,403,'FREE_TOOL_LIMIT_REACHED');
  try{const {rows}=await q('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) RETURNING *',[randomUUID(),server.id,req.body.name.toLowerCase(),req.body.description,req.body.url,JSON.stringify(req.body.params)]);
-  await q('UPDATE servers SET status=$1,updated_at=now() WHERE id=$2',['draft',server.id]);res.status(201).json({tool:rows[0]});
+  await q('UPDATE servers SET status=$1,updated_at=now() WHERE id=$2',['draft',server.id]);await recordActivation('tool_added',req.user.id,server.id);res.status(201).json({tool:rows[0]});
  }catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'DUPLICATE_TOOL_NAME':'TOOL_SAVE_FAILED');}
 });
 app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
@@ -245,7 +281,7 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    added+=out.rowCount;
    if(added>= (req.user.plan==='pro'?50:10))break;
  }
- if(added)await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+ if(added){await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);await recordActivation('tool_added',req.user.id,server.id);}
  res.json({found:entries.length,added});
 });
 app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
@@ -259,6 +295,7 @@ app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  if(!count.rows[0].n)return j(res,400,'ADD_A_TOOL_FIRST');
  const visibility=req.body?.visibility==='private'?'private':'public';
  const {rows}=await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2 RETURNING *",[visibility,server.id]);
+ await recordActivation('server_published',req.user.id,server.id);
  res.json({server:rows[0],endpoint:(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'')+'/mcp/'+server.slug});
 });
 app.patch('/api/tools/:id',auth,async(req,res)=>{
@@ -282,7 +319,7 @@ app.delete('/api/tools/:id',auth,async(req,res)=>{
 });
 app.post('/api/tools/:id/test',auth,async(req,res)=>{
  const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);const tool=rows[0];if(!tool)return j(res,404,'TOOL_NOT_FOUND');
- const started=Date.now();try{const source=toolUrl(tool,req.body?.args||{}),data=await safeGet(source);res.json({ok:true,source,duration_ms:Date.now()-started,response:data.body.slice(0,16000)});}
+ const started=Date.now();try{const source=toolUrl(tool,req.body?.args||{}),data=await safeGet(source);await recordActivation('tool_test_succeeded',req.user.id,tool.server_id);res.json({ok:true,source,duration_ms:Date.now()-started,response:data.body.slice(0,16000)});}
  catch(e){res.status(422).json({ok:false,error:e.message,duration_ms:Date.now()-started});}
 });
 app.get('/api/servers/:id/usage',auth,async(req,res)=>{
@@ -295,6 +332,7 @@ app.get('/api/keys',auth,async(req,res)=>{
 app.post('/api/keys',auth,async(req,res)=>{
  const secret='fdy_'+token(),prefix=secret.slice(0,12);
  const {rows}=await q('INSERT INTO api_keys(id,owner_id,token_hash,prefix,label) VALUES($1,$2,$3,$4,$5) RETURNING id,prefix,label,created_at',[randomUUID(),req.user.id,sha(secret),prefix,string(req.body?.label,50)||'Developer key']);
+ await recordActivation('api_key_created',req.user.id);
  res.status(201).json({key:rows[0],secret});
 });
 app.delete('/api/keys/:id',auth,async(req,res)=>{

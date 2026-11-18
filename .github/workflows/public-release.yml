@@ -1,0 +1,42 @@
+name: Public Foundry Release
+on:
+  workflow_run:
+    workflows: ["Production MCP external acceptance"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Skip stale verification and existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test "$(git rev-parse origin/main)" = "$VERIFIED_SHA" || {
+            echo "Skipping release for stale verified SHA"; exit 0;
+          }
+          if gh release view v0.1.0 >/dev/null 2>&1; then
+            echo "v0.1.0 already exists and will not be overwritten"
+            exit 0
+          fi
+          test -f docs/RELEASE-v0.1.0.md
+          curl --fail --silent --show-error --location \
+            "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); o=d.get('server',d); assert o['name']=='io.github.Noetfield-Systems/mcp-foundry' and o['version']=='0.1.0'; print('OFFICIAL_REGISTRY_READBACK_PASS')"
+          gh release create v0.1.0 \
+            --target "$VERIFIED_SHA" \
+            --title "MCP Foundry v0.1.0 — Native MCP Builder" \
+            --notes-file docs/RELEASE-v0.1.0.md \
+            --latest
+          gh release view v0.1.0 --json url,tagName,name

@@ -21,6 +21,20 @@ function displayStats(d){
  ];
  $('#operator-stats').innerHTML=data.map(([label,value])=>'<div class="usage-card"><b>'+escapeHtml(value)+'</b><small>'+escapeHtml(label)+'</small></div>').join('');
 }
+function displayFunnel(f){
+  const points=[
+    ['Created accounts',f.accounts_created],
+    ['Started template',f.template_started],
+    ['Created a server',f.created_server],
+    ['Added a tool',f.added_tool],
+    ['Ran a successful live test',f.first_live_test],
+    ['Published MCP server',f.published],
+    ['Executed a managed tool',f.executed_managed_tool],
+    ['Submitted an implementation enquiry',f.scoped_pilot_enquiries]
+  ];
+  const max=Math.max(1,...points.map(item=>Number(item[1])||0));
+  $('#operator-funnel').innerHTML='<div class="funnel-grid">'+points.map(([name,count])=>'<div class="funnel-item"><div class="funnel-heading"><strong>'+escapeHtml(name)+'</strong><b>'+escapeHtml(count)+'</b></div><div class="funnel-track"><span style="width:'+Math.max(0,Math.min(100,Math.round((Number(count)||0)/max*100)))+'%"></span></div></div>').join('')+'</div><p class="hint">Rolling 30-day distinct account events; stages are not a linear cohort. Tool calls represent real upstream executions, not unique buyers. Revenue is not inferred from enquiry counts.</p>';
+}
 function displayLeads(leads){
  const tbody=$('#operator-leads');
  if(!leads.length){tbody.innerHTML='<tr><td colspan="5">No consented implementation requests have been received yet. This is a real empty state, not an estimate.</td></tr>';return;}
@@ -31,11 +45,12 @@ function displayLeads(leads){
  }).join('');
 }
 async function load(){
- const [stats,leads]=await Promise.all([
+ const [stats,leads,funnel]=await Promise.all([
   operatorRequest('GET','/api/admin/overview'),
-  operatorRequest('GET','/api/admin/pilot-interest')
+  operatorRequest('GET','/api/admin/pilot-interest'),
+  operatorRequest('GET','/api/admin/funnel')
  ]);
- displayStats(stats);displayLeads(leads.leads);
+ displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);
  $('#operator-action-feedback').textContent='Observed as of '+new Date().toLocaleString();
 }
 $('#operator-form').addEventListener('submit',async event=>{
