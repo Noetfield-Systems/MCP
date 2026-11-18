@@ -2,6 +2,9 @@
 
 **Scope:** Only the independent Noetfield-Systems/MCP repository and its customers, leads, engineering and revenue. Never merge or redirect work to another venture.
 
+## Strategy V3 commercial targeting (18 November 2026)
+The current priority is **existing API businesses with their own users**, then technical agencies with repeat customer projects; self-serve developers and Web3 data are parallel channels, not automatically buyers. Sell scoped implementation and customer docs distribution immediately while preserving the existing CA$199 payment link. Test agency repeat orders and customer-visible installs before building marketplace payouts or generic connector catalogs. See [V3 strategy and 100-action priorities](STRATEGY-PRIORITIES-2026-11-18.md). This is a revised go-to-market priority, not evidence of completed sales.
+
 ## Commercial thesis
 
 1. **API companies and agencies:** Build a real agent-ready interface for an existing public API. Buyers can self-serve or buy a fixed-scope integration.
