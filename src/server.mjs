@@ -30,7 +30,7 @@ const auth=(...args)=>requireAuth(...args);
 const readKey=async(raw)=>{if(!raw?.startsWith('fdy_'))return null;const {rows}=await q('SELECT a.id,a.email,a.plan FROM api_keys k JOIN accounts a ON a.id=k.owner_id WHERE k.token_hash=$1 AND k.revoked_at IS NULL',[sha(raw)]);return rows[0]||null;};
 
 app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,product:'MCP Foundry',store:'postgres',protocol:'2026-07-28'});}catch{res.status(503).json({ok:false,error:'DATABASE_UNAVAILABLE'});}});
-app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()}}));
+app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),custom_checkout_available:!!(stripe&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
 app.all('/mcp/foundry',async(req,res,next)=>{
@@ -131,20 +131,22 @@ app.post('/api/pilot-interest',async(req,res)=>{
   const company=string(req.body?.company,160);
   const website=string(req.body?.website,300);
   const project_brief=string(req.body?.project_brief,2000);
+  const service_package=string(req.body?.service_package,30).toLowerCase()||'custom';
+  if(!['quickstart','launch','private','care','agency','custom'].includes(service_package))return j(res,400,'INVALID_SERVICE_PACKAGE');
   // Honeypot is ignored without creating any stored prospect record.
   if(req.body?.nickname)return res.status(202).json({received:true});
   if(req.body?.contact_consent!==true)return j(res,400,'CONTACT_CONSENT_REQUIRED');
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!contact_name||project_brief.length<20)return j(res,400,'NAME_EMAIL_AND_PROJECT_BRIEF_REQUIRED');
   if(website){try{const parsed=new URL(website);if(parsed.protocol!=='https:')return j(res,400,'HTTPS_WEBSITE_REQUIRED');}catch{return j(res,400,'VALID_WEBSITE_REQUIRED');}}
   try{
-    const {rows}=await q(`INSERT INTO pilot_leads(id,email,contact_name,company,website,project_brief,marketing_consent)
-      VALUES($1,$2,$3,$4,$5,$6,$7)
+    const {rows}=await q(`INSERT INTO pilot_leads(id,email,contact_name,company,website,project_brief,marketing_consent,service_package)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8)
       ON CONFLICT(email) DO UPDATE SET contact_name=excluded.contact_name,company=excluded.company,
       website=excluded.website,project_brief=excluded.project_brief,marketing_consent=excluded.marketing_consent,
-      updated_at=now()
+      service_package=excluded.service_package,updated_at=now()
       RETURNING id,created_at`,
-      [randomUUID(),email,contact_name,company,website,project_brief,req.body?.marketing_consent===true]);
-    return res.status(202).json({received:true,reference:rows[0].id,kind:'pilot_enquiry',payment_collected:false});
+      [randomUUID(),email,contact_name,company,website,project_brief,req.body?.marketing_consent===true,service_package]);
+    return res.status(202).json({received:true,reference:rows[0].id,kind:'pilot_enquiry',service_package,payment_collected:false});
   }catch(error){console.error('pilot_lead_write_failed',error?.code||'UNKNOWN');return j(res,503,'ENQUIRY_SAVE_UNAVAILABLE');}
 });
 // Admin access is an independent operator secret: public account emails
@@ -158,7 +160,7 @@ const operator=(req,res,next)=>{
  next();
 };
 app.get('/api/admin/pilot-interest',operator,async(req,res)=>{
-  const {rows}=await q('SELECT id,contact_name,email,company,website,project_brief,marketing_consent,status,created_at,updated_at FROM pilot_leads ORDER BY updated_at DESC LIMIT 100');
+  const {rows}=await q('SELECT id,contact_name,email,company,website,project_brief,service_package,marketing_consent,status,created_at,updated_at FROM pilot_leads ORDER BY updated_at DESC LIMIT 100');
   res.json({leads:rows});
 });
 app.patch('/api/admin/pilot-interest/:id',operator,async(req,res)=>{
