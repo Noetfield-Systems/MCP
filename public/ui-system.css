@@ -157,9 +157,9 @@ border-color:#303844!important;background:#12171f!important;box-shadow:none!impo
 :where(.tool-form,.auth-form,.market-form) input,:where(.tool-form,.auth-form,.market-form) select,
 :where(.tool-form,.auth-form,.market-form) textarea{background:#0b0f15;color:#f1f4f8;border-color:#38414e}
 .growth-breadcrumb{padding-top:36px}
-.growth-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:54px;
+.growth-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:42px;
 align-items:center;padding:46px 0 74px!important;min-height:0}
-.growth-hero h1{font:650 clamp(50px,5vw,70px)/1.055 var(--display)!important;
+.growth-hero h1{font:650 clamp(48px,4.25vw,61px)/1.055 var(--display)!important;
 letter-spacing:-.07em!important;margin:22px 0!important}
 .growth-hero h1 em{color:#81b4ff!important}
 .growth-hero-copy>p{font-size:16px!important;line-height:1.8;max-width:550px;color:#a9b3c0!important}
