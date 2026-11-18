@@ -24,7 +24,7 @@ test('AES-GCM encrypted OAuth tokens are owner-bound and tamper-evident',()=>{
  }finally{if(prior===undefined)delete process.env.FOUNDRY_OAUTH_ENCRYPTION_KEY;else process.env.FOUNDRY_OAUTH_ENCRYPTION_KEY=prior;}
 });
 test('OAuth bearer tokens cannot be forwarded to an arbitrary GET endpoint',async()=>{
- await assert.rejects(()=>safeGet('https://api.example.com/anything',{authorization:'Bearer ghp_12345678901234567890'}),/OAUTH_HOST_OR_TOKEN_INVALID/);
+ await assert.rejects(()=>safeGet('https://api.example.com/anything',{authorization:'Bearer ghp_12345678901234567890'}),/UPSTREAM_AUTH_HOST_OR_TOKEN_INVALID/);
  await assert.rejects(()=>safeGet('https://127.0.0.1/admin',{authorization:'Bearer ghp_12345678901234567890'}));
- await assert.rejects(()=>safeGet('https://api.github.com/user',{authorization:'token 123456789012'}),/OAUTH_HOST_OR_TOKEN_INVALID/);
+ await assert.rejects(()=>safeGet('https://api.github.com/user',{authorization:'token 123456789012'}),/UPSTREAM_AUTH_HOST_OR_TOKEN_INVALID/);
 });
