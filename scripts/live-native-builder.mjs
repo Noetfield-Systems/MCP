@@ -29,6 +29,12 @@ const makeClient=async(path,secret)=>{
  return client;
 };
 try{
+ const templatesResponse=await fetch(base+'/api/templates',{signal:AbortSignal.timeout(10000)});
+ assert.equal(templatesResponse.status,200);
+ const templateList=await templatesResponse.json();
+ assert.ok(templateList.templates.some(t=>t.id==='github_profile'),'public starter catalog present');
+ const invalidLead=await fetch(base+'/api/pilot-interest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'test@foundry.invalid',contact_name:'Test',project_brief:'No contact consent supplied.'})});
+ assert.equal(invalidLead.status,400,'unconsented lead rejected without storing');
  const register=await post('/api/auth/register',{email,password});assert.equal(register.account.email,email);created=true;
  const key=await post('/api/keys',{label:'E2E conformance disposable key'});
  assert.ok(key.secret.startsWith('fdy_'));
@@ -37,6 +43,12 @@ try{
  try{
    const tools=await client.listTools();const names=tools.tools.map(t=>t.name);
    for(const n of ['search_servers','create_server','list_my_servers','add_readonly_tool','import_openapi','test_readonly_tool','publish_server','get_server_usage']) assert.ok(names.includes(n),'missing '+n);
+   const starter=await post('/api/servers/from-template',{template_id:'github_profile'});
+   assert.equal(starter.tools_added,1);
+   assert.equal(starter.server.status,'draft');
+   const starterResult=result(await client.callTool({name:'test_readonly_tool',arguments:{server_id:starter.server.id,tool_name:'read_github_profile',arguments_json:JSON.stringify(starter.sample_args)}}));
+   assert.equal(starterResult.ok,true,'starter does a live source-backed GET');
+   assert.ok(starterResult.response.includes('Noetfield-Systems'));
    const slug='smoke-'+suffix;
    const server=result(await client.callTool({name:'create_server',arguments:{name:'Disposable Conformance '+suffix,slug,description:'Temporary real MCP integration check'}})).server;
    assert.ok(server.id);
@@ -54,7 +66,7 @@ try{
    assert.ok(usage.calls>=1&&usage.successes>=1,'real persisted invocation observed');
    const anonymous=await fetch(base+'/api/servers',{signal:AbortSignal.timeout(8000)});
    assert.equal(anonymous.status,401,'private workspace needs authentication');
-   console.log(JSON.stringify({result:'PASS',host:base,authentication:'bearer-key',created_server:true,read_only_tool_test:'PASS',private_mcp_connect:'PASS',real_tool_invocation:'PASS',stored_usage:'PASS',test_account:true,external_customer:false}));
+   console.log(JSON.stringify({result:'PASS',host:base,authentication:'bearer-key',created_server:true,starter_template:'PASS',lead_consent_validation:'PASS',read_only_tool_test:'PASS',private_mcp_connect:'PASS',real_tool_invocation:'PASS',stored_usage:'PASS',test_account:true,external_customer:false}));
  }finally{if(privateClient)await privateClient.close();await client.close();}
 }finally{
  if(created){
