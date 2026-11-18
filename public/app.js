@@ -1,6 +1,6 @@
 const $=(q,root=document)=>root.querySelector(q);
 const $$=(q,root=document)=>[...root.querySelectorAll(q)];
-const state={user:null,servers:[],selected:null,detail:null,tab:'overview',login:false,templates:[]};
+const state={user:null,servers:[],selected:null,detail:null,tab:'overview',login:false,templates:[],editToolId:null};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=()=>location.origin+'/mcp/foundry';
 const msg=(text)=>{const box=$('#toast');box.textContent=text;box.classList.remove('hidden');clearTimeout(window._toast);window._toast=setTimeout(()=>box.classList.add('hidden'),4000);};
@@ -37,6 +37,21 @@ function renderDetail(){
  $('#server-detail').innerHTML=`<div class="detail-header"><div><span class="workspace-eyebrow">SELECTED SERVER · ${esc(s.status)}</span><h4>${esc(s.name)}</h4></div><button class="btn btn-outline btn-small" id="close-detail">Back to all servers</button></div><div class="detail-tabs">${detailTabs()}</div><div id="detail-content" class="detail-content"></div>`;
  const pane=$('#detail-content');
  if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button></div>`;
+ if(state.tab==='overview'){
+   $('.tool-item',pane).forEach((element,index)=>{
+     const tool=t[index];if(!tool)return;
+     element.insertAdjacentHTML('beforeend',`<div class="tool-actions"><button class="btn btn-outline btn-small" data-edit-tool="${esc(tool.id)}">Edit</button><button class="btn btn-outline btn-small danger" data-remove-tool="${esc(tool.id)}">Remove</button></div>`);
+   });
+   pane.insertAdjacentHTML('beforeend',`<div class="lifecycle-actions">
+    ${s.status==='published'?'<button class="btn btn-outline btn-small" id="unpublish-server">Unpublish endpoint</button>':''}
+    <button class="btn btn-outline btn-small danger" id="delete-server">Delete server</button>
+   </div><form id="server-settings-form" class="tool-form lifecycle-settings">
+    <span class="workspace-eyebrow">SERVER PROFILE</span>
+    <label>Server name<input required name="name" maxlength="100" value="${esc(s.name)}"></label>
+    <label>Description<input name="description" maxlength="400" value="${esc(s.description||'')}"></label>
+    <button class="btn btn-outline btn-small">Save details</button>
+   </form>`);
+ }
  if(state.tab==='add tool')pane.innerHTML=`<div class="inner-title"><h4>Register a read-only tool</h4><p>Use a public HTTPS GET API. Query and path parameters are explicitly declared; values cannot redirect tools to other hosts.</p></div><form id="tool-form" class="tool-form"><label>Tool name<input required name="name" placeholder="get_products" pattern="[a-z][a-z0-9_]{1,59}"></label><label>What does the tool do?<input required name="description" placeholder="List products from the inventory API"></label><label>HTTPS URL<input required name="url" type="url" placeholder="https://api.example.com/products"></label><label>Parameters JSON<textarea name="params" spellcheck="false" placeholder='[{"name":"category","in":"query","type":"string","required":false}]'>[]</textarea></label><button class="btn btn-primary btn-small">Save tool</button></form>`;
  if(state.tab==='import openapi')pane.innerHTML=`<div class="inner-title"><h4>Import OpenAPI operations</h4><p>Paste an OpenAPI JSON document. The builder extracts GET operations, descriptions, and query/path parameters. Private headers and write methods are not imported.</p></div><form id="import-form" class="tool-form"><label>Public API base URL<input required type="url" name="baseUrl" placeholder="https://api.example.com/v1/"></label><label>OpenAPI JSON<textarea required name="document" style="min-height:210px" spellcheck="false" placeholder='{"openapi":"3.1.0","paths":{...}}'></textarea></label><button class="btn btn-primary btn-small">Import GET operations</button></form>`;
  if(state.tab==='test')pane.innerHTML=`<div class="inner-title"><h4>Live request playground</h4><p>Tests call the actual endpoint. No simulated response or fabricated latency is returned.</p></div>${t.length?`<form id="test-form" class="tool-form"><label>Select tool<select class="input" name="tool">${t.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}</select></label><label>Arguments JSON<textarea name="args" spellcheck="false">${esc(sampleArgs)}</textarea></label><button class="btn btn-primary btn-small">Run live test</button></form><div id="test-result" class="result-box hidden"></div>`:'<div class="empty-state">Add a tool before running tests.</div>'}`;
@@ -70,6 +85,33 @@ document.addEventListener('click',async e=>{
  if(b.dataset.server){state.tab='overview';await selectServer(b.dataset.server);return;}
  if(b.dataset.tab){state.tab=b.dataset.tab;renderDetail();return;}
  if(b.dataset.panel){showPanel(b.dataset.panel);return;}
+ if(b.dataset.editTool){
+    const tool=state.detail?.tools.find(x=>x.id===b.dataset.editTool);
+    if(!tool)return;
+    state.editToolId=tool.id;state.tab='add tool';renderDetail();
+    const f=$('#tool-form');if(!f)return;f.id='edit-tool-form';
+    f.querySelector('[name=name]').value=tool.name;
+    f.querySelector('[name=description]').value=tool.description;
+    f.querySelector('[name=url]').value=tool.url;
+    f.querySelector('[name=params]').value=JSON.stringify(tool.params,null,2);
+    f.querySelector('button').textContent='Update read-only tool';
+    return;
+ }
+ if(b.dataset.removeTool){
+    if(!confirm('Remove this tool? Its published endpoint will return to draft until republished.'))return;
+    await request('DELETE','/api/tools/'+b.dataset.removeTool);
+    state.editToolId=null;state.tab='overview';await loadServers();feedback('Tool removed; server returned to draft');return;
+ }
+ if(b.id==='unpublish-server'){
+    await request('POST','/api/servers/'+state.selected+'/unpublish',{});
+    state.tab='overview';await loadServers();await loadCatalog();feedback('MCP endpoint unpublished');return;
+ }
+ if(b.id==='delete-server'){
+    if(!confirm('Delete this server and all its tools and usage events? This cannot be undone.'))return;
+    await request('DELETE','/api/servers/'+state.selected);
+    state.selected=null;state.detail=null;$('#server-detail').classList.add('hidden');
+    await loadServers();await loadCatalog();feedback('Server and tools deleted');return;
+ }
  if(b.id==='publish-server'){const x=await request('POST','/api/servers/'+state.selected+'/publish',{visibility:$('#server-visibility').value});feedback('Published: '+x.endpoint);await loadServers();await loadCatalog();return;}
  if(b.dataset.copy){const value=b.dataset.copy==='mcp-url'?url():location.origin+'/mcp/'+state.detail.server.slug;await navigator.clipboard.writeText(value);msg('Endpoint URL copied');return;}
  if(b.id==='create-key'){const x=await request('POST','/api/keys',{label:$('#key-label').value});$('#key-reveal').classList.remove('hidden');$('#key-reveal').textContent='Copy this key now. It will not be shown again: '+x.secret;await loadKeys();return;}
@@ -78,7 +120,7 @@ document.addEventListener('click',async e=>{
  }catch(err){feedback(err.message);}
 });
 document.addEventListener('submit',async e=>{
- const f=e.target;if(!['auth-form','new-server-form','tool-form','import-form','test-form','pilot-form'].includes(f.id))return;e.preventDefault();
+ const f=e.target;if(!['auth-form','new-server-form','tool-form','edit-tool-form','server-settings-form','import-form','test-form','pilot-form'].includes(f.id))return;e.preventDefault();
  const data=new FormData(f);const value=name=>String(data.get(name)||'').trim();
  const button=f.querySelector('button[type=submit],button:not([type])');if(button)button.disabled=true;
  try{
@@ -98,7 +140,18 @@ document.addEventListener('submit',async e=>{
  }
  if(f.id==='auth-form'){const endpoint=state.login?'/api/auth/login':'/api/auth/register';const x=await request('POST',endpoint,{email:value('auth-email')||$('#auth-email').value,password:$('#auth-password').value});state.user=x.account;updateWorkspace();msg('Workspace ready');}
  if(f.id==='new-server-form'){const x=await request('POST','/api/servers',{name:value('name'),slug:value('slug'),description:value('description')});state.tab='overview';await loadServers();await selectServer(x.server.id);feedback('Server created. Add a tool to publish.');}
- if(f.id==='tool-form'){const params=JSON.parse(value('params')||'[]');await request('POST','/api/servers/'+state.selected+'/tools',{name:value('name'),description:value('description'),url:value('url'),params});state.tab='overview';await loadServers();feedback('Tool saved; server is draft until republished');}
+ if(f.id==='tool-form'||f.id==='edit-tool-form'){
+    const params=JSON.parse(value('params')||'[]');
+    const edit=f.id==='edit-tool-form';
+    await request(edit?'PATCH':'POST',edit?'/api/tools/'+state.editToolId:'/api/servers/'+state.selected+'/tools',
+      {name:value('name'),description:value('description'),url:value('url'),params});
+    state.editToolId=null;state.tab='overview';await loadServers();
+    feedback('Tool saved. Republish the server to activate changes.');
+ }
+ if(f.id==='server-settings-form'){
+    await request('PATCH','/api/servers/'+state.selected,{name:value('name'),description:value('description')});
+    await loadServers();await loadCatalog();feedback('Server details saved');
+ }
  if(f.id==='import-form'){const document=JSON.parse(value('document'));const x=await request('POST','/api/servers/'+state.selected+'/import-openapi',{document,baseUrl:value('baseUrl')});state.tab='overview';await loadServers();feedback(x.added+' real GET tool(s) imported');}
  if(f.id==='test-form'){const args=JSON.parse(value('args')||'{}');const tool=value('tool');const result=$('#test-result');result.classList.remove('hidden');result.textContent='Executing against source…';try{const x=await request('POST','/api/tools/'+tool+'/test',{args});result.textContent=JSON.stringify(x,null,2);}catch(err){result.textContent='Test failed: '+err.message;}}
  }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else if(f.id==='pilot-form'){const result=$('#pilot-result');result.classList.remove('success');result.classList.add('error');result.textContent='Request not saved: '+err.message;}else feedback(err.message);}finally{if(button)button.disabled=false;}

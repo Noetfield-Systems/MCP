@@ -39,3 +39,21 @@
 @media(max-width:1100px){.template-list{grid-template-columns:1fr 1fr}}
 @media(max-width:800px){.pilot-offer{grid-template-columns:1fr;gap:30px;padding:30px}.template-list{grid-template-columns:1fr}.template-choice small{min-height:0}}
 @media(max-width:600px){.pilot-offer{margin-top:35px;padding:20px;gap:24px}.pilot-form-wrap{padding:22px 17px}.starter-picker{padding:17px}.template-list{grid-template-columns:1fr}.pilot-copy h3{font-size:34px}}
+
+/* Customer MCP lifecycle and private operator workspace */
+.tool-actions{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.tool-actions .btn{padding:8px 11px;font-size:10px}
+.lifecycle-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;border-top:1px solid #303c53;margin-top:25px;padding-top:20px}
+.lifecycle-settings{margin-top:27px;background:#0d172a;border:1px solid #303e56;padding:21px;border-radius:10px}
+.lifecycle-settings .btn{justify-self:start}
+.operator-table-wrap{overflow-x:auto;border:1px solid #34435d;border-radius:11px;background:#101a2b}
+.operator-table{width:100%;border-collapse:collapse;text-align:left;min-width:780px;font-size:12px}
+.operator-table th{font-size:10px;letter-spacing:.08em;color:#95a5c0;background:#162239;text-transform:uppercase;padding:14px 16px;white-space:nowrap;border-bottom:1px solid #35415c}
+.operator-table td{padding:16px;vertical-align:top;color:#b6c2d5;border-bottom:1px solid #293750;max-width:320px;overflow-wrap:anywhere}
+.operator-table strong{display:block;color:#eef0fa;font-weight:700;margin-bottom:4px}
+.operator-table td small{display:block;color:#8596b1;font-size:11px}
+.operator-table a{color:#bcb0ff}
+.operator-table .brief{line-height:1.7}
+.operator-stage{min-width:125px;font-size:11px}
+@media(max-width:900px){#operator-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:550px){.tool-actions{width:100%;margin-left:0}.lifecycle-actions .btn{flex:1}.operator-table th,.operator-table td{padding:11px 13px}#operator-stats{grid-template-columns:1fr 1fr!important}}

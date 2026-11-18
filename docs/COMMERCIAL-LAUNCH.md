@@ -27,7 +27,7 @@ The connected Noetfield Stripe account has existing unrelated portfolio products
 - `POST /api/pilot-interest` requires contact consent, a valid work email and a real project brief; sends `202` with reference ID only after persistence, not on Stripe success.
 - Fields: contact_name, email, company, website, project_brief, contact_consent, marketing_consent.
 - One latest record per email avoids basic repeated submission duplication. No public read endpoint.
-- `GET /api/admin/pilot-interest` is limited to authenticated account emails explicitly listed in private `FOUNDRY_ADMIN_EMAILS` deployment variable. Without that variable, it is intentionally not accessible. Configure via Railway once an authorized operator identity is selected. Do not invent a Founder email.
+- `GET /api/admin/pilot-interest`, `GET /api/admin/overview` and scoped `PATCH /api/admin/pilot-interest/:id` use a dedicated strong `FOUNDRY_ADMIN_TOKEN` stored only in Railway. The browser Operator Desk at `/operator` holds the token only in page memory. No verified user identity is inferred from an unverified account email. With no token configured, private endpoints fail closed.
 - When updating to Fieldwork, use a consented connector and a durable event; do not silently copy leads across venture databases.
 - No automatic email or booked consultation is claimed until a real messaging integration and receipt exist.
 - Privacy notice: `/privacy`.
@@ -55,3 +55,6 @@ The connected Noetfield Stripe account has existing unrelated portfolio products
 - Temporary test account can create a starter, run real upstream tool, create private server, publish it, connect with SDK, execute and read persisted usage, then delete the account.
 - Public pilot form rejects unconsented submissions and accepts/returns a durable ID on a real, voluntarily submitted customer request.
 - Checkout is shown as unavailable until verified billing configuration exists.
+
+## Lifecycle operations
+Owners can edit server name/description, edit/remove GET tools, unpublish endpoints, or delete servers. Every changed tool returns the server to draft. All operations are scoped to the authenticated account, exercised in the external MCP SDK acceptance suite, and make no claims about independent human customers.

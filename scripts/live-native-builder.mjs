@@ -46,6 +46,8 @@ try{
    const starter=await post('/api/servers/from-template',{template_id:'github_profile'});
    assert.equal(starter.tools_added,1);
    assert.equal(starter.server.status,'draft');
+   const renamed=await post('/api/servers/'+starter.server.id,{name:'GitHub Reader '+suffix,description:'Live operator lifecycle smoke'},'PATCH');
+   assert.ok(renamed.server.name.includes('GitHub Reader'));
    const starterResult=result(await client.callTool({name:'test_readonly_tool',arguments:{server_id:starter.server.id,tool_name:'read_github_profile',arguments_json:JSON.stringify(starter.sample_args)}}));
    assert.equal(starterResult.ok,true,'starter does a live source-backed GET');
    assert.ok(starterResult.response.includes('Noetfield-Systems'));
@@ -64,9 +66,21 @@ try{
    assert.equal(value.isError,undefined);assert.ok(value.content[0].text.includes('Noetfield-Systems/MCP'));
    const usage=result(await client.callTool({name:'get_server_usage',arguments:{server_id:server.id}})).usage;
    assert.ok(usage.calls>=1&&usage.successes>=1,'real persisted invocation observed');
+   const stopped=await post('/api/servers/'+server.id+'/unpublish',{});
+   assert.equal(stopped.status,'draft');
+   const disabled=await fetch(base+'/mcp/'+slug,{method:'GET',signal:AbortSignal.timeout(8000)});
+   assert.equal(disabled.status,404,'unpublished managed endpoint not available');
+   const republished=result(await client.callTool({name:'publish_server',arguments:{server_id:server.id,visibility:'private'}}));
+   assert.equal(republished.status,'published');
+   const removed=await post('/api/tools/'+add.tool.id,{},'DELETE');
+   assert.equal(removed.deleted,true,'owned tool removed');
+   const starterDeleted=await post('/api/servers/'+starter.server.id,{},'DELETE');
+   assert.equal(starterDeleted.deleted,true,'owned starter server removed');
    const anonymous=await fetch(base+'/api/servers',{signal:AbortSignal.timeout(8000)});
    assert.equal(anonymous.status,401,'private workspace needs authentication');
-   console.log(JSON.stringify({result:'PASS',host:base,authentication:'bearer-key',created_server:true,starter_template:'PASS',lead_consent_validation:'PASS',read_only_tool_test:'PASS',private_mcp_connect:'PASS',real_tool_invocation:'PASS',stored_usage:'PASS',test_account:true,external_customer:false}));
+   const operatorDenied=await fetch(base+'/api/admin/pilot-interest',{signal:AbortSignal.timeout(8000)});
+   assert.ok([403,503].includes(operatorDenied.status),'anonymous lead access denied');
+   console.log(JSON.stringify({result:'PASS',host:base,authentication:'bearer-key',created_server:true,starter_template:'PASS',edit_unpublish_delete:'PASS',operator_scope:'PASS',lead_consent_validation:'PASS',read_only_tool_test:'PASS',private_mcp_connect:'PASS',real_tool_invocation:'PASS',stored_usage:'PASS',test_account:true,external_customer:false}));
  }finally{if(privateClient)await privateClient.close();await client.close();}
 }finally{
  if(created){

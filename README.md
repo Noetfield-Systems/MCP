@@ -40,6 +40,12 @@ The backend never silently uses an in-memory customer database. `/healthz` check
 
 See [Commercial Launch Contract](docs/COMMERCIAL-LAUNCH.md) for the qualified lead workflow and the verified-payment boundary. [Privacy notice](https://mcp-foundry-web-production.up.railway.app/privacy).
 
+## Manage the full lifecycle
+Your Studio can now rename and describe servers, edit/remove tools, unpublish a public or private endpoint instantly, and delete no-longer-needed MCP servers. Changes to a tool always return its server to draft until a deliberate republish. The published MCP endpoint and visible directory therefore reflect actual status, not stale UI promises.
+
+## Private commercial operations
+[Operator Desk](https://mcp-foundry-web-production.up.railway.app/operator) shows genuine account/server usage counts and consented implementation enquiry records. Configure a long random `FOUNDRY_ADMIN_TOKEN` in the Railway service (never in GitHub), then enter it once into the Desk. The token stays in page memory and is not stored in browser storage. Lead status is an operator classification, not a paid receipt. Without the secret the endpoint fails closed.
+
 ## Portfolio boundaries
 MCP Foundry owns its customer experiences, MCP hosting, private tenant state and commercial billing. Other Noetfield ventures (SignalForge, SourceA, ARQANT, Fieldwork and others) remain independent providers whose external APIs can be wrapped through consented adapters. It never assumes ownership of their data, customers, agent runtime or treasury.
 
