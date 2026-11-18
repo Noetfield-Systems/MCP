@@ -53,7 +53,29 @@ try{
  assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false','Escape closes navigation');
  const viewport=await page.evaluate(()=>({screen:innerWidth,content:document.documentElement.scrollWidth}));
  assert.ok(viewport.content<=viewport.screen+3,'mobile page does not overflow horizontally: '+JSON.stringify(viewport));
+ // Three genuinely differentiated acquisition pages must be usable on a phone.
+ for(const route of ['/solutions','/web3','/collaborate']){
+   const resp=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
+   assert.equal(resp.status(),200,'market page '+route);
+   assert.equal(await page.locator('main h1').count(),1,'clear vertical headline '+route);
+   assert.ok((await page.locator('main h1').innerText()).length>20,'no placeholder hero');
+   const bounds=await page.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+   assert.ok(bounds.page<=bounds.screen+3,route+' no horizontal mobile overflow: '+JSON.stringify(bounds));
+   await page.locator('.growth-mobile-nav summary').click();
+   assert.equal(await page.locator('.growth-mobile-nav').getAttribute('open'),'','mobile menu opens');
+   await page.locator('.growth-mobile-nav summary').click();
+ }
+ await page.goto(base+'/collaborate',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(await page.locator('[data-track]').count(),6,'six specific developer and partner paths');
+ await page.locator('[data-track="web3_builder"]').click();
+ assert.equal(await page.locator('#op-track').inputValue(),'web3_builder','role selection fills real opportunity form');
+ assert.equal(await page.locator('#opportunity-form').count(),1,'operator-backed real opportunity form rendered');
+ await page.screenshot({path:'artifacts/foundry-collaborate-mobile.png',fullPage:true,animations:'disabled'});
+ await page.goto(base+'/web3',{waitUntil:'domcontentloaded',timeout:20000});
+ await page.screenshot({path:'artifacts/foundry-web3-mobile.png',fullPage:true,animations:'disabled'});
  await page.setViewportSize({width:1440,height:900});
+ await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(await page.locator('.growth-bridge-card').count(),3,'real business, web3 and partner paths on homepage');
  await page.locator('#auth-email').fill(email);
  await page.locator('#auth-password').fill(password);
  await click('#auth-submit');
@@ -107,7 +129,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
- console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
+ console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
  if(registered){
    try {

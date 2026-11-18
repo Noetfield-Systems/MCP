@@ -14,6 +14,27 @@ const run=async()=>{
   assert.equal(docs.status,200,'customer-facing developer guide HTTP 200');
   const docsHTML=await docs.text();
   assert.ok(docsHTML.includes('Official Registry')&&docsHTML.includes('Streamable HTTP'),'published install and SDK guide');
+  for(const route of ['/solutions','/web3','/collaborate']){
+    const response=await fetch(base+route,{signal:AbortSignal.timeout(12000)});
+    assert.equal(response.status,200,route+' independent commercial landing page live');
+    const text=await response.text();
+    assert.match(text,/<main id="main"/,'real accessible main content for '+route);
+    assert.match(text,/MCP.*FOUNDRY/,'standalone Foundry brand on '+route);
+  }
+  const starters=await fetch(base+'/api/templates',{signal:AbortSignal.timeout(12000)});
+  assert.equal(starters.status,200);
+  const examples=(await starters.json()).templates;
+  assert.ok(examples.some(t=>t.id==='dexscreener_market'&&t.tool_count===2),'real read-only Web3 source template');
+  assert.ok(examples.some(t=>t.id==='world_bank_countries'),'official public business data starter');
+  const roles=await fetch(base+'/api/opportunities/tracks',{signal:AbortSignal.timeout(12000)});
+  assert.equal(roles.status,200);
+  assert.equal((await roles.json()).tracks.length,6,'six independently classifiable business/developer pathways');
+  const denied=await fetch(base+'/api/admin/opportunities',{signal:AbortSignal.timeout(12000)});
+  assert.equal(denied.status,403,'partner applications remain private and operator-scoped');
+  const invalid=await fetch(base+'/api/opportunities',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({track:'web3_builder',contact_consent:false,project_brief:'not consented'}),
+    signal:AbortSignal.timeout(12000)});
+  assert.equal(invalid.status,400,'no nonconsented partner lead accepted');
   const robots=await fetch(base+'/robots.txt',{signal:AbortSignal.timeout(12000)});
   assert.equal(robots.status,200,'robots indexing metadata HTTP 200');
   const cat=await fetch(base+'/api/catalog',{signal:AbortSignal.timeout(12000)});

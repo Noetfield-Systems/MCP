@@ -11,6 +11,7 @@ import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
 import {oauthRouter,guardedManagedGet} from './oauth.mjs';
+import {opportunityRouter} from './opportunities.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
@@ -199,6 +200,7 @@ app.get('/api/admin/funnel',operator,async(req,res)=>{
  });
 });
 app.use(expansionRouter({auth,operator,stripe}));
+app.use(opportunityRouter({operator}));
 app.use(oauthRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);

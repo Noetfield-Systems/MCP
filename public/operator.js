@@ -44,6 +44,28 @@ function displayLeads(leads){
  return '<tr><td><strong>'+escapeHtml(lead.contact_name)+'</strong><small><a href="mailto:'+email+'">'+escapeHtml(lead.email)+'</a></small></td><td>'+escapeHtml(lead.company||'—')+'<small>'+escapeHtml(lead.website||'No URL provided')+'</small></td><td class="brief">'+escapeHtml(lead.project_brief)+'</td><td>'+escapeHtml(received)+'</td><td>'+stageSelect(lead)+'</td></tr>';
  }).join('');
 }
+const opportunityStages=['new','contacted','qualified','collaborating','closed'];
+function displayOpportunities(people,counts){
+ const total=counts.reduce((n,r)=>n+Number(r.count),0);
+ const byTrack={};
+ for(const entry of counts)byTrack[entry.track]=(byTrack[entry.track]||0)+Number(entry.count);
+ const labels={api_business:'API businesses',web3_builder:'Web3 builders',agency_partner:'Agencies',
+  developer_contributor:'Developers',community_distribution:'Communities',strategic_partner:'Strategic'};
+ $('#opportunity-track-counts').innerHTML='<div class="funnel-grid">'+
+  Object.entries(labels).map(([track,label])=>'<div class="funnel-item"><div class="funnel-heading"><strong>'+escapeHtml(label)+'</strong><b>'+escapeHtml(byTrack[track]||0)+'</b></div><div class="funnel-track"><span style="width:'+Math.min(100,Math.round(100*(byTrack[track]||0)/Math.max(1,total)))+'%"></span></div></div>').join('')+
+  '</div><p class="hint">'+total+' stored proposal(s), not accepted partnerships, unique people, signed contracts or paid orders.</p>';
+ $('#operator-opportunities').innerHTML=people.length?people.map(p=>{
+  const received=new Date(p.created_at).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+  const email=encodeURIComponent(p.email);
+  const status='<select class="input operator-stage" data-opportunity="'+escapeHtml(p.id)+'">'+
+   opportunityStages.map(stage=>'<option value="'+stage+'"'+(p.status===stage?' selected':'')+'>'+stage+'</option>').join('')+'</select>';
+  return '<tr><td><strong>'+escapeHtml(p.contact_name)+'</strong><small><a href="mailto:'+email+'">'+escapeHtml(p.email)+'</a></small></td>'+
+   '<td>'+escapeHtml(labels[p.track]||p.track)+'<small>Source: '+escapeHtml(p.source)+'</small></td>'+
+   '<td class="brief">'+escapeHtml(p.organization||'Independent builder')+'<small>'+escapeHtml(p.project_brief)+'</small>'+
+   (p.github_url?'<small>'+escapeHtml(p.github_url)+'</small>':'')+'</td>'+
+   '<td>'+escapeHtml(received)+'</td><td>'+status+'</td></tr>';
+ }).join(''):'<tr><td colspan="5">No collaboration proposals submitted. No partners are inferred from an empty pipeline.</td></tr>';
+}
 function displayOrders(orders){
  const table=$('#operator-orders');
  table.innerHTML=orders.length?orders.map(o=>{
@@ -53,13 +75,14 @@ function displayOrders(orders){
  }).join(''):'<tr><td colspan="5">No scoped orders created. Enquiries are not sales.</td></tr>';
 }
 async function load(){
- const [stats,leads,funnel,orders]=await Promise.all([
+ const [stats,leads,funnel,orders,opportunities]=await Promise.all([
   operatorRequest('GET','/api/admin/overview'),
   operatorRequest('GET','/api/admin/pilot-interest'),
   operatorRequest('GET','/api/admin/funnel'),
-  operatorRequest('GET','/api/admin/pilot-orders')
+  operatorRequest('GET','/api/admin/pilot-orders'),
+  operatorRequest('GET','/api/admin/opportunities')
  ]);
- displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);displayOrders(orders.orders);
+ displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);displayOrders(orders.orders);displayOpportunities(opportunities.applications,opportunities.counts);
  $('#order-lead-id').innerHTML=leads.leads.map(l=>'<option value="'+escapeHtml(l.id)+'">'+escapeHtml(l.contact_name)+' — '+escapeHtml(l.company||l.email)+'</option>').join('');
  $('#operator-order-form button[type=submit]').disabled=!leads.leads.length;
  $('#operator-action-feedback').textContent='Observed as of '+new Date().toLocaleString();
@@ -118,4 +141,15 @@ document.addEventListener('click',async event=>{
   $('#operator-order-feedback').textContent='Signed-payment order marked fulfilled. This is an operator status, not a refund or new transaction.';
   await load();
  }catch(error){$('#operator-order-feedback').textContent='Fulfillment failed: '+error.message;}finally{target.disabled=false;}
+});
+
+document.addEventListener('change',async event=>{
+ const node=event.target.closest('[data-opportunity]');if(!node)return;
+ const status=$('#opportunity-action-feedback');node.disabled=true;
+ try{
+  const response=await operatorRequest('PATCH','/api/admin/opportunities/'+encodeURIComponent(node.dataset.opportunity),{status:node.value});
+  status.textContent='Opportunity moved to '+response.application.status+'. No contract or payment has been inferred.';
+  await load();
+ }catch(error){status.textContent='Could not update opportunity: '+error.message;try{await load();}catch{}}
+ finally{node.disabled=false;}
 });

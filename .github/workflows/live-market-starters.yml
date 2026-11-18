@@ -1,0 +1,32 @@
+name: Real Business & Web3 MCP Starter Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "scripts/live-market-starters.mjs"
+      - ".github/workflows/live-market-starters.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - name: Verify business and crypto source-backed MCP tools against Railway
+        env:
+          FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if node scripts/live-market-starters.mjs; then exit 0; fi
+            echo "Market starter source or rollout failed, attempt ${attempt}/5"
+            sleep 20
+          done
+          exit 1
