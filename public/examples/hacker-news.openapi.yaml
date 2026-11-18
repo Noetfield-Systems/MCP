@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info:
+  title: Hacker News Public Reader
+  version: 1.0.0
+  description: Read-only public API, for trying MCP Foundry's OpenAPI importer.
+paths:
+  /v0/maxitem.json:
+    get:
+      operationId: get_latest_item_id
+      summary: Get the current largest Hacker News item ID
+      responses:
+        '200':
+          description: Current maximum item identifier
+  /v0/topstories.json:
+    get:
+      operationId: list_top_story_ids
+      summary: List current Hacker News top story identifiers
+      responses:
+        '200':
+          description: Array of article identifiers
