@@ -1,5 +1,8 @@
 # MCP Foundry — Commercial Launch Contract (17 November 2026)
 
+## Strategy V3 scoped-offer amendment (18 November 2026)
+The active **CA$199 Public API Quickstart Payment Link** remains available. The new **API Agent Launch** is an experimental **from CA$799** proposal-based service for one supported public HTTPS API, up to five curated GET tools, two agreed real workflow tests, one supported client handoff, a shareable install page and one bounded revision. This is **not a live CA$799 Stripe Checkout**; final scope, schedule and price require individual agreement. Private upstream keys, OAuth, writes, custom domains and ongoing maintenance are excluded until separately scoped and supported. `/connect` can generate a customer documentation "Use with AI" link for public servers only; it contains no credentials and is not proof of a successful install. The full plan is in [Strategy V3](STRATEGY-PRIORITIES-2026-11-18.md).
+
 ## Thesis
 The practical buyer outcome is: **a founder or engineering team gives Foundry a public API or OpenAPI spec and receives a real, tested, portable MCP endpoint and verifiable execution history.** MCP Foundry is an independent product. It does not absorb SignalForge, SourceA, ARQANT, Fieldwork or Founder OS.
 
