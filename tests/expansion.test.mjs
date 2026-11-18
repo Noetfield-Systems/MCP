@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {generateClientInstall,HOSTS} from '../public/client-config.mjs';
+import {generateClientInstall,generateDocsInstallLink,HOSTS} from '../public/client-config.mjs';
 import {applyPilotWebhook} from '../src/expansion.mjs';
 
 test('four host installers produce correct stable remote MCP configuration',()=>{
@@ -47,4 +47,21 @@ test('asynchronous payment failure never upgrades a paid order',async()=>{
  const c={query:async(sql,args)=>{if(sql.startsWith('SELECT'))return {rows:[order],rowCount:1};changes.push(sql);return {rowCount:1};}};
  const e={type:'checkout.session.async_payment_failed',data:{object:{id:'cs_live_reference',mode:'payment',metadata:{foundry_pilot_order_id:id}}}};
  assert.equal(await applyPilotWebhook(c,e),true);assert.equal(changes.length,0);
+});
+
+test('customer-owned API docs link is safe, source-portable and only for public server slugs',()=>{
+ const origin='https://mcp-foundry-web-production.up.railway.app';
+ const a=generateDocsInstallLink(origin,'sample-api');
+ assert.equal(a.href,origin+'/connect?server=sample-api');
+ assert.match(a.html,/href="https:\/\/mcp-foundry-web-production.up.railway.app\/connect\?server=sample-api"/);
+ assert.match(a.html,/>Use with AI<\/a>/);
+ assert.ok(!a.html.includes('Bearer'),'never embed private credentials');
+ assert.ok(!a.html.includes('YOUR_FOUNDRY_API_KEY'),'never embed placeholders that suggest published credentials');
+ for(const slug of ['','a','Admin','foo?x=" onmouseover="1','../../../api/auth','api%2Fkey']){
+   assert.throws(()=>generateDocsInstallLink(origin,slug),undefined,'invalid slug: '+slug);
+ }
+ assert.throws(()=>generateDocsInstallLink(origin,'sample-api',{privateServer:true}),/PRIVATE_SERVER_HAS_NO_PUBLIC_DOCS_EMBED/);
+ for(const bad of ['http://example.com','https://user:secret@example.com','https://example.com/path','https://example.com/?secret=key']){
+   assert.throws(()=>generateDocsInstallLink(bad,'sample-api'));
+ }
 });

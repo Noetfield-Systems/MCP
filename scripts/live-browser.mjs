@@ -101,6 +101,18 @@ try{
      await page.screenshot({path:'artifacts/foundry-'+label+'-mobile.png',fullPage:true,animations:'disabled'});
    }
  }
+ // Strategy V3: customer-owned public API docs may include a safe install link.
+ await page.goto(base+'/connect',{waitUntil:'domcontentloaded',timeout:20000});
+ await page.locator('#client-slug').fill('public-docs-example');
+ await page.locator('#docs-embed-code').waitFor({state:'visible',timeout:12000});
+ const embedMarkup=await page.locator('#docs-embed-code').innerText();
+ assert.ok(embedMarkup.includes('/connect?server=public-docs-example'),'public API-docs share link generated');
+ assert.ok(embedMarkup.includes('Use with AI'),'installation widget provides explicit label');
+ assert.ok(!embedMarkup.includes('Bearer'),'never export credentials in public docs');
+ assert.equal(await page.locator('#docs-embed-copy').isEnabled(),true,'public docs embed is copyable');
+ await page.locator('#client-private').check();
+ assert.equal(await page.locator('#docs-embed-copy').isEnabled(),false,'private server embed is disabled');
+ assert.equal(await page.locator('#docs-embed-code').innerText(),'','private configuration is not exported into public docs');
  await page.setViewportSize({width:768,height:1024});
  for(const route of publicRoutes){
    const resp=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});

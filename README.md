@@ -2,7 +2,10 @@
 
 **Your API. Everywhere AI Works.** An independent commercial developer platform for building, hosting, testing, publishing, operating, and ultimately selling real Model Context Protocol integrations.
 
-[Production application](https://mcp-foundry-web-production.up.railway.app) · [Public directory MCP](https://mcp-foundry-web-production.up.railway.app/mcp/foundry) · [Product strategy](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [100-initiative roadmap](docs/GROWTH-AND-ROADMAP.md)
+[Production application](https://mcp-foundry-web-production.up.railway.app) · [Public directory MCP](https://mcp-foundry-web-production.up.railway.app/mcp/foundry) · [Product strategy](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Strategy V3: commercial and execution priorities](docs/STRATEGY-PRIORITIES-2026-11-18.md) · [legacy 100-initiative backlog](docs/GROWTH-AND-ROADMAP.md)
+
+## Strategy V3 — API Agent Launch and customer distribution (18 Nov 2026)
+Our commercial wedge is the **working AI integration delivered to an API business and its users**, not OpenAPI conversion alone. The live CA$199 Public API Quickstart remains available as-is. **API Agent Launch** is an experimental **from CA$799** individually scoped service proposal (not an enabled fixed checkout), covering supported public GET tools, two agreed use cases, a tested client handoff and an optional customer-docs "Use with AI" installation link. The authenticated MCP-native Builder is already available at `/mcp/foundry`; don't duplicate it. See the complete [advisor V3 / 100-action mapping](docs/STRATEGY-PRIORITIES-2026-11-18.fa.md) and its English decision summary.
 
 ## What is real now?
 - Public premium website, developer copy/config, directory backed by PostgreSQL rather than fake listings.
