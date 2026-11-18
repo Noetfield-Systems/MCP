@@ -41,7 +41,7 @@ function displayLeads(leads){
  tbody.innerHTML=leads.map(lead=>{
  const received=new Date(lead.created_at).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
  const email=encodeURIComponent(lead.email);
- return '<tr><td><strong>'+escapeHtml(lead.contact_name)+'</strong><small><a href="mailto:'+email+'">'+escapeHtml(lead.email)+'</a></small></td><td>'+escapeHtml(lead.company||'—')+'<small>'+escapeHtml(lead.website||'No URL provided')+'</small></td><td class="brief">'+escapeHtml(lead.project_brief)+'</td><td>'+escapeHtml(received)+'</td><td>'+stageSelect(lead)+'</td></tr>';
+ return '<tr><td><strong>'+escapeHtml(lead.contact_name)+'</strong><small><a href="mailto:'+email+'">'+escapeHtml(lead.email)+'</a></small></td><td>'+escapeHtml(lead.company||'—')+'<small>'+escapeHtml(lead.website||'No URL provided')+'</small></td><td class="brief"><strong>'+escapeHtml(lead.service_package||'custom')+'</strong><small>'+escapeHtml(lead.project_brief)+'</small></td><td>'+escapeHtml(received)+'</td><td>'+stageSelect(lead)+'</td></tr>';
  }).join('');
 }
 const opportunityStages=['new','contacted','qualified','collaborating','closed'];
