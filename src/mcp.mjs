@@ -1,4 +1,6 @@
 import {McpServer,createMcpHandler} from '@modelcontextprotocol/server';
+import {registerAppResource,registerAppTool,RESOURCE_MIME_TYPE} from '@modelcontextprotocol/ext-apps/server';
+import {readFileSync} from 'node:fs';
 import {toNodeHandler} from '@modelcontextprotocol/node';
 import * as z from 'zod/v4';
 import {q} from './db.mjs';
@@ -44,6 +46,24 @@ export function managedMcp(server,tools,principal){
 export function foundryMcp(principal=null){
   const handler=createMcpHandler(()=>{
     const mcp=new McpServer({name:'MCP Foundry Directory',version:'0.1.0'});
+    // MCP Apps extension: an authenticated or anonymous host can render a
+    // self-contained Foundry View. All actions invoke existing owner-scoped
+    // server tools through the host; no API keys are embedded in HTML.
+    const appUri='ui://mcp-foundry/studio.html';
+    registerAppTool(mcp,'open_foundry_app',{
+      title:'Open MCP Foundry Studio',
+      description:'Open interactive Foundry directory and authenticated Builder workspace in a compatible MCP Apps host.',
+      inputSchema:z.object({}),
+      _meta:{ui:{resourceUri:appUri}},
+      annotations:{readOnlyHint:true,openWorldHint:false}
+    },async()=>({
+      content:[{type:'text',text:'MCP Foundry interactive workspace. Use this View to discover real servers or manage your authorized workspace.'}],
+      structuredContent:{product:'MCP Foundry',surface:'mcp_apps',authenticated:!!principal}
+    }));
+    registerAppResource(mcp,'MCP Foundry Studio',appUri,{mimeType:RESOURCE_MIME_TYPE},async()=>({
+      contents:[{uri:appUri,mimeType:RESOURCE_MIME_TYPE,text:readFileSync(new URL('../dist/index.html',import.meta.url),'utf8')}]
+    }));
+
     mcp.registerTool('search_servers',{description:'Search published public MCP servers in MCP Foundry',inputSchema:z.object({query:z.string().max(100).optional()})},async({query=''})=>{
       const {rows}=await q('SELECT slug,name,description FROM servers WHERE status=\'published\' AND visibility=\'public\' AND (name ILIKE $1 OR description ILIKE $1) ORDER BY updated_at DESC LIMIT 25',['%'+query+'%']);
       return {content:[{type:'text',text:JSON.stringify(rows)}]};
