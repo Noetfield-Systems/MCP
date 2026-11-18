@@ -8,6 +8,7 @@ on:
       - "public/**"
       - "package.json"
       - "scripts/live-smoke.mjs"
+      - "scripts/live-native-builder.mjs"
       - ".github/workflows/live-acceptance.yml"
 jobs:
   live-mcp:
@@ -23,3 +24,8 @@ jobs:
         env:
           FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
         run: node scripts/live-smoke.mjs
+
+      - name: Native authenticated builder and private tool end-to-end
+        env:
+          FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
+        run: node scripts/live-native-builder.mjs
