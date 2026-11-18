@@ -4,6 +4,16 @@
 
 [Production application](https://mcp-foundry-web-production.up.railway.app) · [Public directory MCP](https://mcp-foundry-web-production.up.railway.app/mcp/foundry) · [Product strategy](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Strategy V3: commercial and execution priorities](docs/STRATEGY-PRIORITIES-2026-11-18.md) · [legacy 100-initiative backlog](docs/GROWTH-AND-ROADMAP.md)
 
+## Active publication vs draft editing (18 November 2026)
+Published MCP servers now serve an **immutable tool snapshot**. New tools, edits, OpenAPI imports and revision restores change the editable draft without removing the live server. An explicit Publish transaction creates the next version and switches it atomically; Unpublish still disables an endpoint. API responses expose `published_revision` and `has_unpublished_changes`; the Marketplace and public directory display only published definitions.
+
+## Limited private upstream API key (BYOK)
+In the existing [Connections settings](/oauth) workspace, owners can configure **one AES-256-GCM encrypted upstream bearer key** for an exact public HTTPS API origin. All draft tools for that server must use that host; only private, owner-authenticated MCP calls may inject the key. There are no redirects or secret-bearing public documentation links. Set `FOUNDRY_UPSTREAM_ENCRYPTION_KEY` to a long random **64-character hex secret** in the actual Railway service to enable; until then the UI stays disabled. Save/rotate/revoke deliberately unpublishes that server for retesting before republish. This is not arbitrary OAuth, private-network access or shared end-user auth.
+
+## Orders and pricing
+V3 routes the public Launch proposal, CA$199 Quickstart, private API request and agency/care enquiry into separately classified buyer records. Operator Desk can use scoped quote presets to create actual, buyer-specific order URLs. An offered quote is not a paid sale; per-quote Checkout requires Foundry Stripe secret plus signed webhook configuration. Existing CA$199 hosted Stripe Payment Link remains independent and active per its merchant record. Do not count unverified transactions as collected revenue.
+
+
 ## Strategy V3 — API Agent Launch and customer distribution (18 Nov 2026)
 Our commercial wedge is the **working AI integration delivered to an API business and its users**, not OpenAPI conversion alone. The live CA$199 Public API Quickstart remains available as-is. **API Agent Launch** is an experimental **from CA$799** individually scoped service proposal (not an enabled fixed checkout), covering supported public GET tools, two agreed use cases, a tested client handoff and an optional customer-docs "Use with AI" installation link. The authenticated MCP-native Builder is already available at `/mcp/foundry`; don't duplicate it. See the complete [advisor V3 / 100-action mapping](docs/STRATEGY-PRIORITIES-2026-11-18.fa.md) and its English decision summary.
 
