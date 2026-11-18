@@ -19,6 +19,21 @@
 <div><span>01</span> Authenticate to your existing Foundry workspace</div><div><span>02</span> Approve GitHub's limited user-profile read scope</div><div><span>03</span> Assign the connection only to a private MCP server</div><div><span>04</span> Execute HTTPS GET requests only to api.github.com</div><div><span>05</span> Disconnect locally and revoke remote access in GitHub if needed</div>
 </div><p class="expansion-note">GitHub OAuth application credentials must be configured by the Foundry operator before this connector can authorize a user. The presence of this page does not mean a GitHub account is connected. OAuth for arbitrary third-party providers is not enabled here.</p>
 <a class="btn btn-outline" href="/developers">Read developer docs</a></aside></div>
+
+<section class="product-panel" id="byok-panel" style="margin:20px 0 40px">
+ <span class="workspace-eyebrow">PRIVATE UPSTREAM API · CUSTOMER-OWNED BEARER</span>
+ <h3>Connect one private API with your own key.</h3>
+ <p>Choose an MCP server you own. All of its draft GET tools must target the same public HTTPS host. Foundry encrypts the upstream API key before storing it, injects it only when calling that exact host, and never returns it to the browser or an MCP client. Your MCP endpoint must be private.</p>
+ <form id="byok-form" class="tool-form">
+  <label>Owned MCP server<select id="byok-server" required></select></label>
+  <label>Exact upstream HTTPS origin<input id="byok-host" type="url" required placeholder="https://api.example.com/" autocomplete="off"></label>
+  <label>Customer-owned upstream bearer key<input id="byok-key" type="password" required minlength="10" maxlength="6000" autocomplete="new-password" placeholder="Enter the API key; it will not be shown again"></label>
+  <button class="btn btn-primary" id="byok-save" type="submit" disabled>Securely save key &amp; switch to private draft</button>
+ </form>
+ <p class="status-readout" id="byok-feedback" role="status">Sign in to see available servers.</p>
+ <button class="btn btn-outline btn-small" id="byok-revoke" type="button" disabled>Revoke stored upstream key</button>
+ <p class="expansion-note">After saving, test one private tool and explicitly republish. Replacing or removing a key intentionally unpublishes its endpoint until retested. This does not enable OAuth, write operations or third-party customer access.</p>
+</section>
 </main><footer class="foundry-footer">
  <div class="foundry-footer-inner">
  <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
