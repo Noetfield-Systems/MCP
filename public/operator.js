@@ -71,7 +71,7 @@ function displayOrders(orders){
  table.innerHTML=orders.length?orders.map(o=>{
   const paid=['paid','fulfilled'].includes(o.status);
   const amount=new Intl.NumberFormat('en-CA',{style:'currency',currency:o.currency.toUpperCase()}).format(o.amount_cents/100);
-  return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+(o.status==='paid'?'<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'">Mark fulfilled</button>':paid?'Verified by webhook':'Not paid')+'</td></tr>';
+  return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.offer_type||'custom')+' · '+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+(o.status==='paid'?'<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'">Mark fulfilled</button>':paid?'Verified by webhook':'Not paid')+'</td></tr>';
  }).join(''):'<tr><td colspan="5">No scoped orders created. Enquiries are not sales.</td></tr>';
 }
 async function load(){
@@ -119,6 +119,22 @@ document.addEventListener('change',async event=>{
  }
 });
 
+const offerPresets={
+ quickstart:{amount:19900,scope:'Public API Quickstart: one supported public HTTPS API, up to three GET tools, one live source test and basic client handoff.'},
+ launch:{amount:79900,scope:'API Agent Launch: one eligible public HTTPS API, up to five curated GET tools, two agreed source tests, a compatible client handoff and shareable docs install link.'},
+ private:{amount:149900,scope:'Private API Launch: buyer-specific authorization, exact host, client and accepted deliverables to be agreed before payment.'},
+ care:{amount:null,scope:'Managed Care: explicit upstream checks, bounded support hours, renewal term and response window defined by written scope.'},
+ agency:{amount:null,scope:'Agency delivery: separately scoped client API integration and independently accepted handoff.'},
+ custom:{amount:null,scope:''}
+};
+function chooseOffer(){
+ const offer=offerPresets[$('#order-offer').value];if(!offer)return;
+ if(offer.amount)$('#order-amount').value=String(offer.amount);
+ $('#order-scope').value=offer.scope;
+}
+$('#order-offer').addEventListener('change',chooseOffer);
+
+chooseOffer();
 $('#operator-order-form').addEventListener('submit',async event=>{
  event.preventDefault();
  const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;
@@ -126,7 +142,7 @@ $('#operator-order-form').addEventListener('submit',async event=>{
  try{
   const amount=Number($('#order-amount').value);
   const result=await operatorRequest('POST','/api/admin/pilot-orders',{lead_id:$('#order-lead-id').value,
-    amount_cents:amount,currency:$('#order-currency').value,description:$('#order-scope').value.trim()});
+    amount_cents:amount,currency:$('#order-currency').value,offer_type:$('#order-offer').value,description:$('#order-scope').value.trim()});
   status.textContent='Quote created; no payment collected. Share the exact buyer link:';
   const link=document.createElement('a');link.href=result.share_url;link.textContent=result.share_url;link.target='_blank';link.rel='noopener noreferrer';
   status.append(document.createTextNode(' '),link);
