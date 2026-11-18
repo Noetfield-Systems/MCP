@@ -1,5 +1,13 @@
 # MCP Foundry — Commercial Launch Contract (17 November 2026)
 
+## V3 order conversion — implemented pipeline boundaries
+- Buyers can select API Agent Launch, Public API Quickstart, Private API Launch, Managed Care, Agency or Custom when submitting a consented proposal. Existing buyer emails are still deduplicated; repeat interest updates the selected package.
+- Operator Desk offers editable proposal templates (CA$199 Quickstart, experimental CA$799 Launch, experimental CA$1,499 private integration). The operator confirms a specific scope/amount before creating the buyer-specific order URL. **Prices are starting hypotheses, not automated fixed offerings.**
+- `pilot_orders.offer_type` persists the selected scoped offer; signed Stripe Checkout metadata includes it for reconciliation. This does not configure merchant credentials or claim a verified charge. A dedicated Quickstart Payment Link remains the known immediately purchasable offer.
+- Buyer and invoice ownership must be verified before manually sharing a scoped payment link; downstream checkout is enabled only by actual Stripe merchant/webhook setup.
+- The product now keeps its published endpoint serving an immutable snapshot during ordinary tool editing, and offers an optional owner-configured limited BYOK bearer on a fixed HTTPS host for **private** MCP integrations. Operator delivery acceptance remains a separate workflow.
+
+
 ## Strategy V3 scoped-offer amendment (18 November 2026)
 The active **CA$199 Public API Quickstart Payment Link** remains available. The new **API Agent Launch** is an experimental **from CA$799** proposal-based service for one supported public HTTPS API, up to five curated GET tools, two agreed real workflow tests, one supported client handoff, a shareable install page and one bounded revision. This is **not a live CA$799 Stripe Checkout**; final scope, schedule and price require individual agreement. Private upstream keys, OAuth, writes, custom domains and ongoing maintenance are excluded until separately scoped and supported. `/connect` can generate a customer documentation "Use with AI" link for public servers only; it contains no credentials and is not proof of a successful install. The full plan is in [Strategy V3](STRATEGY-PRIORITIES-2026-11-18.md).
 
