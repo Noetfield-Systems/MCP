@@ -129,9 +129,9 @@ export function expansionRouter({auth,operator,stripe}){
     await c.query('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6)',
        [randomUUID(),server.id,tool.name,tool.description,tool.url,JSON.stringify(tool.params)]);
    }
-   await c.query("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+   await c.query("UPDATE servers SET has_unpublished_changes=(status='published'),updated_at=now() WHERE id=$1",[server.id]);
    await c.query('COMMIT');
-   res.json({restored:rows[0].version,tools:tools.length,status:'draft',requires_republish:true});
+   res.json({restored:rows[0].version,tools:tools.length,status:server.status,active_revision:server.published_revision,requires_republish:true});
   }catch(e){await c.query('ROLLBACK');return fail(res,500,'REVISION_RESTORE_FAILED');}finally{c.release();}
  });
  router.get('/api/team/servers',auth,async(req,res)=>{
