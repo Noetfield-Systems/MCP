@@ -33,6 +33,12 @@ try{
  const priceLink=page.locator('.featured-price .btn');
  assert.equal(await priceLink.getAttribute('href'),'#implementation','custom plan CTA uses an active commercial funnel');
  assert.ok((await page.locator('.hero-proof').innerText()).includes('Open MCP standard'),'avoid unsupported self-host portability claim');
+ assert.equal(await page.locator('.quickstart-offer').count(),1,'fixed-scope commercial offer is visible');
+ const link=page.locator('.quickstart-purchase .btn');
+ assert.equal(await link.getAttribute('href'),'https://buy.stripe.com/5kQ7sMaLm81SeWSfPu1Nu0j','real account-specific live Stripe Checkout link');
+ assert.match(await page.locator('.quickstart-purchase').innerText(),/CA\$199/,'price and currency are explicit');
+ assert.match(await page.locator('.quickstart-disclosure').innerText(),/Excludes private upstream credentials/,'bounded deliverable scope disclosed');
+
  await page.setViewportSize({width:390,height:844});
  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
  await page.waitForTimeout(100);
