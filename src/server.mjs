@@ -351,6 +351,26 @@ app.get('/api/servers/:id/usage',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
  const {rows}=await q("SELECT count(*)::int AS calls,count(*) FILTER(WHERE success)::int AS successes,coalesce(round(avg(duration_ms)),0)::int AS avg_ms,count(DISTINCT date_trunc('day',created_at))::int AS active_days FROM tool_events WHERE server_id=$1 AND created_at>now()-interval '30 days'",[server.id]);res.json({usage:rows[0]});
 });
+app.get('/api/servers/:id/diagnostics',auth,async(req,res)=>{
+ const server=await ownedServer(req.params.id,req.user.id);
+ if(!server)return j(res,404,'SERVER_NOT_FOUND');
+ const [summary,perTool,perError,recent]=await Promise.all([
+  q(`SELECT count(*)::int calls,count(*) FILTER(WHERE success)::int success,
+   coalesce(round(avg(duration_ms)),0)::int avg_ms,
+   coalesce(round(percentile_cont(0.95) WITHIN GROUP (ORDER BY duration_ms)),0)::int p95_ms
+   FROM tool_events WHERE server_id=$1 AND created_at>now()-interval '30 days'`,[server.id]),
+  q(`SELECT tool_name,count(*)::int calls,count(*) FILTER(WHERE success)::int success,
+   coalesce(round(avg(duration_ms)),0)::int avg_ms
+   FROM tool_events WHERE server_id=$1 AND created_at>now()-interval '30 days'
+   GROUP BY tool_name ORDER BY calls DESC,tool_name LIMIT 30`,[server.id]),
+  q(`SELECT error_code,count(*)::int calls FROM tool_events WHERE server_id=$1 AND success=false AND created_at>now()-interval '30 days'
+   GROUP BY error_code ORDER BY calls DESC LIMIT 15`,[server.id]),
+  q(`SELECT id,tool_name,success,error_code,upstream_status,duration_ms,created_at
+   FROM tool_events WHERE server_id=$1 ORDER BY created_at DESC,id DESC LIMIT 50`,[server.id])
+ ]);
+ res.json({window:'rolling_30_days',summary:summary.rows[0],tools:perTool.rows,errors:perError.rows,
+  recent:recent.rows,redacted:true,note:'Owner-only observed executions; never stores arguments, bodies, tokens, hostnames or request URLs. Tests from the Studio playground are not counted as managed MCP invocations.'});
+});
 app.get('/api/keys',auth,async(req,res)=>{
  const {rows}=await q('SELECT id,prefix,label,created_at,revoked_at FROM api_keys WHERE owner_id=$1 ORDER BY created_at DESC',[req.user.id]);res.json({keys:rows});
 });
