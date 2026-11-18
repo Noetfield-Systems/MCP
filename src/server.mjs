@@ -81,7 +81,7 @@ app.post('/api/auth/login',async(req,res)=>{
  cookie(res,sid);res.json({account:{id:rows[0].id,email,plan:rows[0].plan}});
 });
 app.post('/api/auth/logout',async(req,res)=>{
- const sid=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('mcpf_session='))?.slice(15);
+ const sid=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('mcpf_session='))?.slice('mcpf_session='.length);
  if(sid)await q('DELETE FROM sessions WHERE token_hash=$1',[sha(sid)]);
  res.clearCookie('mcpf_session',{path:'/'});res.json({ok:true});
 });
