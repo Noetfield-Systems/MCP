@@ -31,12 +31,21 @@ export function validatedTarget(value){
   u.hash='';
   return u;
 }
+// Node's autoSelectFamily DNS contract requests an array when options.all=true.
+// Pinning a single vetted public IPv4 must preserve both lookup callback forms.
+export function pinnedPublicLookup(address){
+  if(net.isIP(address)!==4||blockedIp(address)) throw new Error('Public IPv4 pin required');
+  return (_hostname,options,cb)=>{
+    if(options?.all) cb(null,[{address,family:4}]);
+    else cb(null,address,4);
+  };
+}
 export async function safeGet(value){
   const u=validatedTarget(value);
   const answers=await dns.lookup(u.hostname,{all:true,family:4,verbatim:true});
   if(!answers.length||answers.some(a=>blockedIp(a.address))) throw new Error('Endpoint DNS is not a public IPv4 address');
   const address=answers[0].address;
-  const dispatcher=new Agent({connect:{lookup:(_hostname,_opts,cb)=>cb(null,address,4)},connections:1,pipelining:0});
+  const dispatcher=new Agent({connect:{lookup:pinnedPublicLookup(address)},connections:1,pipelining:0});
   try {
     const response=await undiciFetch(u,{method:'GET',redirect:'manual',headers:{Accept:'application/json, text/plain;q=0.9'},dispatcher,signal:AbortSignal.timeout(8000)});
     if(response.status>=300&&response.status<400) throw new Error('Upstream redirects are disabled');
