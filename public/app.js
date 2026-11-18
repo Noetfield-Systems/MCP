@@ -30,9 +30,10 @@ async function loadGrowth(){
 async function loadTemplates(){
  const {templates}=await request('GET','/api/templates');
  state.templates=templates;
+ const suggested=new URLSearchParams(location.search).get('starter');
  const target=$('#template-list');
  if(!target)return;
- target.innerHTML=templates.map(t=>`<button class="template-choice" data-template="${esc(t.id)}"><span class="template-category">${esc(t.category)}</span><b>${esc(t.name)}</b><small>${esc(t.description)}</small><span class="template-action">Create draft →</span></button>`).join('');
+ target.innerHTML=templates.map(t=>`<button class="template-choice${suggested===t.id?' recommended':''}" data-template="${esc(t.id)}"><span class="template-category">${esc(t.category)}</span><b>${esc(t.name)}</b><small>${esc(t.description)}</small><span class="template-action">Create draft →</span></button>`).join('');
 }
 async function openapiPayload(form){
  const fd=new FormData(form),file=fd.get('spec_file');
