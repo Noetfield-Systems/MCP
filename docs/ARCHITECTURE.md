@@ -37,7 +37,7 @@ Stripe -> signed /api/stripe/webhook -> event idempotency -> subscription status
 1. Add native OAuth 2.1 consent and resource-server discovery for per-customer write permissions.
 2. Add tenant role management, verified email and password reset, credential revocation and secure session rotation.
 3. Add fully automatic DNS/redirect regression tests, network egress boundary and audit sampling.
-4. Add versioned immutable published tool manifests; currently publishing works by toggling draft and republishing, but not immutable snapshots.
+4. Extend the shipped immutable published snapshots with customer-visible revision comparisons and concurrency-aware edit locking; atomic publish/rollback is supported but rich diff review remains future work.
 5. Add request-level idempotency and explicit human confirmation on all future write operations, payments and external side effects.
 6. Migrate to Stripe billing meters/Metronome as demand justifies usage fees; connect payouts only after payee onboarding.
 7. Track external independent MCP SDK conformance tests on every production commit and exclude artificial test accounts from conversion metrics.
