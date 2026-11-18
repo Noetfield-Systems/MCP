@@ -140,7 +140,7 @@ export function foundryMcp(principal=null){
         const count=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
         if(!count.rows[0].n)throw Error('Add a tool before publishing');
         await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2",[visibility,server.id]);
-        const base=(process.env.PUBLIC_URL||'').replace(/\\/$/,'');
+        const base=(process.env.PUBLIC_URL||'').replace(/\/$/,'');
         return {status:'published',slug:server.slug,endpoint:base+'/mcp/'+server.slug,visibility};
       }));
       mcp.registerTool('get_server_usage',{
