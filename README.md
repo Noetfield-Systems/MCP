@@ -32,6 +32,14 @@ The backend never silently uses an in-memory customer database. `/healthz` check
 
 **From an MCP client** — register in Studio and generate an API key in the API keys tab; then attach `https://mcp-foundry-web-production.up.railway.app/mcp/foundry` with Bearer authentication. The authenticated tool list enables natural-language server creation, importing and publishing. Public discovery requires no key.
 
+## Fastest path to a working MCP server
+1. Create a free account in [Studio](https://mcp-foundry-web-production.up.railway.app/#studio).
+2. Choose one real-source GitHub / Hacker News starter template. This atomically creates an owned draft server with the appropriate tool and schema.
+3. Open **Test**, run the example input against the live upstream API, then **Publish** and copy your own remote MCP URL.
+4. For a custom API integration, use the public [implementation enquiry](https://mcp-foundry-web-production.up.railway.app/#implementation). It stores the requested scope and permission to contact; it is not a checkout or an invented paid order.
+
+See [Commercial Launch Contract](docs/COMMERCIAL-LAUNCH.md) for the qualified lead workflow and the verified-payment boundary. [Privacy notice](https://mcp-foundry-web-production.up.railway.app/privacy).
+
 ## Portfolio boundaries
 MCP Foundry owns its customer experiences, MCP hosting, private tenant state and commercial billing. Other Noetfield ventures (SignalForge, SourceA, ARQANT, Fieldwork and others) remain independent providers whose external APIs can be wrapped through consented adapters. It never assumes ownership of their data, customers, agent runtime or treasury.
 

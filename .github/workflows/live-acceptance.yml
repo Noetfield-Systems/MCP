@@ -28,4 +28,12 @@ jobs:
       - name: Native authenticated builder and private tool end-to-end
         env:
           FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
-        run: node scripts/live-native-builder.mjs
+        run: |
+          # Railway and GitHub CI trigger independently; retry while the newly
+          # merged SHA is rolling out rather than counting an older deployment.
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/live-native-builder.mjs; then exit 0; fi
+            echo "External acceptance failed or deployment not converged (attempt ${attempt}/6)"
+            sleep 12
+          done
+          exit 1
