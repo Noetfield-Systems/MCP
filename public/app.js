@@ -14,7 +14,7 @@ function authMode(login){state.login=login;$('#auth-submit').innerHTML=login?'Si
 function updateWorkspace(){
  const logged=!!state.user;$('#studio-auth').classList.toggle('hidden',logged);$('#studio-app').classList.toggle('hidden',!logged);
  $('#sidebar-account').textContent=logged?state.user.email:'Guest access';$('#sidebar-plan').textContent=logged?state.user.plan.toUpperCase()+' PLAN':'Sign in to create servers';
- $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged){loadServers().catch(e=>feedback(e.message));loadTemplates().catch(e=>feedback(e.message));}
+ $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged){loadServers().catch(e=>feedback(e.message));loadTemplates().catch(e=>feedback(e.message));loadActivation().catch(e=>feedback(e.message));}
 }
 async function loadTemplates(){
  const {templates}=await request('GET','/api/templates');
@@ -23,8 +23,22 @@ async function loadTemplates(){
  if(!target)return;
  target.innerHTML=templates.map(t=>`<button class="template-choice" data-template="${esc(t.id)}"><span class="template-category">${esc(t.category)}</span><b>${esc(t.name)}</b><small>${esc(t.description)}</small><span class="template-action">Create draft →</span></button>`).join('');
 }
+async function loadActivation(){
+ if(!state.user)return;
+ const data=await request('GET','/api/me/activation');
+ const done=data.completed||{};
+ const stages=[
+  {label:'Create server',completed:!!(done.server_created||done.template_started),hint:'Choose a live-source starter'},
+  {label:'Run real test',completed:!!done.tool_test_succeeded,hint:'Execute an upstream GET'},
+  {label:'Publish MCP',completed:!!done.server_published,hint:'Activate your endpoint'},
+  {label:'Real tool call',completed:data.successful_managed_calls>0,hint:'Connect a compatible MCP client'}
+ ];
+ const completed=stages.filter(x=>x.completed).length;
+ const target=$('#activation-steps');if(!target)return;
+ target.innerHTML='<div class="activation-score">'+completed+' / '+stages.length+' completed</div>'+stages.map((x,i)=>'<div class="activation-step '+(x.completed?'complete':'pending')+'"><span class="activation-icon">'+(x.completed?'✓':(i+1))+'</span><div><b>'+esc(x.label)+'</b><small>'+esc(x.completed?'Verified':'Next: '+x.hint)+'</small></div></div>').join('');
+}
 async function loadMe(){try{state.user=(await request('GET','/api/me')).account;}catch{state.user=null;}updateWorkspace();}
-async function loadServers(){const data=await request('GET','/api/servers');state.servers=data.servers;renderServers();if(state.selected)await selectServer(state.selected);}
+async function loadServers(){const data=await request('GET','/api/servers');state.servers=data.servers;renderServers();if(state.selected)await selectServer(state.selected);await loadActivation();}
 function renderServers(){
  $('#server-list').innerHTML=state.servers.length?state.servers.map(s=>`<button class="server-row" data-server="${esc(s.id)}"><span class="server-avatar">⌘</span><span><b>${esc(s.name)}</b><small>/mcp/${esc(s.slug)} · ${s.tool_count} tool(s)</small></span><span class="status ${s.status==='published'?'published':''}">${esc(s.status)}</span></button>`).join(''):'<div class="empty-state">No servers yet. Use “New server” to start with your existing API.</div>';
 }
@@ -36,7 +50,7 @@ function renderDetail(){
  const sampleArgs=JSON.stringify(preset?.sampleArgs||{},null,2);
  $('#server-detail').innerHTML=`<div class="detail-header"><div><span class="workspace-eyebrow">SELECTED SERVER · ${esc(s.status)}</span><h4>${esc(s.name)}</h4></div><button class="btn btn-outline btn-small" id="close-detail">Back to all servers</button></div><div class="detail-tabs">${detailTabs()}</div><div id="detail-content" class="detail-content"></div>`;
  const pane=$('#detail-content');
- if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button></div>`;
+ if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button>${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
  if(state.tab==='overview'){
    $('.tool-item',pane).forEach((element,index)=>{
      const tool=t[index];if(!tool)return;
@@ -113,7 +127,18 @@ document.addEventListener('click',async e=>{
     await loadServers();await loadCatalog();feedback('Server and tools deleted');return;
  }
  if(b.id==='publish-server'){const x=await request('POST','/api/servers/'+state.selected+'/publish',{visibility:$('#server-visibility').value});feedback('Published: '+x.endpoint);await loadServers();await loadCatalog();return;}
- if(b.dataset.copy){const value=b.dataset.copy==='mcp-url'?url():location.origin+'/mcp/'+state.detail.server.slug;await navigator.clipboard.writeText(value);msg('Endpoint URL copied');return;}
+ if(b.dataset.copy){
+  const server=state.detail?.server;
+  const endpoint=server?location.origin+'/mcp/'+server.slug:url();
+  let value=b.dataset.copy==='mcp-url'?url():endpoint;
+  if(b.dataset.copy==='mcp-config'){
+    if(!server||server.status!=='published')throw Error('Publish first');
+    const client={type:'http',url:endpoint};
+    if(server.visibility==='private')client.headers={Authorization:'Bearer YOUR_PERSONAL_FOUNDRY_API_KEY'};
+    value=JSON.stringify({mcpServers:{[server.slug]:client}},null,2);
+  }
+  await navigator.clipboard.writeText(value);msg(b.dataset.copy==='mcp-config'?'Client config copied':'Endpoint URL copied');return;
+ }
  if(b.id==='create-key'){const x=await request('POST','/api/keys',{label:$('#key-label').value});$('#key-reveal').classList.remove('hidden');$('#key-reveal').textContent='Copy this key now. It will not be shown again: '+x.secret;await loadKeys();return;}
  if(b.dataset.revoke){await request('DELETE','/api/keys/'+b.dataset.revoke);await loadKeys();msg('Key revoked');return;}
  if(b.id==='upgrade-plan'){const x=await request('POST','/api/billing/checkout',{});if(x.url){location.href=x.url;}return;}
@@ -153,7 +178,7 @@ document.addEventListener('submit',async e=>{
     await loadServers();await loadCatalog();feedback('Server details saved');
  }
  if(f.id==='import-form'){const document=JSON.parse(value('document'));const x=await request('POST','/api/servers/'+state.selected+'/import-openapi',{document,baseUrl:value('baseUrl')});state.tab='overview';await loadServers();feedback(x.added+' real GET tool(s) imported');}
- if(f.id==='test-form'){const args=JSON.parse(value('args')||'{}');const tool=value('tool');const result=$('#test-result');result.classList.remove('hidden');result.textContent='Executing against source…';try{const x=await request('POST','/api/tools/'+tool+'/test',{args});result.textContent=JSON.stringify(x,null,2);}catch(err){result.textContent='Test failed: '+err.message;}}
+ if(f.id==='test-form'){const args=JSON.parse(value('args')||'{}');const tool=value('tool');const result=$('#test-result');result.classList.remove('hidden');result.textContent='Executing against source…';try{const x=await request('POST','/api/tools/'+tool+'/test',{args});result.textContent=JSON.stringify(x,null,2);await loadActivation();}catch(err){result.textContent='Test failed: '+err.message;}}
  }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else if(f.id==='pilot-form'){const result=$('#pilot-result');result.classList.remove('success');result.classList.add('error');result.textContent='Request not saved: '+err.message;}else feedback(err.message);}finally{if(button)button.disabled=false;}
 });
 let searchTimer;$('#catalog-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadCatalog,250);});
