@@ -103,7 +103,16 @@ try{
    const resp=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
    assert.equal(resp.status(),200,'tablet route '+route);
    const metric=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
-   assert.ok(metric.scroll<=metric.width+3,'tablet 768px page overflow on '+route+': '+JSON.stringify(metric));
+   if(metric.scroll>metric.width+3){
+     const offenders=await page.evaluate(()=>[...document.querySelectorAll('body *')]
+       .map(el=>({el,r:el.getBoundingClientRect()}))
+       .filter(({el,r})=>r.width>0&&r.right>innerWidth+3&&
+         getComputedStyle(el).position!=='fixed'&&getComputedStyle(el).display!=='none')
+       .sort((a,b)=>b.r.right-a.r.right).slice(0,12)
+       .map(({el,r})=>({tag:el.tagName,name:el.className?.toString().slice(0,80)||el.id,
+          right:Math.round(r.right),width:Math.round(r.width),text:el.textContent?.trim().slice(0,40)})));
+     throw Error('tablet overflow on '+route+': '+JSON.stringify({metric,offenders}));
+   }
  }
  await page.setViewportSize({width:1440,height:900});
  for(const route of ['/','/solutions','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
