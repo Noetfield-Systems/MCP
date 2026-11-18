@@ -52,7 +52,7 @@ function renderDetail(){
  const pane=$('#detail-content');
  if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button>${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
  if(state.tab==='overview'){
-   $('.tool-item',pane).forEach((element,index)=>{
+   $$('.tool-item',pane).forEach((element,index)=>{
      const tool=t[index];if(!tool)return;
      element.insertAdjacentHTML('beforeend',`<div class="tool-actions"><button class="btn btn-outline btn-small" data-edit-tool="${esc(tool.id)}">Edit</button><button class="btn btn-outline btn-small danger" data-remove-tool="${esc(tool.id)}">Remove</button></div>`);
    });
