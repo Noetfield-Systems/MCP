@@ -40,11 +40,11 @@ export function pinnedPublicLookup(address){
     else cb(null,address,4);
   };
 }
-export async function safeGet(value,{authorization}={}){
+export async function safeGet(value,{authorization,authorizedHost='api.github.com'}={}){
   const u=validatedTarget(value);
-  // OAuth tokens are injected by the server only, never by a customer tool
-  // argument. An authenticated call may reach only its fixed provider host.
-  if(authorization&&(u.hostname!=='api.github.com'||typeof authorization!=='string'||!/^Bearer [A-Za-z0-9_.-]{10,6000}$/.test(authorization)))throw Error('OAUTH_HOST_OR_TOKEN_INVALID');
+  // Token injection is server-side only, host-pinned and never redirected.
+  // OAuth defaults to api.github.com; BYOK must explicitly declare its exact fixed host.
+  if(authorization&&(u.hostname.toLowerCase()!==authorizedHost||typeof authorization!=='string'||!/^Bearer [A-Za-z0-9~+/_=.-]{10,6000}$/.test(authorization)))throw Error('UPSTREAM_AUTH_HOST_OR_TOKEN_INVALID');
   const answers=await dns.lookup(u.hostname,{all:true,family:4,verbatim:true});
   if(!answers.length||answers.some(a=>blockedIp(a.address))) throw new Error('Endpoint DNS is not a public IPv4 address');
   const address=answers[0].address;
