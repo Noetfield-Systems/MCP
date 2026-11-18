@@ -51,7 +51,7 @@ Your Studio can now rename and describe servers, edit/remove tools, unpublish a 
 ## Private commercial operations
 [Operator Desk](https://mcp-foundry-web-production.up.railway.app/operator) shows genuine account/server usage counts and consented implementation enquiry records. Configure a long random `FOUNDRY_ADMIN_TOKEN` in the Railway service (never in GitHub), then enter it once into the Desk. The token stays in page memory and is not stored in browser storage. Lead status is an operator classification, not a paid receipt. Without the secret the endpoint fails closed.
 
-## Premium product experience and 100-question acceptance
+## OAuth connections and MCP Apps\n\nA constrained GitHub OAuth authorization-code PKCE connector exists for explicitly private MCP servers with encrypted server-side tokens. It remains disabled until a dedicated Foundry GitHub OAuth App client ID/secret and an AES-GCM encryption key are configured. No third-party consent or live account connection is simulated. See [OAuth Connections](docs/OAUTH-CONNECTIONS.md).\n\nThe Foundry MCP endpoint also implements the official MCP Apps Tool + UI Resource extension and returns a self-contained interactive host View. It requires a compatible MCP Apps host. See [MCP Apps](docs/MCP-APPS.md).\n\n## Premium product experience and 100-question acceptance
 
 The premium public site is an evolution of the original dark Foundry visual identity, not a replacement landing page. It now includes an intelligible source API → guarded build/test → remote MCP workflow, three production-grounded product use cases, full public FAQ, polished responsive UI, accessible skip/focus/mobile navigation, live gateway health, and actionable directory MCP URL copy.
 

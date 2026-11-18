@@ -40,14 +40,17 @@ export function pinnedPublicLookup(address){
     else cb(null,address,4);
   };
 }
-export async function safeGet(value){
+export async function safeGet(value,{authorization}={}){
   const u=validatedTarget(value);
+  // OAuth tokens are injected by the server only, never by a customer tool
+  // argument. An authenticated call may reach only its fixed provider host.
+  if(authorization&&(u.hostname!=='api.github.com'||typeof authorization!=='string'||!/^Bearer [A-Za-z0-9_.-]{10,6000}$/.test(authorization)))throw Error('OAUTH_HOST_OR_TOKEN_INVALID');
   const answers=await dns.lookup(u.hostname,{all:true,family:4,verbatim:true});
   if(!answers.length||answers.some(a=>blockedIp(a.address))) throw new Error('Endpoint DNS is not a public IPv4 address');
   const address=answers[0].address;
   const dispatcher=new Agent({connect:{lookup:pinnedPublicLookup(address)},connections:1,pipelining:0});
   try {
-    const response=await undiciFetch(u,{method:'GET',redirect:'manual',headers:{Accept:'application/json, text/plain;q=0.9'},dispatcher,signal:AbortSignal.timeout(8000)});
+    const response=await undiciFetch(u,{method:'GET',redirect:'manual',headers:{Accept:'application/json, text/plain;q=0.9',...(authorization?{Authorization:authorization}:{})},dispatcher,signal:AbortSignal.timeout(8000)});
     if(response.status>=300&&response.status<400) throw new Error('Upstream redirects are disabled');
     const header=Number(response.headers.get('content-length')||'0');
     if(header>262144) throw new Error('Upstream response exceeds 256 KiB');

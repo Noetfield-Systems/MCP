@@ -16,6 +16,14 @@ async function ok(path,opts={}){const r=await fetchJson(path,opts);assert.ok(r.s
 try{
  const a=await ok('/api/auth/register',{account:owner,method:'POST',data:{email:owner.email,password:owner.password}});
  owner.created=true;assert.ok(a.account.id);
+ const oauth=await ok('/api/oauth/github/status',{account:owner});
+ assert.equal(oauth.connected,false,'fresh fixture does not have fake GitHub OAuth connection');
+ assert.equal(typeof oauth.configured,'boolean','real provider configuration surface');
+ assert.ok(!Object.keys(oauth).some(k=>/access_token|refresh_token|client_secret/.test(k)),'never exposes OAuth secrets');
+ if(!oauth.configured){
+  const unavailable=await fetchJson('/api/oauth/github/start',{account:owner,method:'POST',data:{}});
+  assert.equal(unavailable.status,503,'unconfigured OAuth cannot masquerade as a completed connection');
+ }
  const growth=await ok('/api/growth/me',{account:owner});assert.ok(growth.invite_url.includes('?ref=fdy-'));
  const ref=new URL(growth.invite_url).searchParams.get('ref');
  const b=await ok('/api/auth/register',{account:member,method:'POST',data:{email:member.email,password:member.password,referral_code:ref}});
@@ -66,7 +74,7 @@ try{
  await ok('/api/servers/'+serverId+'/publish',{account:owner,method:'POST',data:{visibility:'public'}});
  const listedAgain=await ok('/api/marketplace');
  assert.ok(listedAgain.listings.some(x=>x.slug===starter.server.slug));
- console.log(JSON.stringify({result:'PASS',type:'P0_P1_P2_ACTUAL_POSTGRES',referral_signup:'PASS',publisher_marketplace:'PASS',revision_restore:'PASS',team_invite:'PASS',viewer_denied:'PASS',editor_published:'PASS',revoke:'PASS',operator_isolation:'PASS',real_customer:false,payment_collected:false}));
+ console.log(JSON.stringify({result:'PASS',type:'P0_P1_P2_ACTUAL_POSTGRES',referral_signup:'PASS',publisher_marketplace:'PASS',revision_restore:'PASS',oauth_account_isolation:'PASS',team_invite:'PASS',viewer_denied:'PASS',editor_published:'PASS',revoke:'PASS',operator_isolation:'PASS',real_customer:false,payment_collected:false}));
 }finally{
  for(const account of [member,owner]){
   if(!account.created)continue;
