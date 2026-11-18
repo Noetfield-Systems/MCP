@@ -2,6 +2,7 @@ import express from 'express';
 import {randomBytes,createHash,createCipheriv,createDecipheriv} from 'node:crypto';
 import {q,pool,ownedServer} from './db.mjs';
 import {safeGet} from './security.mjs';
+import {decryptUpstreamKey} from './upstream.mjs';
 
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const b64=b=>b.toString('base64url');
@@ -69,7 +70,15 @@ export async function githubAccessToken(ownerId){
 }
 export async function guardedManagedGet(server,principal,target){
  const {rows}=await q('SELECT provider FROM server_oauth_bindings WHERE server_id=$1',[server.id]);
- if(!rows.length)return safeGet(target);
+ if(!rows.length){
+  const byok=await q('SELECT hostname,token_cipher FROM server_upstream_keys WHERE server_id=$1',[server.id]);
+  if(!byok.rowCount)return safeGet(target);
+  if(server.visibility!=='private'||principal?.id!==server.owner_id)throw Error('UPSTREAM_KEY_OWNER_AUTH_REQUIRED');
+  const {hostname,token_cipher}=byok.rows[0],u=new URL(target);
+  if(u.hostname.toLowerCase()!==hostname||u.protocol!=='https:')throw Error('UPSTREAM_KEY_HOST_MISMATCH');
+  const key=decryptUpstreamKey(token_cipher,server.id,hostname);
+  return safeGet(target,{authorization:'Bearer '+key,authorizedHost:hostname});
+ }
  if(rows[0].provider!=='github')throw Error('UNKNOWN_OAUTH_PROVIDER');
  if(server.visibility!=='private'||principal?.id!==server.owner_id)throw Error('OAUTH_OWNER_AUTH_REQUIRED');
  const u=new URL(target);
