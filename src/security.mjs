@@ -27,7 +27,7 @@ const blockedIp=(v)=>{
 };
 export function validatedTarget(value){
   let u;try {u=new URL(value);}catch{throw new Error('Invalid HTTPS endpoint');}
-  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||!u.hostname||u.hostname.length>253||u.hostname.endsWith('.local')||u.hostname.endsWith('.internal')||net.isIP(u.hostname)) throw new Error('Only public-domain HTTPS endpoints on port 443 are supported');
+  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||!u.hostname||u.hostname.length>253||u.hostname.endsWith('.local')||u.hostname.endsWith('.internal')||net.isIP(u.hostname)||u.hostname.includes('[')||u.hostname.includes(']')) throw new Error('Only public-domain HTTPS endpoints on port 443 are supported');
   u.hash='';
   return u;
 }
