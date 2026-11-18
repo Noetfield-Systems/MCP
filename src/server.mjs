@@ -96,6 +96,14 @@ app.post('/api/auth/logout',async(req,res)=>{
  res.clearCookie('mcpf_session',{path:'/'});res.json({ok:true});
 });
 app.get('/api/me',auth,(req,res)=>res.json({account:req.user}));
+app.get('/api/me/activation',auth,async(req,res)=>{
+ const [events,live]=await Promise.all([
+   q("SELECT name,max(created_at) AS latest FROM activation_events WHERE account_id=$1 GROUP BY name",[req.user.id]),
+   q("SELECT count(*)::int AS successful_calls FROM tool_events te JOIN servers s ON s.id=te.server_id WHERE s.owner_id=$1 AND te.success=true",[req.user.id])
+ ]);
+ const completed=Object.fromEntries(events.rows.map(row=>[row.name,row.latest]));
+ res.json({completed,successful_managed_calls:live.rows[0].successful_calls,source:'observed_account_operations',payments_collected:null});
+});
 app.delete('/api/account',auth,async(req,res)=>{
   // Account owner must re-enter the password. This also makes temporary live
   // conformance accounts safely removable without leaving test traffic behind.
