@@ -1,0 +1,32 @@
+name: P0-P2 Multi-Tenant Live Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "scripts/live-expansion.mjs"
+      - ".github/workflows/live-expansion.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verified-marketplace-team:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Real production multi-account acceptance after Railway convergence
+        env:
+          FOUNDRY_BASE_URL: https://mcp-foundry-web-production.up.railway.app
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/live-expansion.mjs; then exit 0; fi
+            echo "Real expansion acceptance not ready or failed (${attempt}/6)"
+            sleep 15
+          done
+          exit 1
