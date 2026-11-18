@@ -247,7 +247,7 @@ document.addEventListener('submit',async e=>{
    result.classList.remove('success','error');
    const payload={
      contact_name:value('contact_name'),email:value('email'),company:value('company'),
-     website:value('website'),project_brief:value('project_brief'),
+     website:value('website'),project_brief:value('project_brief'),service_package:value('service_package'),
      contact_consent:data.has('contact_consent'),marketing_consent:data.has('marketing_consent'),
      nickname:value('nickname')
    };
@@ -284,6 +284,8 @@ document.addEventListener('input',event=>{
  }
  if(target.matches('#new-server-form [name="slug"]'))target.dataset.userEdited='true';
 });
+const desiredService=new URLSearchParams(location.search).get('service');
+if(['quickstart','launch','private','care','agency','custom'].includes(desiredService)&&$('#pilot-package'))$('#pilot-package').value=desiredService;
 $('#public-mcp-url').textContent=url();
 const gateway=$('#hero-gateway');
 request('GET','/healthz').then(s=>{
