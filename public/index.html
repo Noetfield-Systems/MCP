@@ -77,7 +77,9 @@
    <div id="studio-app" class="studio-app hidden">
     <div class="workspace-title"><div><span class="workspace-eyebrow">MY WORKSPACE</span><h3 id="workspace-heading">Your MCP servers</h3></div><button class="btn btn-primary btn-small" id="new-server">+ New server</button></div>
     <p class="form-feedback" id="workspace-feedback" role="status"></p>
-    <div id="panel-servers" class="app-panel"><div id="server-list" class="server-list"><div class="empty-state">No servers yet. Create one to get started.</div></div><div id="server-detail" class="server-detail hidden"></div></div>
+    <div id="panel-servers" class="app-panel">
+     <div class="starter-picker"><div class="starter-head"><div><span class="workspace-eyebrow">QUICK START</span><h4>Build from a real API.</h4><p>Choose a source-backed starter. Every example calls a genuine public endpoint, not demo data.</p></div></div><div id="template-list" class="template-list"><div class="empty-state">Loading live starter templates…</div></div></div>
+     <div id="server-list" class="server-list"><div class="empty-state">No servers yet. Create one to get started.</div></div><div id="server-detail" class="server-detail hidden"></div></div>
     <div id="panel-keys" class="app-panel hidden"><div class="inner-title"><h4>Personal API keys</h4><p>Private MCP endpoints require a bearer key. Keys are shown once and stored as hashes.</p></div><div class="inline-form"><input id="key-label" placeholder="e.g. Cursor workstation"><button class="btn btn-primary btn-small" id="create-key">Generate key</button></div><div id="key-reveal" class="key-reveal hidden"></div><div id="key-list"></div></div>
     <div id="panel-billing" class="app-panel hidden"><div class="inner-title"><h4>Workspace billing</h4><p>Free workspaces include two servers, ten tools per server, and 500 daily tool executions. Upgrade only when billing is configured.</p></div><div id="billing-panel"></div></div>
    </div>
@@ -99,6 +101,21 @@
 <section class="section wrap" id="pricing"><div class="section-kicker">PRICING <span>05 / 05</span></div><div class="section-head"><h2>Start building.<br><em>Pay when you grow.</em></h2><p>Transparent limits. Paid checkout becomes available when the production Stripe account and webhook are configured.</p></div>
  <div class="pricing-grid"><article class="price-card"><span class="plan-type">FREE / BUILD</span><h3>$0 <small>/ month</small></h3><p>For developers validating their first integrations.</p><ul><li>2 published or draft servers</li><li>10 tools per server</li><li>500 tool executions / day</li><li>Public or private endpoints</li><li>OpenAPI import and live testing</li></ul><a href="#studio" class="btn btn-outline btn-wide">Start for free ↗</a></article>
  <article class="price-card featured-price"><div class="plan-ribbon">FOR TEAMS & PRODUCTION</div><span class="plan-type">PRO / SCALE</span><h3>Custom <small>/ contact us</small></h3><p>Higher limits and production operations for API businesses.</p><ul><li>Expanded servers and tool catalogs</li><li>25,000 executions / day per server</li><li>Usage visibility and private API keys</li><li>Integration engineering support</li><li>Billing-enabled upgrade when configured</li></ul><a href="#studio" class="btn btn-primary btn-wide">View upgrade options ↗</a></article></div>
+<div id="implementation" class="pilot-offer">
+  <div class="pilot-copy"><div class="section-kicker">CUSTOM IMPLEMENTATION</div><span class="pilot-tag">DONE-FOR-YOU MCP ENGINEERING</span><h3>Your API, agent-ready.<br><em>Built with you.</em></h3><p>Need a custom integration, secure gateway, or dedicated MCP rollout? Submit your real API use case for a scoped implementation proposal. A $199 pilot is an initial pricing experiment, not a guaranteed fixed quote or an active checkout.</p><div class="pilot-benefits"><div>✓ Discovery and tool mapping</div><div>✓ Hosted endpoint and SDK test</div><div>✓ Evidence-backed delivery scope</div></div></div>
+  <div class="pilot-form-wrap"><span class="workspace-eyebrow">REQUEST IMPLEMENTATION</span><h4>Tell us what you need.</h4>
+  <form id="pilot-form" class="pilot-form">
+   <label>Your name<input name="contact_name" required maxlength="120" placeholder="Full name" autocomplete="name"></label>
+   <label>Work email<input type="email" name="email" required maxlength="180" placeholder="you@company.com" autocomplete="email"></label>
+   <label>Company / project<input name="company" maxlength="160" placeholder="Organization or project"></label>
+   <label>Website / API URL <small>(optional, HTTPS)</small><input type="url" name="website" maxlength="300" placeholder="https://yourproduct.com"></label>
+   <label>What should your MCP do?<textarea name="project_brief" required minlength="20" maxlength="2000" placeholder="Describe the product, existing API, intended AI clients, and key operations."></textarea></label>
+   <label class="pilot-checkbox"><input type="checkbox" name="contact_consent" required> I agree to be contacted about this request.</label>
+   <label class="pilot-checkbox"><input type="checkbox" name="marketing_consent"> Send me optional Foundry product updates.</label>
+   <div class="pilot-honeypot" aria-hidden="true"><label>Nickname<input name="nickname" tabindex="-1" autocomplete="off"></label></div>
+   <button class="btn btn-primary btn-large" type="submit" id="pilot-submit">Request a scoped proposal <span>↗</span></button>
+   <p id="pilot-result" class="pilot-result" role="status">Your request is stored securely. No payment is taken by this form.</p>
+  </form></div></div>
 </section>
 <section class="final-cta wrap"><div><div class="eyebrow">FROM ENDPOINT TO ECOSYSTEM</div><h2>Make your software<br><em>agent-ready.</em></h2></div><a href="#studio" class="btn btn-light btn-large">Open the Foundry <span>↗</span></a></section>
 </main>
