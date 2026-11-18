@@ -34,7 +34,10 @@ export async function initDb(){
     tool_name text NOT NULL, account_id uuid REFERENCES accounts(id) ON DELETE SET NULL,
     success boolean NOT NULL, duration_ms integer NOT NULL, created_at timestamptz NOT NULL DEFAULT now()
   );
+  ALTER TABLE tool_events ADD COLUMN IF NOT EXISTS error_code text;
+  ALTER TABLE tool_events ADD COLUMN IF NOT EXISTS upstream_status integer;
   CREATE INDEX IF NOT EXISTS tool_events_server_date_idx ON tool_events(server_id,created_at DESC);
+  CREATE INDEX IF NOT EXISTS tool_events_server_error_idx ON tool_events(server_id,error_code) WHERE success=false;
   CREATE TABLE IF NOT EXISTS pilot_leads (
     id uuid PRIMARY KEY,
     email text NOT NULL UNIQUE,
