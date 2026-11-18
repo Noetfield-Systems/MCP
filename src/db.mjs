@@ -35,6 +35,19 @@ export async function initDb(){
     success boolean NOT NULL, duration_ms integer NOT NULL, created_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS tool_events_server_date_idx ON tool_events(server_id,created_at DESC);
+  CREATE TABLE IF NOT EXISTS pilot_leads (
+    id uuid PRIMARY KEY,
+    email text NOT NULL UNIQUE,
+    contact_name text NOT NULL,
+    company text NOT NULL DEFAULT '',
+    website text NOT NULL DEFAULT '',
+    project_brief text NOT NULL,
+    marketing_consent boolean NOT NULL DEFAULT false,
+    status text NOT NULL DEFAULT 'new',
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS pilot_leads_created_idx ON pilot_leads(created_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
