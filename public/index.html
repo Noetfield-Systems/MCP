@@ -86,7 +86,7 @@
 </section>
 <section class="section developers-section" id="developers"><div class="wrap">
  <div class="section-kicker">FOR DEVELOPERS <span>04 / 05</span></div><div class="section-head"><h2>Standard first.<br><em>Fully portable.</em></h2><p>Our built-in MCP directory uses the official TypeScript SDK v2. Publish your own endpoints or integrate Foundry with an existing MCP client.</p></div>
- <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>The public endpoint lists genuine published servers and their tools. No account is needed for discovery; protected customer servers use bearer authentication.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" class="text-link">Read the MCP specification ↗</a></div>
+ <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>Public access discovers genuine published servers. Add your personal Foundry API key to the same MCP endpoint to unlock create_server, import_openapi, test_readonly_tool and publish_server directly from your AI client.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" class="text-link">Read the MCP specification ↗</a></div>
  <div class="dev-code"><div class="code-top"><span><i></i><i></i><i></i></span><b>mcp-client.json</b><button data-copy="mcp-url" class="copy-btn">COPY URL</button></div><pre id="dev-code">{
   "mcpServers": {
     "foundry": {
@@ -94,7 +94,7 @@
       "url": "<span id="public-mcp-url">/mcp/foundry</span>"
     }
   }
-}</pre><div class="code-foot"><span>◈</span> Remote discovery · Source-backed tools only</div></div></div>
+}</pre><div class="code-foot"><span>◈</span> Public discovery · Authenticated builder tools</div></div></div>
 </div></section>
 <section class="section wrap" id="pricing"><div class="section-kicker">PRICING <span>05 / 05</span></div><div class="section-head"><h2>Start building.<br><em>Pay when you grow.</em></h2><p>Transparent limits. Paid checkout becomes available when the production Stripe account and webhook are configured.</p></div>
  <div class="pricing-grid"><article class="price-card"><span class="plan-type">FREE / BUILD</span><h3>$0 <small>/ month</small></h3><p>For developers validating their first integrations.</p><ul><li>2 published or draft servers</li><li>10 tools per server</li><li>500 tool executions / day</li><li>Public or private endpoints</li><li>OpenAPI import and live testing</li></ul><a href="#studio" class="btn btn-outline btn-wide">Start for free ↗</a></article>
