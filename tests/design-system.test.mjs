@@ -23,7 +23,7 @@ test('canonical 12-page premium design shell is consistent and retains product r
    assert.ok(doc.includes('href="/privacy"'),name+' visible privacy destination');
    assert.ok(doc.includes('/#quickstart'),name+' real fixed-scope commercial handoff');
    if(name==='index')assert.ok(doc.includes('id="nav-login"'), 'homepage auth integration preserved');
-   else assert.ok(doc.includes('src="/site-shell.js?v=20261118-graphite"'),name+' dedicated secondary navigation logic');
+   else assert.ok(doc.includes('src="/site-shell.js?v=20261118-b"'),name+' dedicated secondary navigation logic');
  }
 });
 test('canonical design system establishes responsive layout, keyboard and reduced-motion accessibility',()=>{
