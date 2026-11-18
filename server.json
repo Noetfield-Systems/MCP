@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Noetfield-Systems/mcp-foundry",
+  "title": "MCP Foundry — Build, Test & Publish MCP Servers",
+  "description": "Build, test, publish and manage real MCP servers from APIs with a live developer studio.",
+  "repository": {
+    "url": "https://github.com/Noetfield-Systems/MCP",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp-foundry-web-production.up.railway.app/mcp/foundry"
+    }
+  ]
+}

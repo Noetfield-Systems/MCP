@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import {randomUUID,timingSafeEqual} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import {readFileSync} from 'node:fs';
 import {q,initDb,requireAuth,ownedServer,pool} from './db.mjs';
 import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl,safeGet,enforceOrigin,throttle} from './security.mjs';
 import {managedMcp,foundryMcp} from './mcp.mjs';
@@ -309,7 +310,9 @@ app.post('/api/billing/checkout',auth,async(req,res)=>{
  res.json({url:session.url,checkout_session_id:session.id});
  }catch(e){return j(res,502,'CHECKOUT_UNAVAILABLE');}
 });
-app.get('/server.json',(_req,res)=>res.json({name:'io.github.Noetfield-Systems/mcp-foundry',description:'Discover published public MCP servers and their tools',version:'0.1.0',remotes:[{type:'streamable-http',url:(process.env.PUBLIC_URL||'http://localhost:'+port)+'/mcp/foundry'}]}));
+// Serve the exact, versioned official Registry manifest from one SSOT file.
+const officialRegistryManifest=JSON.parse(readFileSync(new URL('../server.json',import.meta.url),'utf8'));
+app.get('/server.json',(_req,res)=>res.json(officialRegistryManifest));
 app.get('/.well-known/mcp/server.json',(req,res)=>res.redirect(307,'/server.json'));
 app.use(express.static(ROOT,{extensions:['html'],maxAge:'5m'}));
 app.use((err,req,res,next)=>{console.error('request_error',err?.message);if(res.headersSent)return next(err);return j(res,500,'INTERNAL_ERROR');});

@@ -1,0 +1,107 @@
+name: Publish MCP Foundry to Official Registry
+on:
+  push:
+    branches: [main]
+    paths:
+      - server.json
+      - .github/workflows/publish-registry.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: mcp-foundry-official-registry
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify local registry metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('server.json').read_text())
+          assert s['name']=='io.github.Noetfield-Systems/mcp-foundry'
+          assert s['version']=='0.1.0'
+          assert s['repository']['url']=='https://github.com/Noetfield-Systems/MCP'
+          assert s['remotes']==[{'type':'streamable-http','url':'https://mcp-foundry-web-production.up.railway.app/mcp/foundry'}]
+          print('SERVER_MANIFEST_CONSISTENT')
+          PY
+      - name: Confirm live remote manifest matches repository
+        run: |
+          python3 - <<'PY'
+          import json,time,urllib.request
+          from pathlib import Path
+          expected=json.loads(Path('server.json').read_text())
+          last=None
+          for attempt in range(1,16):
+            try:
+              with urllib.request.urlopen('https://mcp-foundry-web-production.up.railway.app/server.json',timeout=12) as response:
+                live=json.load(response)
+              if live==expected:
+                print('LIVE_MANIFEST_MATCH_PASS',expected['name'],expected['version'])
+                break
+              last='REMOTE_MANIFEST_NOT_YET_MATCHED'
+            except Exception as e:
+              last=str(e)[:160]
+            print('REMOTE_MANIFEST_PENDING',attempt,last)
+            if attempt==15:
+              raise SystemExit('LIVE_MANIFEST_MATCH_FAILED '+str(last))
+            time.sleep(8)
+          PY
+      - name: Install pinned cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Download and verify pinned official publisher
+        shell: bash
+        run: |
+          set -euo pipefail
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+          archive="mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/$MCP_PUBLISHER_VERSION"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/$MCP_PUBLISHER_VERSION" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+      - name: Validate official manifest schema
+        run: ./mcp-publisher validate
+      - name: Authenticate via GitHub Actions OIDC (no PAT)
+        run: ./mcp-publisher login github-oidc
+      - name: Publish remote-only MCP metadata
+        run: ./mcp-publisher publish
+      - name: Verify exact official registry listing
+        run: |
+          python3 - <<'PY'
+          import json,time,urllib.parse,urllib.request
+          name='io.github.Noetfield-Systems/mcp-foundry'
+          version='0.1.0'
+          uri='https://registry.modelcontextprotocol.io/v0.1/servers/'+urllib.parse.quote(name,safe='')+'/versions/'+version
+          failure='NOT_RETRIEVED'
+          for attempt in range(1,16):
+            try:
+              with urllib.request.urlopen(uri,timeout=15) as r:
+                item=json.load(r)
+              server=item.get('server',item)
+              remotes=server.get('remotes',[])
+              if server.get('name')==name and server.get('version')==version and any(
+                remote.get('url')=='https://mcp-foundry-web-production.up.railway.app/mcp/foundry'
+                for remote in remotes
+              ):
+                print('OFFICIAL_REGISTRY_READBACK_PASS',name,version)
+                print('OFFICIAL_REGISTRY_URI',uri)
+                break
+              failure='ENTRY_MISMATCH'
+            except Exception as e:
+              failure=str(e)[:180]
+            print('OFFICIAL_REGISTRY_PENDING',attempt,failure)
+            if attempt==15:raise SystemExit('OFFICIAL_REGISTRY_NOT_VERIFIED '+failure)
+            time.sleep(8)
+          PY

@@ -1,5 +1,6 @@
 import {Client,StreamableHTTPClientTransport} from '@modelcontextprotocol/client';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 
 const base=(process.env.FOUNDRY_BASE_URL||'https://mcp-foundry-web-production.up.railway.app').replace(/\/$/,'');
 const run=async()=>{
@@ -12,6 +13,11 @@ const run=async()=>{
   const cat=await fetch(base+'/api/catalog',{signal:AbortSignal.timeout(12000)});
   assert.equal(cat.status,200,'directory API HTTP 200');
   assert.ok(Array.isArray((await cat.json()).servers),'directory returns real server list');
+  const manifestResponse=await fetch(base+'/server.json',{signal:AbortSignal.timeout(12000)});
+  assert.equal(manifestResponse.status,200,'official manifest HTTP 200');
+  const expected=JSON.parse(readFileSync(new URL('../server.json',import.meta.url),'utf8'));
+  assert.deepEqual(await manifestResponse.json(),expected,'live manifest byte-equivalent JSON to repository canonical metadata');
+  assert.equal(expected.remotes[0].url,base+'/mcp/foundry','remote URL matches deployed MCP endpoint');
   const client=new Client({name:'foundry-live-smoke',version:'0.1.0'},{versionNegotiation:{mode:'auto'}});
   const transport=new StreamableHTTPClientTransport(new URL(base+'/mcp/foundry'));
   try{
