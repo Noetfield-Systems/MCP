@@ -112,7 +112,16 @@
 </section>
 <section class="section developers-section" id="developers"><div class="wrap">
  <div class="section-kicker">FOR DEVELOPERS <span>04 / 06</span></div><div class="section-head"><h2>Standard first.<br><em>Fully portable.</em></h2><p>Our built-in MCP directory uses the official TypeScript SDK v2. Publish your own endpoints or integrate Foundry with an existing MCP client.</p></div>
- <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>Public access discovers genuine published servers. Add your personal Foundry API key to the same MCP endpoint to unlock create_server, import_openapi, test_readonly_tool and publish_server directly from your AI client.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="/developers" class="text-link">Read installation and SDK docs ↗</a></div>
+ <div class="native-builder-callout" id="build-from-ai"><div>
+  <span class="workspace-eyebrow">ALREADY BUILT · MCP-NATIVE WORKFLOW</span>
+  <h3>Build your MCP from an AI client.</h3>
+  <p>Foundry already exposes authenticated tools to list, create, import, test and publish servers. Generate a personal Foundry API key in Studio, connect a compatible host, and use the existing Builder without leaving your AI conversation. Keep the key in your client's private authorization configuration, never in the prompt.</p>
+  <a href="/developers#native">See authenticated Builder tools and connection steps ↗</a>
+</div><pre aria-label="Example prompt for an authenticated Foundry MCP client">Use the connected Foundry MCP Builder tools to
+create a read-only server for a public API.
+Select only useful GET operations; show me the
+test results before publishing the endpoint.</pre></div>
+<div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>Public access discovers genuine published servers. Add your personal Foundry API key to the same MCP endpoint to unlock create_server, import_openapi, test_readonly_tool and publish_server directly from your AI client.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="/developers" class="text-link">Read installation and SDK docs ↗</a></div>
  <div class="dev-code"><div class="code-top"><span><i></i><i></i><i></i></span><b>mcp-client.json</b><button data-copy="mcp-url" class="copy-btn">COPY URL</button></div><pre id="dev-code">{
   "mcpServers": {
     "foundry": {
