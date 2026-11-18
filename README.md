@@ -4,6 +4,14 @@
 
 [Production application](https://mcp-foundry-web-production.up.railway.app) · [Public directory MCP](https://mcp-foundry-web-production.up.railway.app/mcp/foundry) · [Product strategy](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Strategy V3: commercial and execution priorities](docs/STRATEGY-PRIORITIES-2026-11-18.md) · [legacy 100-initiative backlog](docs/GROWTH-AND-ROADMAP.md)
 
+## Final v1.0 execution — canonically ranked, not 100 launch blockers
+
+- [GA Release Execution Plan (30 ordered upgrades + 6 delivery phases)](docs/GA-RELEASE-EXECUTION-2026-11-18.md).
+- [Complete Strategy V3 100-action execution ledger](docs/GA-100-EXECUTION-LEDGER.md) preserves all original ranks, acceptance criteria, previous-backlog mappings and conservative status/evidence triage.
+- [P0 Production Incident — repeated 502/timeouts](https://github.com/Noetfield-Systems/MCP/issues/47) precedes any claim of a green current production release. Source CI PASS is not live acceptance.
+- **Technical GA is independent of first revenue:** first verified paid project and accepted external usage are parallel commercial targets, not artificial launch blockers.
+- Work in at most 3 lanes: service recovery, buyer/order conversion and external client activation. Keep current graphite UI and existing Stripe Quickstart flow.
+
 ## Active publication vs draft editing (18 November 2026)
 Published MCP servers now serve an **immutable tool snapshot**. New tools, edits, OpenAPI imports and revision restores change the editable draft without removing the live server. An explicit Publish transaction creates the next version and switches it atomically; Unpublish still disables an endpoint. API responses expose `published_revision` and `has_unpublished_changes`; the Marketplace and public directory display only published definitions.
 
