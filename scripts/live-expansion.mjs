@@ -68,9 +68,11 @@ try{
  const prior=await ok('/api/servers/'+serverId+'/revisions',{account:owner});
  assert.ok(prior.revisions.length>=2);
  const restored=await ok('/api/servers/'+serverId+'/revisions/'+prior.revisions[0].id+'/restore',{account:owner,method:'POST'});
- assert.equal(restored.status,'draft');assert.equal(restored.requires_republish,true);
- const absent=await ok('/api/marketplace');
- assert.equal(absent.listings.some(x=>x.slug===starter.server.slug),false,'draft revisions cannot appear as live marketplace items');
+ assert.equal(restored.status,'published','restoring draft leaves active endpoint published');assert.equal(restored.requires_republish,true);
+ const stillLive=await ok('/api/marketplace');
+ assert.equal(stillLive.listings.some(x=>x.slug===starter.server.slug),true,'public listing remains during draft restore');
+ const oldTools=await ok('/api/marketplace/'+starter.server.slug);
+ assert.ok(oldTools.tools.some(t=>t.name==='top_story_ids'),'active tools remain unchanged until cutover');
  await ok('/api/servers/'+serverId+'/publish',{account:owner,method:'POST',data:{visibility:'public'}});
  const listedAgain=await ok('/api/marketplace');
  assert.ok(listedAgain.listings.some(x=>x.slug===starter.server.slug));
