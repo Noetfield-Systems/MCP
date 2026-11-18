@@ -6,7 +6,7 @@
 
 ## What is real now?
 - Public premium website, developer copy/config, directory backed by PostgreSQL rather than fake listings.
-- Authenticated customer workspace: create/read servers, add GET tool, OpenAPI JSON import, real upstream test, publish private/public endpoint, create/revoke API keys, observed execution usage.
+- Authenticated customer workspace: create/read servers, add GET tool, OpenAPI JSON/YAML import (paste, upload or public HTTPS spec URL with preview before writes), real upstream test, publish private/public endpoint, create/revoke API keys, observed execution usage.
 - Official MCP SDK v2, stateless Streamable HTTP and protocol 2026-07-28.
 - Own public discovery server `/mcp/foundry` with anonymous read-only `search_servers`, `get_server_tools`.
 - With `Authorization: Bearer fdy_...`: **Foundry itself is a builder MCP** with `list_my_servers`, `create_server`, `add_readonly_tool`, `import_openapi`, `test_readonly_tool`, `publish_server`, `get_server_usage`. Every management tool uses the authenticated account's tenant only. No anonymous write permissions.
