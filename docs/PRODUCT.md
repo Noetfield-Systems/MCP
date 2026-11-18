@@ -1,5 +1,8 @@
 # MCP Foundry — canonical product thesis (2026-11-17)
 
+## Current V3 commercial priority (18 November 2026)
+**Canonical priority order:** [STRATEGY-PRIORITIES-2026-11-18.md](STRATEGY-PRIORITIES-2026-11-18.md), supported by the [complete advisor V3 100-action table](STRATEGY-PRIORITIES-2026-11-18.fa.md). Sell API Agent Launch as a scoped integration outcome (from CA$799 proposed) alongside the existing live CA$199 limited Quickstart. Use the shipped MCP-native Builder and installed client-config flow. Customer-owned API docs distribution, independently verified client use and profitable fulfillment precede duplicative features. Private upstream support, monthly care and recurring merchant subscriptions are **not automatically enabled** by publishing an offer.
+
 ## What we are building
 **MCP Foundry — Your API. Everywhere AI Works.** A standalone commercial product for creating, running, testing, distributing, analyzing, and ultimately monetizing interoperable MCP endpoints. The repository `Noetfield-Systems/MCP` is its source of truth. Noetfield is portfolio owner, not the product identity.
 
@@ -20,7 +23,7 @@
 A user signs up; creates a server; pastes an OpenAPI JSON plus public HTTPS base URL; imports limited GET operations; tests using live endpoint; publishes; copies `/mcp/:slug`; client discovers tools; calls use tenant-owned server; usage is shown. Private servers use bearer keys. No simulated data, fake customers, or fabricated checkout.
 
 ## UX contract
-Public site English-first, purposeful editorial typography, premium dark slate + violet/amber visuals, high contrast, desktop and mobile parity. Workspace pages: Servers, Tool Designer, OpenAPI Import, Test Playground, Keys, Usage, Billing. Public pages: Platform, Live Directory, Studio, Developers, Pricing. Human-readable text; never replace a commercial product with a game, empty AI-themed dashboard or synthetic activity.
+Public site English-first, purposeful editorial typography, approved graphite/neutral system with restrained blue emphasis, high contrast, desktop and mobile parity. Workspace pages: Servers, Tool Designer, OpenAPI Import, Test Playground, Keys, Usage, Billing. Public pages: Platform, Live Directory, Studio, Developers, Pricing. Human-readable text; never replace a commercial product with a game, empty AI-themed dashboard or synthetic activity.
 
 ## North-star and funnels
 **North star: weekly externally successful tool invocations in customer-owned published servers.** Supporting:
