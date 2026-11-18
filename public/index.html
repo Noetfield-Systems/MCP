@@ -7,14 +7,14 @@
 <meta property="og:type" content="website"><meta property="og:title" content="MCP Foundry — Your API. Everywhere AI Works.">
 <meta property="og:description" content="Build, test, publish and operate live MCP servers from your existing APIs. Official MCP Registry-listed.">
 <meta property="og:url" content="https://mcp-foundry-web-production.up.railway.app/">
-<title>MCP Foundry — Your API. Everywhere AI Works.</title>
+<title>MCP Foundry — Your APIs. Ready for agents.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"><link rel="stylesheet" href="/growth.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-b"></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"><link rel="stylesheet" href="/growth.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-graphite"></head><body>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="page-bg" aria-hidden="true"></div>
 <header class="nav foundry-nav">
- <a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
  <nav aria-label="Primary navigation" id="primary-nav"><a href="/" aria-current="page">Platform</a><a href="/solutions">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
  <div class="nav-actions"><button class="foundry-signin" id="nav-login" type="button">Sign in</button><a class="foundry-launch" href="#studio">Open Studio <span aria-hidden="true">↗</span></a></div>
  <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
@@ -22,31 +22,24 @@
 <main id="main">
 <section id="home" class="hero wrap">
  <div class="hero-copy">
-  <div class="eyebrow"><span class="tiny-star">✦</span> THE API-TO-MCP PLATFORM <span class="eyebrow-rule"></span> SPEC 2026-07-28</div>
-  <h1>Give your API<br>a seat at the <em>AI table.</em></h1>
-  <p>Turn an existing API into a working MCP endpoint without rebuilding protocol infrastructure. Design, test, publish and operate real tools in one focused workspace.</p>
-  <div class="hero-actions"><a href="#studio" class="btn btn-primary btn-large">Build your first server <span>↗</span></a><a href="/developers" class="btn btn-ghost btn-large">Explore documentation <span>↗</span></a></div>
-  <div class="hero-proof"><span class="proof-icon">✓</span> <a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener" style="color:#c3b8ff">Official Registry listed ↗</a> <span class="proof-separator"></span> Open protocol <span class="proof-separator"></span> Portable endpoints <span class="proof-separator"></span> Open MCP standard</div>
+  <div class="eyebrow"><span class="live-dot" aria-hidden="true"></span> MCP BUILD &amp; DISTRIBUTION <span class="eyebrow-rule" aria-hidden="true"></span> OPEN PROTOCOL</div>
+  <h1>Your APIs.<br><em>Ready for agents.</em></h1>
+  <p>Turn existing APIs into real MCP servers. Define tools, test responses, publish an endpoint, and connect AI clients — in one workspace.</p>
+  <div class="hero-actions"><a href="#studio" class="btn btn-primary btn-large">Open the Builder <span aria-hidden="true">↗</span></a><a href="/marketplace" class="btn btn-outline btn-large">Explore integrations <span aria-hidden="true">↗</span></a></div>
+  <div class="hero-proof"><a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official MCP Registry ↗</a><span class="proof-separator"></span> Source-backed tools <span class="proof-separator"></span> Hosted HTTPS endpoints</div>
  </div>
- <div class="hero-art" aria-label="Reference workflow from public API to MCP endpoint">
-  <div class="console-halo"></div>
-  <div class="console-panel">
-   <div class="console-top"><span class="console-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>FOUNDRY / BUILD PIPELINE</span><span class="console-label">WORKFLOW</span></div>
-   <div class="console-content">
-    <div class="console-chain">
-     <div class="chain-step"><span class="chain-number">01</span><div><small>EXISTING SOURCE</small><strong>Public HTTPS API</strong><span>Read-only GET operations</span></div><span class="chain-arrow">↗</span></div>
-     <div class="chain-join" aria-hidden="true"><i></i></div>
-     <div class="chain-step chain-active"><span class="chain-number">02</span><div><small>THE FOUNDRY</small><strong>Validate · Test · Publish</strong><span>Schemas, controlled access and live responses</span></div><span class="chain-arrow">✳</span></div>
-     <div class="chain-join" aria-hidden="true"><i></i></div>
-     <div class="chain-step"><span class="chain-number">03</span><div><small>REMOTE MCP</small><strong>One endpoint, many clients</strong><span>SDK v2 · Streamable HTTP</span></div><span class="chain-arrow">↗</span></div>
-    </div>
-    <div class="console-command"><div class="command-label"><span>REMOTE TRANSPORT</span><span>STREAMABLE HTTP</span></div><div class="command-url"><span>POST</span><code>/mcp/your-server</code><span>⌁</span></div></div>
-   </div>
-   <div class="console-bottom"><span><i class="status-light" aria-hidden="true"></i><span id="hero-gateway">Checking gateway</span></span><span>FIG. 01 / PRODUCT FLOW</span></div>
-  </div>
-  <div class="console-float"><span>⌘</span><div><strong>Model Context Protocol</strong><small>Built with the official SDK</small></div></div>
- </div>
- </section>
+ <div class="hero-art"><div class="preview-shell" aria-label="Illustrative tool-definition workbench; real operations are available in Studio"><div class="preview-top"><div class="traffic"><span></span><span></span><span></span></div><span class="preview-url">foundry / workspace / builder</span><div class="right"><i></i> <span id="hero-gateway">Checking gateway</span></div></div>
+   <div class="workbench"><div class="wb-left"><div class="wb-label">WORKSPACE</div><div class="wb-item sel"><i>▦</i> Builder</div><div class="wb-item"><i>⌘</i> Servers</div><div class="wb-item"><i>↗</i> Usage</div><div class="wb-divider"></div><div class="wb-label">CURRENT FLOW</div><div class="wb-steps"><span>✓</span> <strong>Source</strong><br><span>✓</span> <strong>Tools</strong><br><span>✓</span> <strong>Test</strong><br><span>○</span> Publish</div></div>
+    <div class="wb-main"><div class="wb-head"><span class="wb-path">API / World Bank Country Data</span><span class="chip">SOURCE EXAMPLE</span></div><h3 class="wb-title">Configure your MCP server</h3><p class="wb-description">Read-only HTTP tools · OpenAPI compatible</p>
+     <div class="tabline"><button class="selected" data-wb-tab="definition" aria-selected="true">Tool definition</button><button data-wb-tab="result" aria-selected="false">Test result</button><button data-wb-tab="endpoint" aria-selected="false">Endpoint</button></div>
+     <div class="wb-block"><div class="wb-block-title"><span id="wb-code-label">TOOL / get_country</span><span id="wb-code-kind">HTTP GET</span></div><div class="codebox" id="wb-code-content"><span class="c-purple">GET</span>  <span class="c-blue">api.worldbank.org/v2/country/CA</span>
+
+<span class="c-yellow">query</span>   format  <span class="c-green">json</span>
+<span class="c-yellow">output</span>  country / capital / region
+<span class="c-yellow">schema</span>  validated on response</div></div>
+     <div class="wb-footer"><span class="tick">●</span> Example tool definition <b>TOOLS / 1</b></div>
+    </div></div></div></div>
+</section>
 <section class="trustbar wrap"><span>ONE WORKSPACE. THE FULL MCP LIFECYCLE.</span><div><strong>01</strong> Create</div><div><strong>02</strong> Test</div><div><strong>03</strong> Publish</div><div><strong>04</strong> Connect</div></section>
 <section id="workflows" class="section wrap showcase-section">
  <div class="section-kicker">PURPOSE-BUILT WORKFLOWS <span>REAL APIs · REAL RESULTS</span></div>
@@ -171,7 +164,7 @@
 </main>
 <footer class="foundry-footer">
  <div class="foundry-footer-inner">
- <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
  <p>Turn working APIs into tools AI clients can actually use. Build, test, publish and deliver.</p></div>
  <div class="foundry-footer-links">
  <div><strong>PRODUCT</strong><a href="/">Platform</a><a href="/#studio">Studio</a><a href="/marketplace">Marketplace</a><a href="/connect">Client connection</a></div>
@@ -182,4 +175,5 @@
 </footer>
 <div class="toast hidden" role="status" id="toast"></div>
 <script type="module" src="/app.js"></script>
+<script src="/preview-workbench.js" defer></script>
 </body></html>
