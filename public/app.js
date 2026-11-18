@@ -3,13 +3,19 @@ const $$=(q,root=document)=>[...root.querySelectorAll(q)];
 const state={user:null,servers:[],selected:null,detail:null,tab:'overview',login:false,templates:[],editToolId:null};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=()=>location.origin+'/mcp/foundry';
+let catalogRequestId=0;
+const nav=$('#primary-nav'),menu=$('#menu-toggle');
+function setMenu(open){document.querySelector('.nav')?.classList.toggle('open',open);if(menu){menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close navigation':'Open navigation');}}
+nav?.addEventListener('click',event=>{if(event.target.closest('a'))setMenu(false);});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')setMenu(false);});
+document.addEventListener('click',event=>{if(document.querySelector('.nav')?.classList.contains('open')&&!event.target.closest('.nav'))setMenu(false);});
 const msg=(text)=>{const box=$('#toast');box.textContent=text;box.classList.remove('hidden');clearTimeout(window._toast);window._toast=setTimeout(()=>box.classList.add('hidden'),4000);};
 const feedback=(text)=>{$('#workspace-feedback').textContent=text;msg(text);};
 async function request(method,path,data){let r;try{r=await fetch(path,{method,credentials:'same-origin',headers:{...(data!==undefined?{'Content-Type':'application/json'}:{})},body:data===undefined?undefined:JSON.stringify(data)});}catch{throw Error('Network unavailable');}
  let value;try{value=await r.json();}catch{throw Error('Invalid server response');}if(!r.ok)throw Error((value.error||'REQUEST_FAILED').replaceAll('_',' '));return value;}
-async function loadCatalog(){try{const data=await request('GET','/api/catalog?q='+encodeURIComponent($('#catalog-search').value));$('#catalog-count').textContent=data.servers.length+' public server'+(data.servers.length===1?'':'s')+' listed';
-$('#catalog-list').innerHTML=data.servers.length?data.servers.map(s=>`<article class="catalog-card"><span class="plan-type">PUBLIC MCP SERVER</span><h4>${esc(s.name)}</h4><p>${esc(s.description||'Public MCP tool endpoint')}</p><div class="catalog-meta"><span>${esc(s.tool_count)} tool(s)</span><em>${esc(s.slug)}</em></div></article>`).join(''):'<div class="empty-state">No published servers match your search yet. Be the first to publish a working MCP endpoint.</div>';
-}catch(e){$('#catalog-list').innerHTML='<div class="empty-state">Directory is not available: '+esc(e.message)+'</div>';$('#catalog-count').textContent='Directory unavailable';}}
+async function loadCatalog(){const current=++catalogRequestId;try{const data=await request('GET','/api/catalog?q='+encodeURIComponent($('#catalog-search').value));if(current!==catalogRequestId)return;$('#catalog-count').textContent=data.servers.length+' public server'+(data.servers.length===1?'':'s')+' listed';
+$('#catalog-list').innerHTML=data.servers.length?data.servers.map(s=>`<article class="catalog-card"><span class="plan-type">PUBLIC MCP SERVER</span><h4>${esc(s.name)}</h4><p>${esc(s.description||'Public MCP tool endpoint')}</p><div class="catalog-meta"><span>${esc(s.tool_count)} tool(s)</span><em>${esc(s.slug)}</em></div><div class="catalog-actions"><button type="button" class="btn btn-outline btn-small" data-catalog-slug="${esc(s.slug)}">Copy MCP URL</button><a href="/developers#connect" class="catalog-guide">Connect ↗</a></div></article>`).join(''):'<div class="empty-state">No published servers match your search yet. Be the first to publish a working MCP endpoint.</div>';
+}catch(e){if(current!==catalogRequestId)return;$('#catalog-list').innerHTML='<div class="empty-state">Directory is not available: '+esc(e.message)+'</div>';$('#catalog-count').textContent='Directory unavailable';}}
 function authMode(login){state.login=login;$('#auth-submit').innerHTML=login?'Sign in <span>↗</span>':'Create workspace <span>↗</span>';$('#auth-switch').textContent=login?'Need an account? Create workspace':'Already have an account? Sign in';}
 function updateWorkspace(){
  const logged=!!state.user;$('#studio-auth').classList.toggle('hidden',logged);$('#studio-app').classList.toggle('hidden',!logged);
@@ -81,8 +87,9 @@ function showPanel(panel){
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button,[data-copy]');if(!b)return;
  try{
- if(b.id==='menu-toggle'){$('.nav').classList.toggle('open');return;}
- if(b.id==='nav-login'){if(state.user){await request('POST','/api/auth/logout');state.user=null;state.selected=null;updateWorkspace();}else{authMode(true);location.hash='#studio';}return;}
+ if(b.id==='menu-toggle'){setMenu(!document.querySelector('.nav').classList.contains('open'));return;}
+ if(b.dataset.catalogSlug){const link=location.origin+'/mcp/'+encodeURIComponent(b.dataset.catalogSlug);await navigator.clipboard.writeText(link);msg('Public MCP endpoint copied');return;}
+  if(b.id==='nav-login'){if(state.user){await request('POST','/api/auth/logout');state.user=null;state.selected=null;updateWorkspace();}else{authMode(true);location.hash='#studio';}return;}
  if(b.id==='auth-switch'){authMode(!state.login);return;}
  if(b.dataset.template){
    if(!state.user){location.hash='#studio';return;}
@@ -182,5 +189,19 @@ document.addEventListener('submit',async e=>{
  }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else if(f.id==='pilot-form'){const result=$('#pilot-result');result.classList.remove('success');result.classList.add('error');result.textContent='Request not saved: '+err.message;}else feedback(err.message);}finally{if(button)button.disabled=false;}
 });
 let searchTimer;$('#catalog-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadCatalog,250);});
+document.addEventListener('input',event=>{
+ const target=event.target;
+ if(target.matches('#new-server-form [name="name"]')){
+   const slug=document.querySelector('#new-server-form [name="slug"]');
+   if(!slug||slug.dataset.userEdited==='true')return;
+   slug.value=target.value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'').slice(0,48);
+ }
+ if(target.matches('#new-server-form [name="slug"]'))target.dataset.userEdited='true';
+});
 $('#public-mcp-url').textContent=url();
+const gateway=$('#hero-gateway');
+request('GET','/healthz').then(s=>{
+ if(gateway)gateway.textContent=s.ok?'Gateway operational':'Service unavailable';
+ document.querySelector('.status-light')?.classList.toggle('online',!!s.ok);
+}).catch(()=>{if(gateway)gateway.textContent='Status temporarily unavailable';});
 loadCatalog();loadMe();request('GET','/api/status').then(s=>{if(s.protocol)document.documentElement.dataset.protocol=s.protocol;}).catch(()=>{});
