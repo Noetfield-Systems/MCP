@@ -412,5 +412,9 @@ app.get('/.well-known/mcp/server.json',(req,res)=>res.redirect(307,'/server.json
 app.use(express.static(ROOT,{extensions:['html'],maxAge:'5m'}));
 app.use((err,req,res,next)=>{console.error('request_error',err?.message);if(res.headersSent)return next(err);return j(res,500,'INTERNAL_ERROR');});
 await initDb();
-await seedProspectAccounts();
+// Prospect research is a commercial convenience, never a blocker for existing
+// customer MCP endpoints, payments, or the public site. Retry seeding after the
+// database/CRM issue is diagnosed; do not pretend the CRM was populated.
+try { await seedProspectAccounts(); }
+catch (error) { console.error('prospect_seed_failed',error?.code||error?.message||'UNKNOWN'); }
 app.listen(port,'0.0.0.0',()=>console.log(JSON.stringify({event:'listening',product:'mcp-foundry',port,protocol:'2026-07-28'})));
