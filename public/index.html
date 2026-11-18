@@ -150,7 +150,7 @@ test results before publishing the endpoint.</pre></div>
     <span class="workspace-eyebrow">PROPOSED STARTING PRICE · CAD</span>
     <strong>From CA$799</strong>
     <small>One-time · experimental offer · individually scoped</small>
-    <a href="#implementation" class="btn btn-primary btn-large">Request a Launch proposal ↗</a>
+    <a href="/?service=launch#implementation" class="btn btn-primary btn-large">Request a Launch proposal ↗</a>
     <p>This is a proposal request, not a live checkout. No payment is taken until you accept a defined scope and payment instructions.</p>
     <a href="#quickstart" class="launch-offer-alt">Need only 3 public GET tools? Use CA$199 Quickstart ↗</a>
   </div>
@@ -159,6 +159,14 @@ test results before publishing the endpoint.</pre></div>
   <div class="pilot-copy"><div class="section-kicker">CUSTOM IMPLEMENTATION</div><span class="pilot-tag">DONE-FOR-YOU MCP ENGINEERING</span><h3>Your API, agent-ready.<br><em>Built with you.</em></h3><p>Need API Agent Launch, a custom integration, secure gateway, or dedicated MCP rollout? Submit your real API use case for a scoped implementation proposal. API Agent Launch starts at an experimental CA$799, with final terms confirmed individually. The fixed-scope public API Quickstart above is available for CA$199 via Stripe. For OAuth, private upstreams, advanced controls or larger builds, request a separate quote. This enquiry form itself does not charge.</p><div class="pilot-benefits"><div>✓ Discovery and tool mapping</div><div>✓ Hosted endpoint and SDK test</div><div>✓ Evidence-backed delivery scope</div></div></div>
   <div class="pilot-form-wrap"><span class="workspace-eyebrow">REQUEST IMPLEMENTATION</span><h4>Tell us what you need.</h4>
   <form id="pilot-form" class="pilot-form">
+   <label>What do you want to launch?<select name="service_package" id="pilot-package" required>
+     <option value="launch">API Agent Launch · proposal from CA$799</option>
+     <option value="quickstart">Public API Quickstart · CA$199 paid offer</option>
+     <option value="private">Private API Launch · custom quote</option>
+     <option value="care">Managed Care · maintenance enquiry</option>
+     <option value="agency">Agency package · multiple customers</option>
+     <option value="custom">Another integration / custom scope</option>
+   </select></label>
    <label>Your name<input name="contact_name" required maxlength="120" placeholder="Full name" autocomplete="name"></label>
    <label>Work email<input type="email" name="email" required maxlength="180" placeholder="you@company.com" autocomplete="email"></label>
    <label>Company / project<input name="company" maxlength="160" placeholder="Organization or project"></label>
