@@ -10,6 +10,12 @@ const run=async()=>{
   const page=await fetch(base+'/',{signal:AbortSignal.timeout(12000)});
   assert.equal(page.status,200,'website HTTP 200');
   const body=await page.text();assert.ok(body.includes('MCP FOUNDRY')||body.includes('MCP Foundry'),'actual web interface served');
+  const docs=await fetch(base+'/developers',{signal:AbortSignal.timeout(12000)});
+  assert.equal(docs.status,200,'customer-facing developer guide HTTP 200');
+  const docsHTML=await docs.text();
+  assert.ok(docsHTML.includes('Official Registry')&&docsHTML.includes('Streamable HTTP'),'published install and SDK guide');
+  const robots=await fetch(base+'/robots.txt',{signal:AbortSignal.timeout(12000)});
+  assert.equal(robots.status,200,'robots indexing metadata HTTP 200');
   const cat=await fetch(base+'/api/catalog',{signal:AbortSignal.timeout(12000)});
   assert.equal(cat.status,200,'directory API HTTP 200');
   assert.ok(Array.isArray((await cat.json()).servers),'directory returns real server list');
