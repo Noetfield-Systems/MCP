@@ -43,6 +43,16 @@ try{
  try{
    const tools=await client.listTools();const names=tools.tools.map(t=>t.name);
    for(const n of ['search_servers','create_server','list_my_servers','add_readonly_tool','import_openapi','test_readonly_tool','publish_server','get_server_usage']) assert.ok(names.includes(n),'missing '+n);
+   assert.ok(names.includes('open_foundry_app'),'MCP Apps host tool discoverable');
+   const appTool=tools.tools.find(t=>t.name==='open_foundry_app');
+   assert.equal(appTool._meta?.ui?.resourceUri,'ui://mcp-foundry/studio.html');
+   const appResult=await client.callTool({name:'open_foundry_app',arguments:{}});
+   assert.ok(!appResult.isError,'host app launch tool');
+   const resources=await client.listResources();
+   assert.ok(resources.resources.some(r=>r.uri==='ui://mcp-foundry/studio.html'),'MCP Apps resource list');
+   const view=await client.readResource({uri:'ui://mcp-foundry/studio.html'});
+   const html=view.contents?.[0]?.text||'';
+   assert.ok(html.includes('MCP FOUNDRY')&&html.includes('Public directory'),'self-contained embedded Foundry View');
    const starter=await post('/api/servers/from-template',{template_id:'hacker_news'});
    assert.equal(starter.tools_added,1);
    assert.equal(starter.server.status,'draft');

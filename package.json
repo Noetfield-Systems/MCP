@@ -11,7 +11,8 @@
     "start": "node src/server.mjs",
     "dev": "node --watch src/server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/server.mjs && node --check src/db.mjs && node --check src/security.mjs && node --check src/templates.mjs && node --check src/mcp.mjs && node --check public/app.js && node --check scripts/live-smoke.mjs && node --check scripts/live-native-builder.mjs && node --check public/operator.js && node --check public/developers.js && node --check src/activation.mjs && node --check scripts/live-browser.mjs && node --check src/openapi.mjs && node --check src/expansion.mjs && node --check public/client-config.mjs && node --check public/connect.js && node --check public/marketplace.js && node --check public/team.js && node --check public/order.js && node --check scripts/live-expansion.mjs"
+    "check": "node --check src/server.mjs && node --check src/db.mjs && node --check src/security.mjs && node --check src/templates.mjs && node --check src/mcp.mjs && node --check public/app.js && node --check scripts/live-smoke.mjs && node --check scripts/live-native-builder.mjs && node --check public/operator.js && node --check public/developers.js && node --check src/activation.mjs && node --check scripts/live-browser.mjs && node --check src/openapi.mjs && node --check src/expansion.mjs && node --check public/client-config.mjs && node --check public/connect.js && node --check public/marketplace.js && node --check public/team.js && node --check public/order.js && node --check scripts/live-expansion.mjs && node --check apps/app.js && node --check vite.mcp.config.mjs && npm run build:mcp-app",
+    "build:mcp-app": "vite build --config vite.mcp.config.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/node": "^2.1.2",
@@ -21,9 +22,12 @@
     "stripe": "^23.0.0",
     "undici": "^7.16.0",
     "zod": "^4.2.0",
-    "yaml": "^2.9.1"
+    "yaml": "^2.9.1",
+    "@modelcontextprotocol/ext-apps": "^1.1.2"
   },
   "devDependencies": {
-    "@modelcontextprotocol/client": "^2.4.0"
+    "@modelcontextprotocol/client": "^2.4.0",
+    "vite": "^7.2.2",
+    "vite-plugin-singlefile": "^2.3.0"
   }
 }
