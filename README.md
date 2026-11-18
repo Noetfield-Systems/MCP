@@ -22,6 +22,12 @@ The current product is an independent **AI-access integration service**, not a g
 
 **New customer acquisition asset:** [Free API Agent Readiness Assessment](https://mcp-foundry-web-production.up.railway.app/readiness) (route added on this branch; only call it live once deployed): no registration needed, six-step browser-only self-assessment, 12-point printable checklist and an optional consented enquiry through the **existing** pilot lead pipeline. This does not automatically create a paid order. Existing CA$199 Quickstart and scoped from CA$799 Launch stay unchanged.
 
+## ICP Research CRM & Solution Blueprints (18 Nov 2026)
+- [Ten real researched API business accounts](data/researched-prospects.json) with public API docs, contact channels, native MCP position and individual outreach drafts. **Research records are not customer endorsements, active leads, messages sent, or paid contracts.**
+- [Private Operator Desk](https://mcp-foundry-web-production.up.railway.app/operator) now has an operator-protected prospect CRM backed by the existing Foundry PostgreSQL service. Research rows are upserted only once and never overwrite manual outreach stages. CSV export is operator-protected; marking `contacted` requires a recorded real contact receipt.
+- [Ten industry Solution Blueprints](https://mcp-foundry-web-production.up.railway.app/blueprints) (route introduced in this release) explain candidate tools, customer task and acceptance, without pretending client projects exist.
+- [MCP Doctor engineering and commercial manual](docs/MCP-DOCTOR-ENGINEERING-2026-11-18.md) converts study into a reusable codebase inspection, tool-curation, evaluation and buyer-discovery practice.
+
 ## What is real now?
 - Public premium website, developer copy/config, directory backed by PostgreSQL rather than fake listings.
 - Authenticated customer workspace: create/read servers, add GET tool, OpenAPI JSON/YAML import (paste, upload or public HTTPS spec URL with preview before writes), real upstream test, publish private/public endpoint, create/revoke API keys, observed execution usage.
