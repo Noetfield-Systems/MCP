@@ -396,3 +396,40 @@ header.foundry-nav{
   html{scroll-behavior:auto}
   .foundry-nav *, .foundry-footer *, .growth-body *{transition:none!important;animation-duration:.01ms!important}
 }
+
+/* QA-found mobile defect: Developer Docs code examples widened the entire
+   page to 509px at a 390px viewport. Constrain grid min-content sizing,
+   keep code scroll within its own panel, and wrap only prose/URLs. */
+.docs-page,.docs-page .docs-hero,.docs-page .docs-layout,.docs-page .docs-body,
+.docs-page .docs-section,.docs-page .docs-code,.docs-page .docs-hero-status{
+  min-width:0;max-width:100%;
+}
+.docs-page .docs-code{overflow:hidden}
+.docs-page .docs-code pre{
+  display:block;max-width:100%;min-width:0;
+  white-space:pre;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+}
+.docs-page .docs-code-title{flex-wrap:wrap;gap:8px}
+.docs-page .docs-hero-status code{
+  display:block;min-width:0;max-width:100%;
+  white-space:normal;overflow-wrap:anywhere;word-break:break-word;
+}
+.docs-page .docs-hero>div{min-width:0}
+.docs-page .docs-steps>div{min-width:0}
+.docs-page .docs-tool-grid>div{min-width:0;overflow-wrap:anywhere}
+@media(max-width:1000px){
+  .docs-page .docs-layout{grid-template-columns:minmax(0,1fr)}
+  .docs-page .docs-hero{grid-template-columns:minmax(0,1fr)}
+  .docs-page .docs-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+  .docs-page .docs-nav{grid-template-columns:minmax(0,1fr)}
+  .docs-page .docs-hero-status{padding:20px}
+  .docs-page .docs-code pre{padding:17px 13px}
+  .docs-page .docs-section h2{font-size:clamp(29px,8vw,42px);overflow-wrap:break-word}
+}
+@media(max-width:350px){
+  .foundry-nav .nav-actions .foundry-launch{display:none}
+  .foundry-nav .foundry-brand{font-size:16px}
+}
