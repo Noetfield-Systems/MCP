@@ -7,6 +7,8 @@ import {readFileSync} from 'node:fs';
 import {q,initDb,requireAuth,ownedServer,pool} from './db.mjs';
 import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl,safeGet,enforceOrigin,throttle} from './security.mjs';
 import {managedMcp,foundryMcp} from './mcp.mjs';
+import {activeTools,markDraftChanged,publishDraftServer} from './publication.mjs';
+import {upstreamKeyRouter,upstreamEncryptionReady} from './upstream.mjs';
 import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
@@ -28,7 +30,7 @@ const auth=(...args)=>requireAuth(...args);
 const readKey=async(raw)=>{if(!raw?.startsWith('fdy_'))return null;const {rows}=await q('SELECT a.id,a.email,a.plan FROM api_keys k JOIN accounts a ON a.id=k.owner_id WHERE k.token_hash=$1 AND k.revoked_at IS NULL',[sha(raw)]);return rows[0]||null;};
 
 app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,product:'MCP Foundry',store:'postgres',protocol:'2026-07-28'});}catch{res.status(503).json({ok:false,error:'DATABASE_UNAVAILABLE'});}});
-app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET)}}));
+app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
 app.all('/mcp/foundry',async(req,res,next)=>{
@@ -45,7 +47,8 @@ app.all('/mcp/:slug',async(req,res,next)=>{
     const key=req.get('authorization')?.replace(/^Bearer /i,'');
     const principal=await readKey(key);
     if(server.visibility!=='public'&&principal?.id!==server.owner_id)return j(res,401,'MCP_API_KEY_REQUIRED');
-    const tools=(await q('SELECT * FROM tools WHERE server_id=$1 ORDER BY name',[server.id])).rows;
+    const tools=activeTools(server);
+    if(!tools)return j(res,503,'PUBLISHED_REVISION_UNAVAILABLE');
     return managedMcp(server,tools,principal)(req,res,next);
   }catch(e){next(e);}
 });
@@ -202,8 +205,9 @@ app.get('/api/admin/funnel',operator,async(req,res)=>{
 app.use(expansionRouter({auth,operator,stripe}));
 app.use(opportunityRouter({operator}));
 app.use(oauthRouter({auth}));
+app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
- const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
+ const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
 });
 app.get('/api/servers',auth,async(req,res)=>{
@@ -274,7 +278,7 @@ app.post('/api/servers/:id/tools',auth,async(req,res)=>{
  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
  if(req.user.plan!=='pro'&&count.rows[0].n>=10)return j(res,403,'FREE_TOOL_LIMIT_REACHED');
  try{const {rows}=await q('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) RETURNING *',[randomUUID(),server.id,req.body.name.toLowerCase(),req.body.description,req.body.url,JSON.stringify(req.body.params)]);
-  await q('UPDATE servers SET status=$1,updated_at=now() WHERE id=$2',['draft',server.id]);await recordActivation('tool_added',req.user.id,server.id);res.status(201).json({tool:rows[0]});
+  await markDraftChanged(server.id);await recordActivation('tool_added',req.user.id,server.id);res.status(201).json({tool:rows[0]});
  }catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'DUPLICATE_TOOL_NAME':'TOOL_SAVE_FAILED');}
 });
 app.post('/api/servers/:id/preview-openapi',auth,async(req,res)=>{
@@ -305,12 +309,12 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    added+=out.rowCount;
    if(added>= (req.user.plan==='pro'?50:10))break;
  }
- if(added){await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);await recordActivation('tool_added',req.user.id,server.id);}
+ if(added){await markDraftChanged(server.id);await recordActivation('tool_added',req.user.id,server.id);}
  res.json({found:entries.length,added,origin,skipped:entries.length-added});
 });
 app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
- await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+ await q("UPDATE servers SET status='draft',published_snapshot=NULL,has_unpublished_changes=false,updated_at=now() WHERE id=$1",[server.id]);
  res.json({status:'draft',endpoint_disabled:true,slug:server.slug});
 });
 app.post('/api/servers/:id/publish',auth,async(req,res)=>{
@@ -320,10 +324,12 @@ app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  const visibility=req.body?.visibility==='private'?'private':'public';
  const oauthBinding=await q('SELECT 1 FROM server_oauth_bindings WHERE server_id=$1',[server.id]);
  if(oauthBinding.rowCount&&visibility!=='private')return j(res,409,'OAUTH_SERVER_MUST_REMAIN_PRIVATE');
- await snapshotServer(server.id);
- const {rows}=await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2 RETURNING *",[visibility,server.id]);
+ let published;try{published=await publishDraftServer(server.id,visibility);}catch(e){
+  return j(res,['UPSTREAM_AUTH_REQUIRES_PRIVATE','UPSTREAM_KEY_HOST_MISMATCH','GITHUB_OAUTH_REQUIRES_API_GITHUB_COM_TOOLS','CONFLICTING_UPSTREAM_AUTH'].includes(e.message)?409:400,e.message||'PUBLISH_FAILED');
+ }
  await recordActivation('server_published',req.user.id,server.id);
- res.json({server:rows[0],endpoint:(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'')+'/mcp/'+server.slug});
+ res.json({server:published.server,published_revision:published.version,
+   endpoint:(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'')+'/mcp/'+server.slug});
 });
 app.patch('/api/tools/:id',auth,async(req,res)=>{
  const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);
@@ -334,15 +340,15 @@ app.patch('/api/tools/:id',auth,async(req,res)=>{
  try{
    const updated=await q('UPDATE tools SET name=$1,description=$2,url=$3,params=$4 WHERE id=$5 RETURNING *',
      [input.name,input.description,input.url,JSON.stringify(input.params),tool.id]);
-   await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[tool.server_id]);
-   res.json({tool:updated.rows[0],server_status:'draft'});
+   await markDraftChanged(tool.server_id);
+   res.json({tool:updated.rows[0],server_status:server.status,unpublished_changes:server.status==='published'});
  }catch(e){j(res,e.code==='23505'?409:500,e.code==='23505'?'DUPLICATE_TOOL_NAME':'TOOL_UPDATE_FAILED');}
 });
 app.delete('/api/tools/:id',auth,async(req,res)=>{
  const {rows}=await q('DELETE FROM tools t USING servers s WHERE t.id=$1 AND t.server_id=s.id AND s.owner_id=$2 RETURNING t.id,t.server_id',[req.params.id,req.user.id]);
  if(!rows.length)return j(res,404,'TOOL_NOT_FOUND');
- await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[rows[0].server_id]);
- res.json({deleted:true,tool_id:rows[0].id,server_status:'draft'});
+ await markDraftChanged(rows[0].server_id);
+ res.json({deleted:true,tool_id:rows[0].id,unpublished_changes:true});
 });
 app.post('/api/tools/:id/test',auth,async(req,res)=>{
  const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);const tool=rows[0];if(!tool)return j(res,404,'TOOL_NOT_FOUND');
