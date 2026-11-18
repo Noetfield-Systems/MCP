@@ -60,7 +60,11 @@ try{
  await click('[data-tab="import openapi"]');
  await page.locator('#import-form').waitFor({state:'visible'});
  await click('#load-openapi-example');
- assert.ok((await page.locator('#import-form [name=document]').inputValue()).includes('openapi: 3.1.0'));
+ await page.waitForFunction(()=>{
+   const form=document.querySelector('#import-form');
+   return form?.querySelector('[name=document]')?.value?.includes('openapi: 3.1.0') &&
+     form?.querySelector('[name=baseUrl]')?.value==='https://hacker-news.firebaseio.com';
+ },undefined,{timeout:15000});
  await click('#preview-openapi');
  await page.locator('.openapi-preview-row').first().waitFor({state:'visible',timeout:12000});
  assert.equal(await page.locator('.openapi-preview-row').count(),2,'two real previewed GET operations');
