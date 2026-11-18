@@ -24,7 +24,13 @@ app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,p
 app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET)}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
-app.all('/mcp/foundry',(...args)=>foundryMcp()(...args));
+app.all('/mcp/foundry',async(req,res,next)=>{
+  try{
+    const bearer=req.get('authorization')?.replace(/^Bearer /i,'');
+    const principal=await readKey(bearer);
+    return foundryMcp(principal)(req,res,next);
+  }catch(error){next(error);}
+});
 app.all('/mcp/:slug',async(req,res,next)=>{
   try{
     const {rows}=await q("SELECT s.*,a.plan AS owner_plan FROM servers s JOIN accounts a ON a.id=s.owner_id WHERE s.slug=$1 AND s.status='published'",[req.params.slug]);
@@ -86,6 +92,16 @@ app.post('/api/auth/logout',async(req,res)=>{
  res.clearCookie('mcpf_session',{path:'/'});res.json({ok:true});
 });
 app.get('/api/me',auth,(req,res)=>res.json({account:req.user}));
+app.delete('/api/account',auth,async(req,res)=>{
+  // Account owner must re-enter the password. This also makes temporary live
+  // conformance accounts safely removable without leaving test traffic behind.
+  if(typeof req.body?.password!=='string')return j(res,400,'PASSWORD_REQUIRED');
+  const {rows}=await q('SELECT password_hash FROM accounts WHERE id=$1',[req.user.id]);
+  if(!rows.length||!passwordMatches(req.body.password,rows[0].password_hash))return j(res,403,'INVALID_PASSWORD');
+  await q('DELETE FROM accounts WHERE id=$1',[req.user.id]);
+  res.clearCookie('mcpf_session',{path:'/'});
+  res.json({deleted:true});
+});
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
