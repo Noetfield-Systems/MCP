@@ -10,6 +10,7 @@ import {managedMcp,foundryMcp} from './mcp.mjs';
 import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
+import {oauthRouter,guardedManagedGet} from './oauth.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
@@ -198,6 +199,7 @@ app.get('/api/admin/funnel',operator,async(req,res)=>{
  });
 });
 app.use(expansionRouter({auth,operator,stripe}));
+app.use(oauthRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
@@ -314,6 +316,8 @@ app.post('/api/servers/:id/publish',auth,async(req,res)=>{
  const count=await q('SELECT count(*)::int AS n FROM tools WHERE server_id=$1',[server.id]);
  if(!count.rows[0].n)return j(res,400,'ADD_A_TOOL_FIRST');
  const visibility=req.body?.visibility==='private'?'private':'public';
+ const oauthBinding=await q('SELECT 1 FROM server_oauth_bindings WHERE server_id=$1',[server.id]);
+ if(oauthBinding.rowCount&&visibility!=='private')return j(res,409,'OAUTH_SERVER_MUST_REMAIN_PRIVATE');
  await snapshotServer(server.id);
  const {rows}=await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2 RETURNING *",[visibility,server.id]);
  await recordActivation('server_published',req.user.id,server.id);
@@ -340,7 +344,7 @@ app.delete('/api/tools/:id',auth,async(req,res)=>{
 });
 app.post('/api/tools/:id/test',auth,async(req,res)=>{
  const {rows}=await q('SELECT t.*,s.owner_id FROM tools t JOIN servers s ON s.id=t.server_id WHERE t.id=$1 AND s.owner_id=$2',[req.params.id,req.user.id]);const tool=rows[0];if(!tool)return j(res,404,'TOOL_NOT_FOUND');
- const started=Date.now();try{const source=toolUrl(tool,req.body?.args||{}),data=await safeGet(source);await recordActivation('tool_test_succeeded',req.user.id,tool.server_id);res.json({ok:true,source,duration_ms:Date.now()-started,response:data.body.slice(0,16000)});}
+ const started=Date.now();try{const source=toolUrl(tool,req.body?.args||{}),server=await ownedServer(tool.server_id,req.user.id),data=await guardedManagedGet(server,req.user,source);await recordActivation('tool_test_succeeded',req.user.id,tool.server_id);res.json({ok:true,source,duration_ms:Date.now()-started,response:data.body.slice(0,16000)});}
  catch(e){res.status(422).json({ok:false,error:e.message,duration_ms:Date.now()-started});}
 });
 app.get('/api/servers/:id/usage',auth,async(req,res)=>{
