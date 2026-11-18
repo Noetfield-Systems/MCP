@@ -3,6 +3,7 @@ import {toNodeHandler} from '@modelcontextprotocol/node';
 import * as z from 'zod/v4';
 import {q} from './db.mjs';
 import {recordActivation} from './activation.mjs';
+import {parseOpenapi,openapiPreview} from './openapi.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
 import {randomUUID} from 'node:crypto';
 
@@ -103,14 +104,14 @@ export function foundryMcp(principal=null){
         }catch(e){if(e.code==='23505')throw Error('Duplicate tool name');throw e;}
       }));
       mcp.registerTool('import_openapi',{
-        description:'Import OpenAPI JSON GET operations as draft MCP tools. Only public HTTPS servers and safe read-only operations are supported.',
+        description:'Import OpenAPI JSON or YAML GET operations as draft MCP tools. Only public HTTPS servers and read-only GET operations are supported.',
         inputSchema:z.object({
           server_id:z.string().uuid(),base_url:z.url(),openapi_json:z.string().min(5).max(262144)
         })
       },guarded(async({server_id,base_url,openapi_json})=>{
-        const server=await myServer(server_id);let doc;
-        try{doc=JSON.parse(openapi_json);}catch{throw Error('Invalid OpenAPI JSON');}
-        const entries=specTools(doc,base_url);let added=0;
+        const server=await myServer(server_id);
+        const doc=parseOpenapi(openapi_json);
+        const entries=openapiPreview(doc,base_url).tools;let added=0;
         const limit=principal.plan==='pro'?50:10;
         const existing=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
         const capacity=Math.max(0,limit-existing.rows[0].n);

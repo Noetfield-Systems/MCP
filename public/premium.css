@@ -285,3 +285,28 @@ button:disabled,.btn:disabled{opacity:.56;cursor:not-allowed;transform:none}
  .detail-content{min-width:0}
  .endpoint-box code{overflow-wrap:anywhere;white-space:normal}
 }
+
+/* Preview-first OpenAPI import — clear sources, outcomes and safe controls */
+.openapi-wizard{display:grid;gap:16px}
+.import-source-grid{display:grid;grid-template-columns:1fr;gap:13px}
+.import-source-grid label{display:grid;gap:8px;font-size:12px}
+.import-source-grid textarea{width:100%;line-height:1.65}
+.import-source-grid small{color:#9bb1cb;font-size:11px;line-height:1.65}
+.import-source-grid input[type=file]{width:100%;border:1px dashed #647196;border-radius:9px;padding:14px;color:#bcc7d9;background:#0c1628}
+.import-source-grid input[type=file]::file-selector-button{background:#342d55;border:1px solid #756a9d;color:#e9e2ff;padding:10px 13px;border-radius:7px;margin-right:12px;cursor:pointer}
+.import-source-grid input[type=file]:hover{border-color:#bbadfa}
+.import-sample-btn{margin-top:11px;justify-self:start;white-space:normal}
+.import-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:6px 0}
+.import-actions .btn{min-height:43px}
+.openapi-preview{background:#0d182b;border:1px solid #364b67;border-radius:12px;padding:17px 18px;color:#a9b9d0;font-size:12px;line-height:1.7}
+.openapi-preview-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid #2f405e;padding-bottom:12px}
+.openapi-preview-heading strong{font-family:'Space Grotesk',sans-serif;font-size:15px;color:#f1ecff}
+.openapi-preview-heading small{font-size:10px;color:#aab8cc}
+.openapi-preview-list{display:grid;gap:10px;max-height:320px;overflow:auto;margin-top:12px}
+.openapi-preview-row{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid #314563;border-radius:9px;background:#142239;padding:13px}
+.openapi-preview-row div{display:grid;gap:3px;min-width:0}
+.openapi-preview-row b{font:600 13px 'Space Grotesk',sans-serif;color:#ecebff}
+.openapi-preview-row small{color:#a5b5ce;font-size:11px}
+.openapi-preview-row code{font-size:10px;color:#b6c8e1;white-space:normal;overflow-wrap:anywhere}
+.openapi-preview-row>span{flex-shrink:0;font-size:9px;font-weight:700;color:#a4ead4;border:1px solid #345e59;background:#1f3a3a;border-radius:6px;padding:5px 8px}
+@media(max-width:600px){.import-actions .btn{width:100%}.openapi-preview{padding:13px}.openapi-preview-row{align-items:flex-start}.import-sample-btn{width:100%}}

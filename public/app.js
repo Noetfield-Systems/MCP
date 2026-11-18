@@ -29,6 +29,24 @@ async function loadTemplates(){
  if(!target)return;
  target.innerHTML=templates.map(t=>`<button class="template-choice" data-template="${esc(t.id)}"><span class="template-category">${esc(t.category)}</span><b>${esc(t.name)}</b><small>${esc(t.description)}</small><span class="template-action">Create draft →</span></button>`).join('');
 }
+async function openapiPayload(form){
+ const fd=new FormData(form),file=fd.get('spec_file');
+ const baseUrl=String(fd.get('baseUrl')||'').trim();
+ let text=String(fd.get('document')||'').trim();
+ const specUrl=String(fd.get('spec_url')||'').trim();
+ if(file instanceof File&&file.size){
+  if(file.size>262144)throw Error('OpenAPI file exceeds 256 KiB');
+  text=await file.text();
+ }
+ if(!text&&!specUrl)throw Error('Paste JSON/YAML, upload a file, or supply a public spec URL');
+ return text?{baseUrl,document_text:text}:{baseUrl,spec_url:specUrl};
+}
+function renderOpenapiPreview(x){
+ const box=$('#openapi-preview');if(!box)return;
+ if(!x.tools?.length){box.textContent='No supported GET operations. Write methods are not imported.';return;}
+ box.innerHTML='<div class="openapi-preview-heading"><strong>'+x.found+' supported GET operation(s)</strong><small>'+x.available+' tool slots available · preview only</small></div><div class="openapi-preview-list">'+
+ x.tools.map(t=>'<div class="openapi-preview-row"><div><b>'+esc(t.name)+'</b><small>'+esc(t.description)+'</small><code>'+esc(t.url)+'</code></div><span>GET</span></div>').join('')+'</div>';
+}
 async function loadActivation(){
  if(!state.user)return;
  const data=await request('GET','/api/me/activation');
@@ -73,7 +91,16 @@ function renderDetail(){
    </form>`);
  }
  if(state.tab==='add tool')pane.innerHTML=`<div class="inner-title"><h4>Register a read-only tool</h4><p>Use a public HTTPS GET API. Query and path parameters are explicitly declared; values cannot redirect tools to other hosts.</p></div><form id="tool-form" class="tool-form"><label>Tool name<input required name="name" placeholder="get_products" pattern="[a-z][a-z0-9_]{1,59}"></label><label>What does the tool do?<input required name="description" placeholder="List products from the inventory API"></label><label>HTTPS URL<input required name="url" type="url" placeholder="https://api.example.com/products"></label><label>Parameters JSON<textarea name="params" spellcheck="false" placeholder='[{"name":"category","in":"query","type":"string","required":false}]'>[]</textarea></label><button class="btn btn-primary btn-small">Save tool</button></form>`;
- if(state.tab==='import openapi')pane.innerHTML=`<div class="inner-title"><h4>Import OpenAPI operations</h4><p>Paste an OpenAPI JSON document. The builder extracts GET operations, descriptions, and query/path parameters. Private headers and write methods are not imported.</p></div><form id="import-form" class="tool-form"><label>Public API base URL<input required type="url" name="baseUrl" placeholder="https://api.example.com/v1/"></label><label>OpenAPI JSON<textarea required name="document" style="min-height:210px" spellcheck="false" placeholder='{"openapi":"3.1.0","paths":{...}}'></textarea></label><button class="btn btn-primary btn-small">Import GET operations</button></form>`;
+ if(state.tab==='import openapi')pane.innerHTML=`<div class="inner-title"><h4>OpenAPI Import Studio</h4><p>Import read-only GET operations from OpenAPI 3.x or Swagger 2. Preview the exact tool names and endpoints before changing your server.</p></div>
+<form id="import-form" class="tool-form openapi-wizard">
+<label>Public upstream API base URL<input required type="url" name="baseUrl" placeholder="https://api.example.com"></label>
+<div class="import-source-grid">
+<label>Paste JSON or YAML<textarea name="document" style="min-height:175px" spellcheck="false" placeholder="openapi: 3.1.0&#10;info:&#10;  title: My API&#10;  version: 1.0.0&#10;paths:&#10;  /items:&#10;    get:&#10;      operationId: list_items"></textarea><button type="button" class="btn btn-outline btn-small import-sample-btn" id="load-openapi-example">Load a real YAML example</button></label>
+<label>Upload specification file<input type="file" name="spec_file" accept=".json,.yaml,.yml,application/json,text/yaml"><small>Max 256 KiB. Uploaded file takes priority over pasted text.</small></label>
+<label>Or fetch public HTTPS spec URL<input type="url" name="spec_url" placeholder="https://example.com/openapi.yaml"><small>Used if no file or pasted text. Private hosts and redirects are blocked.</small></label>
+</div><div class="import-actions"><button type="button" class="btn btn-outline btn-small" id="preview-openapi">Preview tools</button><button type="submit" class="btn btn-primary btn-small">Import GET operations</button></div>
+<div id="openapi-preview" class="openapi-preview" role="status" aria-live="polite">Preview is read-only. Nothing is imported until you choose Import.</div>
+</form>`;
  if(state.tab==='test')pane.innerHTML=`<div class="inner-title"><h4>Live request playground</h4><p>Tests call the actual endpoint. No simulated response or fabricated latency is returned.</p></div>${t.length?`<form id="test-form" class="tool-form"><label>Select tool<select class="input" name="tool">${t.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}</select></label><label>Arguments JSON<textarea name="args" spellcheck="false">${esc(sampleArgs)}</textarea></label><button class="btn btn-primary btn-small">Run live test</button></form><div id="test-result" class="result-box hidden"></div>`:'<div class="empty-state">Add a tool before running tests.</div>'}`;
  if(state.tab==='usage'){pane.innerHTML='<div class="empty-state">Loading observed usage…</div>';request('GET','/api/servers/'+s.id+'/usage').then(x=>{pane.innerHTML=`<div class="usage-grid"><div class="usage-card"><b>${x.usage.calls}</b><small>Tool calls / 30 days</small></div><div class="usage-card"><b>${x.usage.successes}</b><small>Successful executions</small></div><div class="usage-card"><b>${x.usage.avg_ms} ms</b><small>Average execution time</small></div></div><p class="hint">Observed invocation events only. Calls do not imply distinct users or collected revenue.</p>`;}).catch(e=>pane.textContent=e.message);}
 }
@@ -99,6 +126,31 @@ document.addEventListener('click',async e=>{
      state.tab='overview';state.selected=null;await loadServers();await selectServer(x.server.id);
      feedback('Live-source starter created. Use Test and Publish to activate the MCP endpoint.');
    }finally{b.disabled=false;}
+   return;
+ }
+ if(b.id==='load-openapi-example'){
+   b.disabled=true;
+   try{
+    const response=await fetch('/examples/hacker-news.openapi.yaml');
+    if(!response.ok)throw Error('EXAMPLE_NOT_AVAILABLE');
+    const spec=await response.text();
+    const form=$('#import-form');
+    form.querySelector('[name=baseUrl]').value='https://hacker-news.firebaseio.com';
+    form.querySelector('[name=document]').value=spec;
+    form.querySelector('[name=spec_url]').value='';
+    form.querySelector('[name=spec_file]').value='';
+    $('#openapi-preview').textContent='Example loaded. Choose Preview tools to inspect the GET operations before importing.';
+   }finally{b.disabled=false;}
+   return;
+ }
+ if(b.id==='preview-openapi'){
+   const form=$('#import-form');if(!form?.reportValidity())return;
+   b.disabled=true;const target=$('#openapi-preview');target.textContent='Validating specification…';
+   try{const payload=await openapiPayload(form);
+    const result=await request('POST','/api/servers/'+state.selected+'/preview-openapi',payload);
+    renderOpenapiPreview(result);
+   }catch(error){target.textContent='Preview failed: '+error.message;}
+   finally{b.disabled=false;}
    return;
  }
  if(b.id==='new-server'){showPanel('servers');renderNewServer();return;}
@@ -184,7 +236,7 @@ document.addEventListener('submit',async e=>{
     await request('PATCH','/api/servers/'+state.selected,{name:value('name'),description:value('description')});
     await loadServers();await loadCatalog();feedback('Server details saved');
  }
- if(f.id==='import-form'){const document=JSON.parse(value('document'));const x=await request('POST','/api/servers/'+state.selected+'/import-openapi',{document,baseUrl:value('baseUrl')});state.tab='overview';await loadServers();feedback(x.added+' real GET tool(s) imported');}
+ if(f.id==='import-form'){const payload=await openapiPayload(f);const x=await request('POST','/api/servers/'+state.selected+'/import-openapi',payload);state.tab='overview';await loadServers();feedback(x.added+' GET tool(s) imported from '+x.found+' supported operations; '+x.skipped+' skipped');}
  if(f.id==='test-form'){const args=JSON.parse(value('args')||'{}');const tool=value('tool');const result=$('#test-result');result.classList.remove('hidden');result.textContent='Executing against source…';try{const x=await request('POST','/api/tools/'+tool+'/test',{args});result.textContent=JSON.stringify(x,null,2);await loadActivation();}catch(err){result.textContent='Test failed: '+err.message;}}
  }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else if(f.id==='pilot-form'){const result=$('#pilot-result');result.classList.remove('success');result.classList.add('error');result.textContent='Request not saved: '+err.message;}else feedback(err.message);}finally{if(button)button.disabled=false;}
 });
