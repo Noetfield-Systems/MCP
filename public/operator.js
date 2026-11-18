@@ -44,13 +44,24 @@ function displayLeads(leads){
  return '<tr><td><strong>'+escapeHtml(lead.contact_name)+'</strong><small><a href="mailto:'+email+'">'+escapeHtml(lead.email)+'</a></small></td><td>'+escapeHtml(lead.company||'—')+'<small>'+escapeHtml(lead.website||'No URL provided')+'</small></td><td class="brief">'+escapeHtml(lead.project_brief)+'</td><td>'+escapeHtml(received)+'</td><td>'+stageSelect(lead)+'</td></tr>';
  }).join('');
 }
+function displayOrders(orders){
+ const table=$('#operator-orders');
+ table.innerHTML=orders.length?orders.map(o=>{
+  const paid=['paid','fulfilled'].includes(o.status);
+  const amount=new Intl.NumberFormat('en-CA',{style:'currency',currency:o.currency.toUpperCase()}).format(o.amount_cents/100);
+  return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+(o.status==='paid'?'<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'">Mark fulfilled</button>':paid?'Verified by webhook':'Not paid')+'</td></tr>';
+ }).join(''):'<tr><td colspan="5">No scoped orders created. Enquiries are not sales.</td></tr>';
+}
 async function load(){
- const [stats,leads,funnel]=await Promise.all([
+ const [stats,leads,funnel,orders]=await Promise.all([
   operatorRequest('GET','/api/admin/overview'),
   operatorRequest('GET','/api/admin/pilot-interest'),
-  operatorRequest('GET','/api/admin/funnel')
+  operatorRequest('GET','/api/admin/funnel'),
+  operatorRequest('GET','/api/admin/pilot-orders')
  ]);
- displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);
+ displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);displayOrders(orders.orders);
+ $('#order-lead-id').innerHTML=leads.leads.map(l=>'<option value="'+escapeHtml(l.id)+'">'+escapeHtml(l.contact_name)+' — '+escapeHtml(l.company||l.email)+'</option>').join('');
+ $('#operator-order-form button[type=submit]').disabled=!leads.leads.length;
  $('#operator-action-feedback').textContent='Observed as of '+new Date().toLocaleString();
 }
 $('#operator-form').addEventListener('submit',async event=>{
@@ -83,4 +94,28 @@ document.addEventListener('change',async event=>{
   $('#operator-action-feedback').textContent=error.message;
   if(previous)target.value=previous;
  }
+});
+
+$('#operator-order-form').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;
+ const status=$('#operator-order-feedback');
+ try{
+  const amount=Number($('#order-amount').value);
+  const result=await operatorRequest('POST','/api/admin/pilot-orders',{lead_id:$('#order-lead-id').value,
+    amount_cents:amount,currency:$('#order-currency').value,description:$('#order-scope').value.trim()});
+  status.textContent='Quote created; no payment collected. Share the exact buyer link:';
+  const link=document.createElement('a');link.href=result.share_url;link.textContent=result.share_url;link.target='_blank';link.rel='noopener noreferrer';
+  status.append(document.createTextNode(' '),link);
+  await load();
+ }catch(error){status.textContent='Unable to create quote: '+error.message;}
+ finally{button.disabled=false;}
+});
+document.addEventListener('click',async event=>{
+ const target=event.target.closest('[data-fulfill]');if(!target)return;
+ target.disabled=true;
+ try{await operatorRequest('POST','/api/admin/pilot-orders/'+encodeURIComponent(target.dataset.fulfill)+'/fulfill',{});
+  $('#operator-order-feedback').textContent='Signed-payment order marked fulfilled. This is an operator status, not a refund or new transaction.';
+  await load();
+ }catch(error){$('#operator-order-feedback').textContent='Fulfillment failed: '+error.message;}finally{target.disabled=false;}
 });
