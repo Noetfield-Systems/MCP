@@ -23,3 +23,18 @@ export function generateClientInstall(host,endpoint,{privateServer=false}={}){
  return {kind:'json',filename:item.filename,text:JSON.stringify(config,null,2),
    hint:privateServer?'Replace only the placeholder with your private Foundry API key; do not commit this file or share the key.':'Remote Streamable HTTP support depends on the specific host version.'};
 }
+
+/**
+ * Generate a customer-docs installation link for a public Foundry server.
+ * No client credentials or customer secrets are ever put in the embed code.
+ * This is an installation guide link, not an automatic install or usage receipt.
+ */
+export function generateDocsInstallLink(origin,slug,{privateServer=false}={}){
+ if(privateServer)throw Error('PRIVATE_SERVER_HAS_NO_PUBLIC_DOCS_EMBED');
+ if(typeof slug!=='string'||!/^[a-z][a-z0-9-]{2,48}$/.test(slug))throw Error('INVALID_PUBLIC_SERVER_SLUG');
+ const base=new URL(origin);
+ if(base.protocol!=='https:'||base.username||base.password||base.search||base.hash||base.pathname!=='/')throw Error('INVALID_FOUNDRY_PUBLIC_ORIGIN');
+ const url=new URL('/connect?server='+encodeURIComponent(slug),base);
+ const html='<a href="'+url.href+'" target="_blank" rel="noopener noreferrer">Use with AI</a>';
+ return {href:url.href,html};
+}
