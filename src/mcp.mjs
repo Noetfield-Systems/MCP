@@ -7,6 +7,7 @@ import {q} from './db.mjs';
 import {recordActivation} from './activation.mjs';
 import {parseOpenapi,openapiPreview} from './openapi.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
+import {guardedManagedGet} from './oauth.mjs';
 import {randomUUID} from 'node:crypto';
 
 function schemaFor(params){
@@ -24,7 +25,7 @@ async function executeTool(server,tool,args,principal){
     const count=await q('SELECT count(*)::int AS n FROM tool_events WHERE server_id=$1 AND created_at>now()-interval \'1 day\'',[server.id]);
     if(count.rows[0].n >= (server.owner_plan==='pro'?25000:500))throw new Error('Daily execution quota reached');
     const target=toolUrl(tool,args);
-    const result=await safeGet(target);
+    const result=await guardedManagedGet(server,principal,target);
     success=true;
     return {content:[{type:'text',text:result.body}],structuredContent:{status:result.status,contentType:result.contentType,source:target}};
   } catch(error){
@@ -152,7 +153,7 @@ export function foundryMcp(principal=null){
         if(!rows.length)throw Error('Tool not found');
         let args;try{args=JSON.parse(arguments_json);}catch{throw Error('Invalid tool argument JSON');}
         const source=toolUrl(rows[0],args);
-        const data=await safeGet(source);
+        const data=await guardedManagedGet(server,principal,source);
         await recordActivation('tool_test_succeeded',principal.id,server.id,'native_mcp');
         return {ok:true,source,status:data.status,content_type:data.contentType,response:data.body.slice(0,16000)};
       }));
@@ -163,6 +164,8 @@ export function foundryMcp(principal=null){
         const server=await myServer(server_id);
         const count=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
         if(!count.rows[0].n)throw Error('Add a tool before publishing');
+        const binding=await q('SELECT 1 FROM server_oauth_bindings WHERE server_id=$1',[server.id]);
+        if(binding.rowCount&&visibility!=='private')throw Error('OAUTH_SERVER_MUST_REMAIN_PRIVATE');
         await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2",[visibility,server.id]);
         await recordActivation('server_published',principal.id,server.id,'native_mcp');
         const base=(process.env.PUBLIC_URL||'').replace(/\/$/,'');
