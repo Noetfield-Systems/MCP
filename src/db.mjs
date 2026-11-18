@@ -51,6 +51,13 @@ export async function initDb(){
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS pilot_leads_created_idx ON pilot_leads(created_at DESC);
+  ALTER TABLE pilot_leads ADD COLUMN IF NOT EXISTS service_package text NOT NULL DEFAULT 'custom'
+    CHECK(service_package IN ('quickstart','launch','private','care','agency','custom'));
+  CREATE INDEX IF NOT EXISTS pilot_leads_package_idx ON pilot_leads(service_package,updated_at DESC);
+  ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS offer_type text NOT NULL DEFAULT 'custom'
+    CHECK(offer_type IN ('quickstart','launch','private','care','agency','custom'));
+  CREATE INDEX IF NOT EXISTS pilot_orders_offer_idx ON pilot_orders(offer_type,created_at DESC);
+
   CREATE TABLE IF NOT EXISTS opportunity_applications (
     id uuid PRIMARY KEY,
     email text NOT NULL,
