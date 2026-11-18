@@ -7,9 +7,14 @@
 <title>Developer Docs — MCP Foundry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"></head><body>
-<header class="nav"><a href="/" class="brand"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a><nav><a href="/#capabilities">Platform</a><a href="/#studio">Studio</a><a href="/#pricing">Pricing</a></nav><div class="nav-actions"><a class="btn btn-small btn-outline" href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry ↗</a><a class="btn btn-primary btn-small" href="/#studio">Open Studio ↗</a></div></header>
-<main class="wrap docs-page">
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-b"></head><body>
+<a class="skip-link foundry-skip" href="#main">Skip to content</a><header class="nav foundry-nav">
+ <a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers" aria-current="page">Developers</a><a href="/collaborate">Work with us</a></nav>
+ <div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio <span aria-hidden="true">↗</span></a></div>
+ <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
+</header>
+<main id="main" class="wrap docs-page">
 <div class="section-kicker">DEVELOPER DOCUMENTATION <span>VERSION 0.1.0 · MCP 2026-07-28</span></div>
 <div class="docs-hero"><div><div class="eyebrow">OFFICIAL REGISTRY LISTED · REMOTE STREAMABLE HTTP</div><h1>Connect once.<br><em>Build for agents.</em></h1><p>MCP Foundry publishes real HTTPS tools from your APIs. Start without payment, test an actual upstream response, then attach the resulting MCP endpoint to a compatible AI client.</p><div class="hero-actions"><a class="btn btn-primary btn-large" href="/#studio">Create your first server ↗</a><a class="btn btn-outline btn-large" href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">View source code ↗</a></div></div><div class="docs-hero-status"><span class="plan-type">PUBLIC CONNECTION</span><code>https://mcp-foundry-web-production.up.railway.app/mcp/foundry</code><span class="status published">Official Registry v0.1.0</span><p>The public directory works without a key. Add a personal Foundry API key to unlock authenticated creation, import, test and publication tools.</p></div></div>
 <div class="docs-layout"><aside class="docs-nav"><span class="workspace-eyebrow">QUICK NAVIGATION</span><a href="#quickstart">01 · Quickstart</a><a href="#connect">02 · Connect your MCP client</a><a href="#native">03 · Use Foundry as an MCP app</a><a href="#sdk">04 · SDK integration</a><a href="#discovery">05 · Discovery & Registry</a><a href="#boundaries">06 · Limits & safe execution</a><a href="#help">07 · Support & implementation</a></aside>
@@ -65,6 +70,16 @@ try {
 <section id="help" class="docs-section"><span class="section-kicker">07 / IMPLEMENTATION</span><h2>Need a custom <em>MCP integration?</em></h2><p>We also offer scoped development proposals for existing APIs. You can request an implementation assessment through the form; no payment is charged merely for submitting the request. The current paid subscription checkout is not enabled without completed production billing configuration.</p><a href="/#implementation" class="btn btn-primary btn-large">Request implementation ↗</a><p class="hint" style="margin-top:20px">For product source, CI evidence and public issues see <a href="https://github.com/Noetfield-Systems/MCP" style="color:#beb3ff" target="_blank" rel="noopener">GitHub</a>.</p></section>
 </div></div>
 </main>
-<footer class="footer wrap"><div class="footer-brand">MCP FOUNDRY</div><div class="footer-links"><a href="/">Home</a><a href="/privacy">Privacy</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Noetfield Systems Inc.</div></footer>
+<footer class="foundry-footer">
+ <div class="foundry-footer-inner">
+ <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <p>Turn working APIs into tools AI clients can actually use. Build, test, publish and deliver.</p></div>
+ <div class="foundry-footer-links">
+ <div><strong>PRODUCT</strong><a href="/">Platform</a><a href="/#studio">Studio</a><a href="/marketplace">Marketplace</a><a href="/connect">Client connection</a></div>
+ <div><strong>SOLUTIONS</strong><a href="/solutions">For API businesses</a><a href="/web3">For Web3</a><a href="/#quickstart">Public API Quickstart</a><a href="/collaborate">Work with us</a></div>
+ <div><strong>RESOURCES</strong><a href="/developers">Developer docs</a><a href="/team">Teams</a><a href="/oauth">OAuth</a><a href="/privacy">Privacy &amp; data</a></div>
+ </div></div>
+ <div class="foundry-footer-bottom"><span>© 2026 MCP Foundry · An independent Noetfield Systems Inc. product.</span><span><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;·&nbsp; <a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener noreferrer">MCP Registry</a></span></div>
+</footer>
 <script type="module" src="/developers.js"></script>
-</body></html>
+<script src="/site-shell.js?v=20261118-b" defer></script></body></html>

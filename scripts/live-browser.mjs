@@ -53,18 +53,58 @@ try{
  assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false','Escape closes navigation');
  const viewport=await page.evaluate(()=>({screen:innerWidth,content:document.documentElement.scrollWidth}));
  assert.ok(viewport.content<=viewport.screen+3,'mobile page does not overflow horizontally: '+JSON.stringify(viewport));
- // Three genuinely differentiated acquisition pages must be usable on a phone.
- for(const route of ['/solutions','/web3','/collaborate']){
-   const resp=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
-   assert.equal(resp.status(),200,'market page '+route);
-   assert.equal(await page.locator('main h1').count(),1,'clear vertical headline '+route);
-   assert.ok((await page.locator('main h1').innerText()).length>20,'no placeholder hero');
-   const bounds=await page.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
-   assert.ok(bounds.page<=bounds.screen+3,route+' no horizontal mobile overflow: '+JSON.stringify(bounds));
-   await page.locator('.growth-mobile-nav summary').click();
-   assert.equal(await page.locator('.growth-mobile-nav').getAttribute('open'),'','mobile menu opens');
-   await page.locator('.growth-mobile-nav summary').click();
+ // Canonical design system acceptance: every public page uses the same
+ // header, footer, typography, focusable mobile menu and no horizontal overflow.
+ const publicRoutes=['/','/solutions','/web3','/collaborate','/marketplace',
+  '/connect','/developers','/team','/oauth','/operator','/order','/privacy'];
+ const expectedNav=['Platform','For APIs','Web3','Marketplace','Developers','Work with us'];
+ for(const route of publicRoutes){
+   const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
+   assert.equal(response.status(),200,'public page '+route+' is live');
+   assert.equal(await page.locator('header.foundry-nav').count(),1,'canonical header: '+route);
+   assert.equal(await page.locator('footer.foundry-footer').count(),1,'canonical footer: '+route);
+   const values=await page.evaluate(()=>{
+     const header=document.querySelector('header.foundry-nav');
+     return {
+       width:innerWidth,scroll:document.documentElement.scrollWidth,
+       headerHeight:Math.round(header.getBoundingClientRect().height),
+       font:getComputedStyle(document.body).fontFamily,
+       background:getComputedStyle(document.body).backgroundColor,
+       links:[...document.querySelectorAll('#primary-nav a')].map(a=>a.textContent.trim()),
+       theme:[...document.styleSheets].some(x=>x.href?.includes('/ui-system.css'))
+     };
+   });
+   assert.deepEqual(values.links,expectedNav,'same navigation across '+route);
+   assert.equal(values.headerHeight,72,'same mobile header height on '+route);
+   assert.ok(values.font.includes('DM Sans'),'consistent brand body font '+route);
+   assert.ok(values.theme,'shared design tokens loaded on '+route);
+   assert.ok(values.scroll<=values.width+3,'no mobile overflow on '+route+': '+JSON.stringify(values));
+   const button=page.locator('#menu-toggle');
+   await button.click();
+   assert.equal(await button.getAttribute('aria-expanded'),'true','mobile menu opens on '+route);
+   await page.keyboard.press('Escape');
+   assert.equal(await button.getAttribute('aria-expanded'),'false','Escape closes mobile menu on '+route);
+   if(['/solutions','/web3','/collaborate','/marketplace','/developers'].includes(route)){
+     const label=route.slice(1);
+     await page.screenshot({path:'artifacts/foundry-'+label+'-mobile.png',fullPage:true,animations:'disabled'});
+   }
  }
+ await page.setViewportSize({width:1440,height:900});
+ for(const route of ['/','/solutions','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
+   const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
+   assert.equal(response.status(),200,'desktop page '+route);
+   const metrics=await page.evaluate(()=>({
+     viewport:innerWidth,scroll:document.documentElement.scrollWidth,
+     header:Math.round(document.querySelector('header.foundry-nav').getBoundingClientRect().height),
+     headerBg:getComputedStyle(document.querySelector('header.foundry-nav')).backgroundColor
+   }));
+   assert.equal(metrics.header,82,'consistent desktop header height on '+route);
+   assert.ok(metrics.scroll<=metrics.viewport+3,'no desktop horizontal overflow on '+route+': '+JSON.stringify(metrics));
+   if(['/solutions','/web3','/collaborate','/connect'].includes(route)){
+     await page.screenshot({path:'artifacts/foundry-'+route.slice(1)+'-desktop.png',fullPage:true,animations:'disabled'});
+   }
+ }
+ await page.setViewportSize({width:390,height:844});
  await page.goto(base+'/collaborate',{waitUntil:'domcontentloaded',timeout:20000});
  assert.equal(await page.locator('[data-track]').count(),6,'six specific developer and partner paths');
  await page.locator('[data-track="web3_builder"]').click();
@@ -129,7 +169,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
- console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
+ console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',canonical_12_page_design:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
  if(registered){
    try {

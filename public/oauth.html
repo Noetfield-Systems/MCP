@@ -1,7 +1,12 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1121"><title>OAuth Connections — MCP Foundry</title>
-<meta name="description" content="Connect a GitHub account to a private MCP Foundry server through OAuth authorization-code PKCE, with encrypted server-side credentials."><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"></head>
-<body><header class="nav"><a class="brand" href="/"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a><nav><a href="/">Platform</a><a href="/connect">Connect</a><a href="/team">Teams</a><a href="/marketplace">Marketplace</a></nav><div class="nav-actions"><a class="btn btn-small btn-primary" href="/#studio">Open Studio</a></div></header>
-<main class="wrap expansion-main"><div class="section-kicker">P1 / AUTHENTICATED API CONNECTIONS</div><h1>Your APIs.<br><em>Your authorization.</em></h1>
+<meta name="description" content="Connect a GitHub account to a private MCP Foundry server through OAuth authorization-code PKCE, with encrypted server-side credentials."><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/ui-system.css?v=20261118-b"></head>
+<body><a class="skip-link foundry-skip" href="#main">Skip to content</a><header class="nav foundry-nav">
+ <a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
+ <div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio <span aria-hidden="true">↗</span></a></div>
+ <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
+</header>
+<main id="main" class="wrap expansion-main"><div class="section-kicker">P1 / AUTHENTICATED API CONNECTIONS</div><h1>Your APIs.<br><em>Your authorization.</em></h1>
 <p class="expansion-intro">Connect GitHub with an authorization-code and PKCE flow. Foundry stores access credentials encrypted on the server and only sends them to <code>api.github.com</code> for explicitly private, owner-authenticated MCP server calls.</p>
 <div class="connect-layout"><section class="product-panel"><span class="workspace-eyebrow">GITHUB / PROVIDER CONNECTION</span><h3 id="oauth-heading">Checking OAuth configuration…</h3>
 <p id="oauth-description">Loading your account-specific connection state…</p><button class="btn btn-primary" id="oauth-connect" disabled>Connect GitHub securely</button>
@@ -14,4 +19,14 @@
 <div><span>01</span> Authenticate to your existing Foundry workspace</div><div><span>02</span> Approve GitHub's limited user-profile read scope</div><div><span>03</span> Assign the connection only to a private MCP server</div><div><span>04</span> Execute HTTPS GET requests only to api.github.com</div><div><span>05</span> Disconnect locally and revoke remote access in GitHub if needed</div>
 </div><p class="expansion-note">GitHub OAuth application credentials must be configured by the Foundry operator before this connector can authorize a user. The presence of this page does not mean a GitHub account is connected. OAuth for arbitrary third-party providers is not enabled here.</p>
 <a class="btn btn-outline" href="/developers">Read developer docs</a></aside></div>
-</main><footer class="footer wrap"><span>MCP FOUNDRY · OWNER-CONTROLLED CONNECTIONS</span><a href="/privacy">Privacy</a></footer><script type="module" src="/oauth.js"></script></body></html>
+</main><footer class="foundry-footer">
+ <div class="foundry-footer-inner">
+ <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>MCP <b>FOUNDRY</b></span></a>
+ <p>Turn working APIs into tools AI clients can actually use. Build, test, publish and deliver.</p></div>
+ <div class="foundry-footer-links">
+ <div><strong>PRODUCT</strong><a href="/">Platform</a><a href="/#studio">Studio</a><a href="/marketplace">Marketplace</a><a href="/connect">Client connection</a></div>
+ <div><strong>SOLUTIONS</strong><a href="/solutions">For API businesses</a><a href="/web3">For Web3</a><a href="/#quickstart">Public API Quickstart</a><a href="/collaborate">Work with us</a></div>
+ <div><strong>RESOURCES</strong><a href="/developers">Developer docs</a><a href="/team">Teams</a><a href="/oauth">OAuth</a><a href="/privacy">Privacy &amp; data</a></div>
+ </div></div>
+ <div class="foundry-footer-bottom"><span>© 2026 MCP Foundry · An independent Noetfield Systems Inc. product.</span><span><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;·&nbsp; <a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener noreferrer">MCP Registry</a></span></div>
+</footer><script type="module" src="/oauth.js"></script><script src="/site-shell.js?v=20261118-b" defer></script></body></html>
