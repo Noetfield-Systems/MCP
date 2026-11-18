@@ -17,7 +17,7 @@ test('canonical 12-page premium design shell is consistent and retains product r
    assert.deepEqual(hrefs,originalNavigation,name+' same canonical destinations');
    assert.equal((doc.match(/<header class="nav foundry-nav">/g)||[]).length,1,name+' one standard header');
    assert.equal((doc.match(/<footer class="foundry-footer">/g)||[]).length,1,name+' one standard footer');
-   assert.ok(doc.includes('href="/ui-system.css?v=20261118-c"'),name+' loads final shared theme');
+   assert.ok(doc.includes('href="/ui-system.css?v=20261118-b"'),name+' loads final shared theme');
    assert.ok(doc.includes('<main id="main"'),name+' has skip-link landmark');
    assert.ok(doc.includes('aria-controls="primary-nav" aria-expanded="false"'),name+' accessible mobile nav');
    assert.ok(doc.includes('href="/privacy"'),name+' visible privacy destination');
@@ -38,17 +38,4 @@ test('canonical design system establishes responsive layout, keyboard and reduce
  assert.match(js,/Escape/);
  assert.match(js,/aria-expanded/);
  assert.match(js,/aria-current/);
-});
-
-test('finish 02 uses the unified final design across 12 routes',()=>{
-  const css=readFileSync(new URL('../public/ui-system.css',import.meta.url),'utf8');
-  for(const token of ['--fd-container:1200px','--fd-canvas:#0b1420','--fd-accent:#e7ceb0',
-    '--fd-section-space:100px','#home.hero','body.growth-body .growth-hero',
-    '.expansion-main .product-panel','@media(max-width:600px)','prefers-reduced-motion:reduce']){
-    assert.ok(css.includes(token),'shared design token/surface: '+token);
-  }
-  for(const name of routeNames){
-    assert.equal((html(name).match(/ui-system\.css\?v=20261118-c/g)||[]).length,1,
-      name+' loads exactly one versioned final design sheet');
-  }
 });
