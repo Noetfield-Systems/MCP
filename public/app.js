@@ -14,7 +14,13 @@ function authMode(login){state.login=login;$('#auth-submit').innerHTML=login?'Si
 function updateWorkspace(){
  const logged=!!state.user;$('#studio-auth').classList.toggle('hidden',logged);$('#studio-app').classList.toggle('hidden',!logged);
  $('#sidebar-account').textContent=logged?state.user.email:'Guest access';$('#sidebar-plan').textContent=logged?state.user.plan.toUpperCase()+' PLAN':'Sign in to create servers';
- $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged)loadServers().catch(e=>feedback(e.message));
+ $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged){loadServers().catch(e=>feedback(e.message));loadTemplates().catch(e=>feedback(e.message));}
+}
+async function loadTemplates(){
+ const {templates}=await request('GET','/api/templates');
+ const target=$('#template-list');
+ if(!target)return;
+ target.innerHTML=templates.map(t=>`<button class="template-choice" data-template="${esc(t.id)}"><span class="template-category">${esc(t.category)}</span><b>${esc(t.name)}</b><small>${esc(t.description)}</small><span class="template-action">Create draft →</span></button>`).join('');
 }
 async function loadMe(){try{state.user=(await request('GET','/api/me')).account;}catch{state.user=null;}updateWorkspace();}
 async function loadServers(){const data=await request('GET','/api/servers');state.servers=data.servers;renderServers();if(state.selected)await selectServer(state.selected);}
@@ -46,6 +52,16 @@ document.addEventListener('click',async e=>{
  if(b.id==='menu-toggle'){$('.nav').classList.toggle('open');return;}
  if(b.id==='nav-login'){if(state.user){await request('POST','/api/auth/logout');state.user=null;state.selected=null;updateWorkspace();}else{authMode(true);location.hash='#studio';}return;}
  if(b.id==='auth-switch'){authMode(!state.login);return;}
+ if(b.dataset.template){
+   if(!state.user){location.hash='#studio';return;}
+   b.disabled=true;
+   try{
+     const x=await request('POST','/api/servers/from-template',{template_id:b.dataset.template});
+     state.tab='overview';state.selected=null;await loadServers();await selectServer(x.server.id);
+     feedback('Live-source starter created. Use Test and Publish to activate the MCP endpoint.');
+   }finally{b.disabled=false;}
+   return;
+ }
  if(b.id==='new-server'){showPanel('servers');renderNewServer();return;}
  if(b.id==='close-detail'){state.selected=null;$('#server-detail').classList.add('hidden');return;}
  if(b.dataset.server){state.tab='overview';await selectServer(b.dataset.server);return;}
@@ -59,16 +75,30 @@ document.addEventListener('click',async e=>{
  }catch(err){feedback(err.message);}
 });
 document.addEventListener('submit',async e=>{
- const f=e.target;if(!['auth-form','new-server-form','tool-form','import-form','test-form'].includes(f.id))return;e.preventDefault();
+ const f=e.target;if(!['auth-form','new-server-form','tool-form','import-form','test-form','pilot-form'].includes(f.id))return;e.preventDefault();
  const data=new FormData(f);const value=name=>String(data.get(name)||'').trim();
  const button=f.querySelector('button[type=submit],button:not([type])');if(button)button.disabled=true;
  try{
+ if(f.id==='pilot-form'){
+   const result=$('#pilot-result');
+   result.classList.remove('success','error');
+   const payload={
+     contact_name:value('contact_name'),email:value('email'),company:value('company'),
+     website:value('website'),project_brief:value('project_brief'),
+     contact_consent:data.has('contact_consent'),marketing_consent:data.has('marketing_consent'),
+     nickname:value('nickname')
+   };
+   const response=await request('POST','/api/pilot-interest',payload);
+   result.classList.add('success');
+   result.textContent='Request received. Reference '+(response.reference||'recorded')+'. No payment has been taken.';
+   f.reset();
+ }
  if(f.id==='auth-form'){const endpoint=state.login?'/api/auth/login':'/api/auth/register';const x=await request('POST',endpoint,{email:value('auth-email')||$('#auth-email').value,password:$('#auth-password').value});state.user=x.account;updateWorkspace();msg('Workspace ready');}
  if(f.id==='new-server-form'){const x=await request('POST','/api/servers',{name:value('name'),slug:value('slug'),description:value('description')});state.tab='overview';await loadServers();await selectServer(x.server.id);feedback('Server created. Add a tool to publish.');}
  if(f.id==='tool-form'){const params=JSON.parse(value('params')||'[]');await request('POST','/api/servers/'+state.selected+'/tools',{name:value('name'),description:value('description'),url:value('url'),params});state.tab='overview';await loadServers();feedback('Tool saved; server is draft until republished');}
  if(f.id==='import-form'){const document=JSON.parse(value('document'));const x=await request('POST','/api/servers/'+state.selected+'/import-openapi',{document,baseUrl:value('baseUrl')});state.tab='overview';await loadServers();feedback(x.added+' real GET tool(s) imported');}
  if(f.id==='test-form'){const args=JSON.parse(value('args')||'{}');const tool=value('tool');const result=$('#test-result');result.classList.remove('hidden');result.textContent='Executing against source…';try{const x=await request('POST','/api/tools/'+tool+'/test',{args});result.textContent=JSON.stringify(x,null,2);}catch(err){result.textContent='Test failed: '+err.message;}}
- }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else feedback(err.message);}finally{if(button)button.disabled=false;}
+ }catch(err){if(f.id==='auth-form')$('#auth-feedback').textContent=err.message;else if(f.id==='pilot-form'){const result=$('#pilot-result');result.classList.remove('success');result.classList.add('error');result.textContent='Request not saved: '+err.message;}else feedback(err.message);}finally{if(button)button.disabled=false;}
 });
 let searchTimer;$('#catalog-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadCatalog,250);});
 $('#public-mcp-url').textContent=url();
