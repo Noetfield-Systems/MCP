@@ -54,3 +54,24 @@ test('approved graphite product preview is installed without replacing live Stud
  for(const token of ['#08090b','#81b4ff','.preview-shell','.growth-hero','.docs-layout','.market-list','.workspace-shell'])
    assert.ok(css.includes(token),'shared approved design: '+token);
 });
+
+test('V3 sales offer keeps real Quickstart checkout and labels new Launch as quoted',()=>{
+ const home=html('index');
+ assert.ok(home.includes('id="quickstart"'),'original CA$199 checkout retained');
+ assert.ok(home.includes('https://buy.stripe.com/5kQ7sMaLm81SeWSfPu1Nu0j'),'existing live hosted checkout link retained');
+ assert.ok(home.includes('id="agent-launch"'),'new scoped offer discoverable');
+ assert.ok(home.includes('From CA$799'),'price is an explicitly experimental starting quote');
+ assert.ok(home.includes('individually scoped'),'must not pretend instant checkout is configured');
+ assert.ok(home.includes('id="pilot-form"'),'existing persistent consent-based buyer enquiry remains intact');
+ assert.ok(home.includes('id="build-from-ai"'),'existing native MCP Builder explained');
+ assert.ok(home.includes('/developers#native'),'native Builder leads to working docs');
+ assert.ok(html('solutions').includes('/#agent-launch'),'API owners can reach the Launch offer');
+});
+test('customer docs install is visible on /connect and remains a separate public-only widget',()=>{
+ const connect=html('connect');
+ for(const id of ['id="client-host"','id="client-slug"','id="client-private"','id="docs-install-panel"','id="docs-embed-code"','id="docs-embed-copy"'])assert.ok(connect.includes(id),id);
+ const script=readFileSync(new URL('../public/connect.js',import.meta.url),'utf8');
+ assert.match(script,/generateDocsInstallLink/);
+ assert.match(script,/docs-embed-copy/);
+ assert.match(script,/disabled=true/);
+});
