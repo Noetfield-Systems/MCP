@@ -24,7 +24,13 @@ app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,p
 app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET)}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
-app.all('/mcp/foundry',(...args)=>foundryMcp()(...args));
+app.all('/mcp/foundry',async(req,res,next)=>{
+  try{
+    const bearer=req.get('authorization')?.replace(/^Bearer /i,'');
+    const principal=await readKey(bearer);
+    return foundryMcp(principal)(req,res,next);
+  }catch(error){next(error);}
+});
 app.all('/mcp/:slug',async(req,res,next)=>{
   try{
     const {rows}=await q("SELECT s.*,a.plan AS owner_plan FROM servers s JOIN accounts a ON a.id=s.owner_id WHERE s.slug=$1 AND s.status='published'",[req.params.slug]);
