@@ -95,7 +95,7 @@ function renderDetail(){
 <form id="import-form" class="tool-form openapi-wizard">
 <label>Public upstream API base URL<input required type="url" name="baseUrl" placeholder="https://api.example.com"></label>
 <div class="import-source-grid">
-<label>Paste JSON or YAML<textarea name="document" style="min-height:175px" spellcheck="false" placeholder="openapi: 3.1.0&#10;info:&#10;  title: My API&#10;  version: 1.0.0&#10;paths:&#10;  /items:&#10;    get:&#10;      operationId: list_items"></textarea></label>
+<label>Paste JSON or YAML<textarea name="document" style="min-height:175px" spellcheck="false" placeholder="openapi: 3.1.0&#10;info:&#10;  title: My API&#10;  version: 1.0.0&#10;paths:&#10;  /items:&#10;    get:&#10;      operationId: list_items"></textarea><button type="button" class="btn btn-outline btn-small import-sample-btn" id="load-openapi-example">Load a real YAML example</button></label>
 <label>Upload specification file<input type="file" name="spec_file" accept=".json,.yaml,.yml,application/json,text/yaml"><small>Max 256 KiB. Uploaded file takes priority over pasted text.</small></label>
 <label>Or fetch public HTTPS spec URL<input type="url" name="spec_url" placeholder="https://example.com/openapi.yaml"><small>Used if no file or pasted text. Private hosts and redirects are blocked.</small></label>
 </div><div class="import-actions"><button type="button" class="btn btn-outline btn-small" id="preview-openapi">Preview tools</button><button type="submit" class="btn btn-primary btn-small">Import GET operations</button></div>
@@ -125,6 +125,21 @@ document.addEventListener('click',async e=>{
      const x=await request('POST','/api/servers/from-template',{template_id:b.dataset.template});
      state.tab='overview';state.selected=null;await loadServers();await selectServer(x.server.id);
      feedback('Live-source starter created. Use Test and Publish to activate the MCP endpoint.');
+   }finally{b.disabled=false;}
+   return;
+ }
+ if(b.id==='load-openapi-example'){
+   b.disabled=true;
+   try{
+    const response=await fetch('/examples/hacker-news.openapi.yaml');
+    if(!response.ok)throw Error('EXAMPLE_NOT_AVAILABLE');
+    const spec=await response.text();
+    const form=$('#import-form');
+    form.querySelector('[name=baseUrl]').value='https://hacker-news.firebaseio.com';
+    form.querySelector('[name=document]').value=spec;
+    form.querySelector('[name=spec_url]').value='';
+    form.querySelector('[name=spec_file]').value='';
+    $('#openapi-preview').textContent='Example loaded. Choose Preview tools to inspect the GET operations before importing.';
    }finally{b.disabled=false;}
    return;
  }
