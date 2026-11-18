@@ -67,7 +67,7 @@ The workflow [publish-registry.yml](.github/workflows/publish-registry.yml) uses
 Verify a listed release only via the real Registry API record for `io.github.Noetfield-Systems/mcp-foundry` (version `0.1.0`). A GitHub manifest, passing unit tests or a CI run that never reached the readback stage are not proof of registry publication.
 
 ## Manage the full lifecycle
-Your Studio can now rename and describe servers, edit/remove tools, unpublish a public or private endpoint instantly, and delete no-longer-needed MCP servers. Changes to a tool always return its server to draft until a deliberate republish. The published MCP endpoint and visible directory therefore reflect actual status, not stale UI promises.
+Your Studio can now rename and describe servers, edit/remove tools, unpublish a public or private endpoint instantly, and delete no-longer-needed MCP servers. Changing a tool stages an editable draft while the last published revision stays live. Explicit republish swaps to the tested draft; Unpublish and Delete deliberately revoke access. The directory lists only published tool snapshots.
 
 ## Private commercial operations
 [Operator Desk](https://mcp-foundry-web-production.up.railway.app/operator) shows genuine account/server usage counts and consented implementation enquiry records. Configure a long random `FOUNDRY_ADMIN_TOKEN` in the Railway service (never in GitHub), then enter it once into the Desk. The token stays in page memory and is not stored in browser storage. Lead status is an operator classification, not a paid receipt. Without the secret the endpoint fails closed.
