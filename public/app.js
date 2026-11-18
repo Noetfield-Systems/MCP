@@ -1,6 +1,6 @@
 const $=(q,root=document)=>root.querySelector(q);
 const $$=(q,root=document)=>[...root.querySelectorAll(q)];
-const state={user:null,servers:[],selected:null,detail:null,tab:'overview',login:false,templates:[],editToolId:null};
+const state={user:null,servers:[],selected:null,detail:null,tab:'overview',login:false,templates:[],editToolId:null,growth:null};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=()=>location.origin+'/mcp/foundry';
 let catalogRequestId=0;
@@ -20,7 +20,12 @@ function authMode(login){state.login=login;$('#auth-submit').innerHTML=login?'Si
 function updateWorkspace(){
  const logged=!!state.user;$('#studio-auth').classList.toggle('hidden',logged);$('#studio-app').classList.toggle('hidden',!logged);
  $('#sidebar-account').textContent=logged?state.user.email:'Guest access';$('#sidebar-plan').textContent=logged?state.user.plan.toUpperCase()+' PLAN':'Sign in to create servers';
- $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged){loadServers().catch(e=>feedback(e.message));loadTemplates().catch(e=>feedback(e.message));loadActivation().catch(e=>feedback(e.message));}
+ $('#nav-login').textContent=logged?'Sign out':'Sign in';if(logged){loadServers().catch(e=>feedback(e.message));loadTemplates().catch(e=>feedback(e.message));loadActivation().catch(e=>feedback(e.message));loadGrowth().catch(e=>feedback(e.message));}else{state.growth=null;}
+}
+async function loadGrowth(){
+ if(!state.user)return;
+ const data=await request('GET','/api/growth/me');state.growth=data;
+ $('#growth-summary').textContent=data.referrals+' real signup(s) · '+data.activated_referrals+' with successful managed tool calls';
 }
 async function loadTemplates(){
  const {templates}=await request('GET','/api/templates');
@@ -67,14 +72,14 @@ function renderServers(){
  $('#server-list').innerHTML=state.servers.length?state.servers.map(s=>`<button class="server-row" data-server="${esc(s.id)}"><span class="server-avatar">⌘</span><span><b>${esc(s.name)}</b><small>/mcp/${esc(s.slug)} · ${s.tool_count} tool(s)</small></span><span class="status ${s.status==='published'?'published':''}">${esc(s.status)}</span></button>`).join(''):'<div class="empty-state">No servers yet. Use “New server” to start with your existing API.</div>';
 }
 async function selectServer(id){state.selected=id;const data=await request('GET','/api/servers/'+encodeURIComponent(id));state.detail=data;$('#server-detail').classList.remove('hidden');renderDetail();}
-function detailTabs(){return ['overview','add tool','import openapi','test','usage'].map(tab=>`<button class="detail-tab ${state.tab===tab?'active':''}" data-tab="${tab}">${tab[0].toUpperCase()+tab.slice(1)}</button>`).join('');}
+function detailTabs(){return ['overview','add tool','import openapi','test','usage','revisions'].map(tab=>`<button class="detail-tab ${state.tab===tab?'active':''}" data-tab="${tab}">${tab[0].toUpperCase()+tab.slice(1)}</button>`).join('');}
 function renderDetail(){
  const s=state.detail.server,t=state.detail.tools;
  const preset=state.templates.find(x=>s.slug.startsWith(x.id.replaceAll('_','-')+'-'));
  const sampleArgs=JSON.stringify(preset?.sampleArgs||{},null,2);
  $('#server-detail').innerHTML=`<div class="detail-header"><div><span class="workspace-eyebrow">SELECTED SERVER · ${esc(s.status)}</span><h4>${esc(s.name)}</h4></div><button class="btn btn-outline btn-small" id="close-detail">Back to all servers</button></div><div class="detail-tabs">${detailTabs()}</div><div id="detail-content" class="detail-content"></div>`;
  const pane=$('#detail-content');
- if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button>${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
+ if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button><a href="/connect?server=${esc(s.slug)}${s.visibility==='private'?'&private=1':''}" class="btn btn-outline btn-small">Client setup ↗</a>${s.status==='published'&&s.visibility==='public'?'<a class="btn btn-outline btn-small" href="/marketplace">List in marketplace ↗</a>':''}${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
  if(state.tab==='overview'){
    $$('.tool-item',pane).forEach((element,index)=>{
      const tool=t[index];if(!tool)return;
@@ -103,6 +108,14 @@ function renderDetail(){
 </form>`;
  if(state.tab==='test')pane.innerHTML=`<div class="inner-title"><h4>Live request playground</h4><p>Tests call the actual endpoint. No simulated response or fabricated latency is returned.</p></div>${t.length?`<form id="test-form" class="tool-form"><label>Select tool<select class="input" name="tool">${t.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}</select></label><label>Arguments JSON<textarea name="args" spellcheck="false">${esc(sampleArgs)}</textarea></label><button class="btn btn-primary btn-small">Run live test</button></form><div id="test-result" class="result-box hidden"></div>`:'<div class="empty-state">Add a tool before running tests.</div>'}`;
  if(state.tab==='usage'){pane.innerHTML='<div class="empty-state">Loading observed usage…</div>';request('GET','/api/servers/'+s.id+'/usage').then(x=>{pane.innerHTML=`<div class="usage-grid"><div class="usage-card"><b>${x.usage.calls}</b><small>Tool calls / 30 days</small></div><div class="usage-card"><b>${x.usage.successes}</b><small>Successful executions</small></div><div class="usage-card"><b>${x.usage.avg_ms} ms</b><small>Average execution time</small></div></div><p class="hint">Observed invocation events only. Calls do not imply distinct users or collected revenue.</p>`;}).catch(e=>pane.textContent=e.message);}
+ if(state.tab==='revisions'){
+  pane.innerHTML='<div class="empty-state">Loading published revisions…</div>';
+  request('GET','/api/servers/'+s.id+'/revisions').then(x=>{
+   if(!x.revisions.length){pane.innerHTML='<div class="empty-state">Publish your server once to create a restorable version. Prior revisions are immutable snapshots.</div>';return;}
+   pane.innerHTML='<div class="inner-title"><h4>Published versions</h4><p>Restoring any version creates an unpublished draft. Review the tools and republish explicitly.</p></div><div class="team-list">'+
+   x.revisions.map(r=>'<div class="team-item"><div><b>Version '+esc(r.version)+'</b><small>'+esc(r.tools)+' tools · '+esc(new Date(r.created_at).toLocaleString())+'</small></div><button data-restore-revision="'+esc(r.id)+'" class="btn btn-outline btn-small">Restore as draft</button></div>').join('')+'</div>';
+  }).catch(error=>{pane.textContent=error.message;});
+ }
 }
 function renderNewServer(){state.selected=null;$('#server-detail').classList.remove('hidden');$('#server-detail').innerHTML=`<div class="detail-header"><h4>Create MCP server</h4><button class="btn btn-outline btn-small" id="close-detail">Cancel</button></div><form id="new-server-form" class="tool-form" style="margin-top:23px"><label>Server name<input required name="name" placeholder="Commerce API"></label><label>Unique public slug<input required name="slug" pattern="[a-z][a-z0-9-]{2,48}" placeholder="commerce-api"></label><label>Description<input name="description" placeholder="Search and read our product catalog"></label><button class="btn btn-primary btn-small">Create server</button></form>`;}
 async function loadKeys(){const x=await request('GET','/api/keys');$('#key-list').innerHTML=x.keys.length?x.keys.map(k=>`<div class="key-item"><span><b>${esc(k.label)}</b><br><small>${esc(k.prefix)}… · ${k.revoked_at?'Revoked':'Active'}</small></span>${k.revoked_at?'':'<button class="btn btn-outline btn-small danger" data-revoke="${esc(k.id)}">Revoke</button>'}</div>`).join(''):'<div class="empty-state">You have not created an API key.</div>';}
@@ -153,6 +166,7 @@ document.addEventListener('click',async e=>{
    finally{b.disabled=false;}
    return;
  }
+ if(b.id==='copy-growth-invite'){if(!state.growth)await loadGrowth();await navigator.clipboard.writeText(state.growth.invite_url);msg('Invite URL copied. Referrals count only real new accounts.');return;}
  if(b.id==='new-server'){showPanel('servers');renderNewServer();return;}
  if(b.id==='close-detail'){state.selected=null;$('#server-detail').classList.add('hidden');return;}
  if(b.dataset.server){state.tab='overview';await selectServer(b.dataset.server);return;}
@@ -178,6 +192,11 @@ document.addEventListener('click',async e=>{
  if(b.id==='unpublish-server'){
     await request('POST','/api/servers/'+state.selected+'/unpublish',{});
     state.tab='overview';await loadServers();await loadCatalog();feedback('MCP endpoint unpublished');return;
+ }
+ if(b.dataset.restoreRevision){
+   if(!confirm('Restore this published revision as a draft? All current tools will be replaced and the endpoint unpublished until you publish again.'))return;
+   const r=await request('POST','/api/servers/'+state.selected+'/revisions/'+b.dataset.restoreRevision+'/restore',{});
+   state.tab='overview';await loadServers();await loadCatalog();feedback('Version '+r.restored+' restored as draft. Review and republish to enable endpoint.');return;
  }
  if(b.id==='delete-server'){
     if(!confirm('Delete this server and all its tools and usage events? This cannot be undone.'))return;
@@ -222,7 +241,7 @@ document.addEventListener('submit',async e=>{
    result.textContent='Request received. Reference '+(response.reference||'recorded')+'. No payment has been taken.';
    f.reset();
  }
- if(f.id==='auth-form'){const endpoint=state.login?'/api/auth/login':'/api/auth/register';const x=await request('POST',endpoint,{email:value('auth-email')||$('#auth-email').value,password:$('#auth-password').value});state.user=x.account;updateWorkspace();msg('Workspace ready');}
+ if(f.id==='auth-form'){const endpoint=state.login?'/api/auth/login':'/api/auth/register';const ref=new URLSearchParams(location.search).get('ref')||'';const x=await request('POST',endpoint,{email:value('auth-email')||$('#auth-email').value,password:$('#auth-password').value,...(!state.login&&/^fdy-[a-zA-Z0-9_-]{8,28}$/.test(ref)?{referral_code:ref}:{})});state.user=x.account;updateWorkspace();msg('Workspace ready');}
  if(f.id==='new-server-form'){const x=await request('POST','/api/servers',{name:value('name'),slug:value('slug'),description:value('description')});state.tab='overview';await loadServers();await selectServer(x.server.id);feedback('Server created. Add a tool to publish.');}
  if(f.id==='tool-form'||f.id==='edit-tool-form'){
     const params=JSON.parse(value('params')||'[]');
