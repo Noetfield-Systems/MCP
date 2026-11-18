@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validatedTarget,toolUrl,specTools,passwordHash,passwordMatches} from '../src/security.mjs';
+import {validatedTarget,toolUrl,specTools,passwordHash,passwordMatches,pinnedPublicLookup} from '../src/security.mjs';
 
 test('public HTTPS host required, internal and literal IP blocked',()=>{
   assert.equal(validatedTarget('https://api.example.com/v1').hostname,'api.example.com');
@@ -27,4 +27,14 @@ test('password verifier rejects wrong passwords',()=>{
  assert.equal(passwordMatches('correct strong passphrase',hash),true);
  assert.equal(passwordMatches('incorrect strong passphrase',hash),false);
  assert.throws(()=>passwordHash('short'));
+});
+
+test('vetted DNS pin supports Node all=true and legacy callbacks',async()=>{
+ const lookup=pinnedPublicLookup('8.8.8.8');
+ const array=await new Promise((resolve,reject)=>lookup('dns.google',{all:true},(err,v)=>err?reject(err):resolve(v)));
+ assert.deepEqual(array,[{address:'8.8.8.8',family:4}]);
+ const single=await new Promise((resolve,reject)=>lookup('dns.google',{all:false},(err,v,f)=>err?reject(err):resolve({address:v,family:f})));
+ assert.deepEqual(single,{address:'8.8.8.8',family:4});
+ assert.throws(()=>pinnedPublicLookup('127.0.0.1'));
+ assert.throws(()=>pinnedPublicLookup('10.0.0.1'));
 });
