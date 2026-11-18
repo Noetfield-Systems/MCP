@@ -40,6 +40,11 @@ The backend never silently uses an in-memory customer database. `/healthz` check
 
 See [Commercial Launch Contract](docs/COMMERCIAL-LAUNCH.md) for the qualified lead workflow and the verified-payment boundary. [Privacy notice](https://mcp-foundry-web-production.up.railway.app/privacy).
 
+## Official MCP Registry distribution
+The canonical remote-only manifest is [server.json](server.json), also served unchanged from [the live manifest](https://mcp-foundry-web-production.up.railway.app/server.json) and [well-known discovery](https://mcp-foundry-web-production.up.railway.app/.well-known/mcp/server.json).
+The workflow [publish-registry.yml](.github/workflows/publish-registry.yml) uses the official publisher pinned to v1.8.1, Sigstore artifact verification, GitHub Actions OIDC and an exact official Registry API readback. No long-lived GitHub PAT or fictional npm package is required. An unsuccessful Registry action does **not** affect the existing production MCP endpoint or customer tools.
+Verify a listed release only via the real Registry API record for `io.github.Noetfield-Systems/mcp-foundry` (version `0.1.0`). A GitHub manifest, passing unit tests or a CI run that never reached the readback stage are not proof of registry publication.
+
 ## Manage the full lifecycle
 Your Studio can now rename and describe servers, edit/remove tools, unpublish a public or private endpoint instantly, and delete no-longer-needed MCP servers. Changes to a tool always return its server to draft until a deliberate republish. The published MCP endpoint and visible directory therefore reflect actual status, not stale UI promises.
 
