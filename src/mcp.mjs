@@ -8,6 +8,7 @@ import {recordActivation} from './activation.mjs';
 import {parseOpenapi,openapiPreview} from './openapi.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
 import {guardedManagedGet} from './oauth.mjs';
+import {markDraftChanged,publishDraftServer} from './publication.mjs';
 import {classifyToolError} from './diagnostics.mjs';
 import {randomUUID} from 'node:crypto';
 
@@ -68,12 +69,13 @@ export function foundryMcp(principal=null){
     }));
 
     mcp.registerTool('search_servers',{description:'Search published public MCP servers in MCP Foundry',inputSchema:z.object({query:z.string().max(100).optional()})},async({query=''})=>{
-      const {rows}=await q('SELECT slug,name,description FROM servers WHERE status=\'published\' AND visibility=\'public\' AND (name ILIKE $1 OR description ILIKE $1) ORDER BY updated_at DESC LIMIT 25',['%'+query+'%']);
+      const {rows}=await q('SELECT slug,name,description FROM servers WHERE status=\'published\' AND visibility=\'public\' AND published_snapshot IS NOT NULL AND (name ILIKE $1 OR description ILIKE $1) ORDER BY updated_at DESC LIMIT 25',['%'+query+'%']);
       return {content:[{type:'text',text:JSON.stringify(rows)}]};
     });
     mcp.registerTool('get_server_tools',{description:'List tools published by one MCP Foundry server',inputSchema:z.object({slug:z.string().max(80)})},async({slug})=>{
-      const {rows}=await q('SELECT s.name,t.name AS tool_name,t.description,t.params FROM servers s JOIN tools t ON t.server_id=s.id WHERE s.slug=$1 AND s.status=\'published\' AND s.visibility=\'public\' ORDER BY t.name',[slug]);
-      return {content:[{type:'text',text:JSON.stringify(rows)}]};
+      const {rows}=await q("SELECT name,published_snapshot->'tools' AS tools FROM servers WHERE slug=$1 AND status='published' AND visibility='public' AND published_snapshot IS NOT NULL",[slug]);
+      const tools=rows[0]?.tools||[];
+      return {content:[{type:'text',text:JSON.stringify(tools.map(t=>({tool_name:t.name,description:t.description,params:t.params})))}]};
     });
     // Anonymous clients can discover servers; authenticated API key holders can build and publish.
     // Each tool checks the owner and persists changes in the existing Foundry database.
@@ -108,7 +110,7 @@ export function foundryMcp(principal=null){
         required:z.boolean().default(false)
       });
       mcp.registerTool('add_readonly_tool',{
-        description:'Add a GET-only HTTPS tool to a server that you own. Values are allowed only in declared query/path parameters. The server returns to draft until republished.',
+        description:'Add a GET-only HTTPS tool to a server that you own. Values are allowed only in declared query/path parameters. Editing a published server keeps its live revision running until the next publish.',
         inputSchema:z.object({
           server_id:z.string().uuid(),name:z.string().regex(/^[a-z][a-z0-9_]{1,59}$/),
           description:z.string().trim().min(3).max(280),url:z.url().max(1500),
@@ -121,9 +123,9 @@ export function foundryMcp(principal=null){
         if(principal.plan!=='pro'&&count.rows[0].n>=10)throw Error('Free plan tool limit reached');
         try{
           const {rows}=await q("INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,name",[randomUUID(),server.id,name,description,url,JSON.stringify(params)]);
-          await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);
+          await markDraftChanged(server.id);
           await recordActivation('tool_added',principal.id,server.id,'native_mcp');
-          return {tool:rows[0],status:'draft'};
+          return {tool:rows[0],status:server.status,unpublished_changes:server.status==='published'};
         }catch(e){if(e.code==='23505')throw Error('Duplicate tool name');throw e;}
       }));
       mcp.registerTool('import_openapi',{
@@ -144,7 +146,7 @@ export function foundryMcp(principal=null){
           added+=out.rowCount;
         }
         if(added){await q("UPDATE servers SET status='draft',updated_at=now() WHERE id=$1",[server.id]);await recordActivation('tool_added',principal.id,server.id,'native_mcp');}
-        return {found:entries.length,added,status:added?'draft':server.status};
+        return {found:entries.length,added,status:server.status,unpublished_changes:!!added&&server.status==='published'};
       }));
       mcp.registerTool('test_readonly_tool',{
         description:'Run one real read-only tool against its upstream HTTPS API, only for an MCP server you own. This is a test, not a customer invocation.',
@@ -168,10 +170,10 @@ export function foundryMcp(principal=null){
         if(!count.rows[0].n)throw Error('Add a tool before publishing');
         const binding=await q('SELECT 1 FROM server_oauth_bindings WHERE server_id=$1',[server.id]);
         if(binding.rowCount&&visibility!=='private')throw Error('OAUTH_SERVER_MUST_REMAIN_PRIVATE');
-        await q("UPDATE servers SET status='published',visibility=$1,updated_at=now() WHERE id=$2",[visibility,server.id]);
+        const published=await publishDraftServer(server.id,visibility);
         await recordActivation('server_published',principal.id,server.id,'native_mcp');
         const base=(process.env.PUBLIC_URL||'').replace(/\/$/,'');
-        return {status:'published',slug:server.slug,endpoint:base+'/mcp/'+server.slug,visibility};
+        return {status:'published',slug:server.slug,endpoint:base+'/mcp/'+server.slug,visibility,published_revision:published.version};
       }));
       mcp.registerTool('get_server_usage',{
         description:'Get only observed real tool invocation metrics for a server in your workspace; does not infer customers or revenue.',
