@@ -189,7 +189,24 @@ header.foundry-nav{
   background:#1a2a3d;color:#e5ebf3;
   position:relative;
 }
-.foundry-nav .nav-hamburger{width:19px;height:2px;background:currentColor;border-radius:2px}
+.foundry-nav .nav-hamburger{
+  display:block;position:relative;width:19px;height:2px;
+  background:currentColor;border-radius:2px;
+}
+.foundry-nav .nav-hamburger:before,
+.foundry-nav .nav-hamburger:after{
+  content:'';position:absolute;left:0;width:19px;height:2px;
+  background:currentColor;border-radius:2px;
+  transition:transform .16s,top .16s;
+}
+.foundry-nav .nav-hamburger:before{top:-6px}
+.foundry-nav .nav-hamburger:after{top:6px}
+.foundry-skip:focus,.skip-link:focus{
+  position:fixed!important;left:16px!important;top:12px!important;z-index:200!important;
+  background:#f2e8d9!important;color:#142234!important;
+  padding:12px 16px!important;border-radius:8px!important;
+  width:auto!important;height:auto!important;
+}
 .foundry-nav .nav-hamburger:before,.foundry-nav .nav-hamburger:after{width:19px;height:2px;border-radius:2px}
 .foundry-nav.open .nav-hamburger{background:transparent}
 .foundry-nav.open .nav-hamburger:before{top:0;transform:rotate(45deg)}
