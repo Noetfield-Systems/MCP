@@ -57,6 +57,17 @@ try{
  await page.locator('#server-detail').waitFor({state:'visible',timeout:15000});
  await page.locator('#server-detail .tool-item').first().waitFor({state:'visible',timeout:15000});
  assert.ok((await page.locator('#server-detail .tool-item').count())>0,'real starter tools render without browser JS errors');
+ await click('[data-tab="import openapi"]');
+ await page.locator('#import-form').waitFor({state:'visible'});
+ await click('#load-openapi-example');
+ assert.ok((await page.locator('#import-form [name=document]').inputValue()).includes('openapi: 3.1.0'));
+ await click('#preview-openapi');
+ await page.locator('.openapi-preview-row').first().waitFor({state:'visible',timeout:12000});
+ assert.equal(await page.locator('.openapi-preview-row').count(),2,'two real previewed GET operations');
+ assert.equal(await page.locator('#server-detail .tool-item').count(),0,'preview does not write to the workspace view');
+ await click('#import-form button[type="submit"]');
+ await page.waitForFunction(()=>document.querySelectorAll('#server-detail .tool-item').length===3,undefined,{timeout:15000});
+
  await click('[data-tab="test"]');
  await page.locator('#test-form').waitFor({state:'visible'});
  await click('#test-form button');
@@ -86,7 +97,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
- console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
+ console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
  if(registered){
    try {
