@@ -64,3 +64,17 @@
 .growth-actions .btn{font-size:11px;white-space:normal;text-align:center}
 @media(max-width:800px){.builder-growth{display:block}.growth-actions{max-width:none;margin-top:16px}}
 @media(max-width:480px){.growth-actions .btn{width:100%}}
+
+/* Real one-time commercial offer; checkout runs solely on Stripe. */
+.quickstart-offer{margin:30px 0 32px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.6fr);gap:24px;padding:30px;border:1px solid #7f77ad;border-radius:18px;background:linear-gradient(122deg,#2b2944,#18243b 55%,#131f31);box-shadow:0 25px 75px #04091855}
+.quickstart-offer h3{font-size:clamp(26px,3vw,36px);margin:13px 0 15px;letter-spacing:-.055em}
+.quickstart-offer p{color:#c0cadd;font-size:14px;line-height:1.8;max-width:600px}
+.quickstart-inclusions{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 24px}
+.quickstart-inclusions span{color:#d6e9df;font-size:11px;border:1px solid #4e696b;border-radius:99px;padding:7px 11px;background:#263a40}
+.quickstart-offer .quickstart-disclosure{font-size:12px;color:#9baec4;line-height:1.75}
+.quickstart-purchase{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;border:1px solid #65658f;border-radius:14px;background:#111d31;padding:26px}
+.quickstart-purchase strong{font:600 clamp(40px,5vw,60px) 'Space Grotesk',sans-serif;letter-spacing:-.07em;color:#eee8ff;margin:16px 0 2px}
+.quickstart-purchase small{font-size:11px;line-height:1.7;color:#a7b8d1}
+.quickstart-purchase>.btn{margin:22px 0 13px;width:100%;text-align:center;white-space:normal}
+.quickstart-contact{font-size:11px;color:#ded2ff;font-weight:700;margin-top:18px;line-height:1.6}
+@media(max-width:850px){.quickstart-offer{grid-template-columns:1fr;padding:22px}.quickstart-purchase{padding:22px}}
