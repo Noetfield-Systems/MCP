@@ -192,16 +192,16 @@ export function expansionRouter({auth,operator,stripe}){
   res.json({published:true,slug:rows[0].slug,published_revision:published.version,collaborator_role:'editor'});
  });
  router.get('/api/admin/pilot-orders',operator,async(_req,res)=>{
-  const {rows}=await q(`SELECT o.id,o.lead_id,o.amount_cents,o.currency,o.description,o.status,o.created_at,o.completed_at,
+  const {rows}=await q(`SELECT o.id,o.lead_id,o.offer_type,o.amount_cents,o.currency,o.description,o.status,o.created_at,o.completed_at,
   l.contact_name,l.company,l.email FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id ORDER BY o.created_at DESC LIMIT 100`);
   res.json({orders:rows,revenue_claims:'Only Stripe signed webhook-confirmed paid orders count'});
  });
  router.post('/api/admin/pilot-orders',operator,async(req,res)=>{
-  const lead=req.body?.lead_id,amount=req.body?.amount_cents,currency=str(req.body?.currency,3).toLowerCase(),description=str(req.body?.description,300);
-  if(!uuid(lead)||!Number.isInteger(amount)||amount<1000||amount>2500000||!['cad','usd'].includes(currency)||description.length<20)return fail(res,400,'VALID_SCOPED_ORDER_REQUIRED');
+  const lead=req.body?.lead_id,amount=req.body?.amount_cents,currency=str(req.body?.currency,3).toLowerCase(),description=str(req.body?.description,300),offer_type=str(req.body?.offer_type,30).toLowerCase()||'custom';
+  if(!uuid(lead)||!Number.isInteger(amount)||amount<1000||amount>2500000||!['cad','usd'].includes(currency)||!['quickstart','launch','private','care','agency','custom'].includes(offer_type)||description.length<20)return fail(res,400,'VALID_SCOPED_ORDER_REQUIRED');
   const token=randomBytes(32).toString('base64url');
   try{
-   const {rows}=await q('INSERT INTO pilot_orders(id,lead_id,payment_token_hash,amount_cents,currency,description) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,amount_cents,currency,status',[randomUUID(),lead,hash(token),amount,currency,description]);
+   const {rows}=await q('INSERT INTO pilot_orders(id,lead_id,payment_token_hash,amount_cents,currency,description,offer_type) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,amount_cents,currency,status,offer_type',[randomUUID(),lead,hash(token),amount,currency,description,offer_type]);
    const base=(process.env.PUBLIC_URL||('https://'+req.get('host'))).replace(/\/$/,'');
    res.status(201).json({order:rows[0],share_url:base+'/order/'+token,payment_collected:false});
   }catch(e){return fail(res,e.code==='23503'?404:500,e.code==='23503'?'LEAD_NOT_FOUND':'ORDER_CREATE_FAILED');}
@@ -209,7 +209,7 @@ export function expansionRouter({auth,operator,stripe}){
  router.get('/order/:token',(_req,res)=>res.sendFile('order.html',{root:new URL('../public/',import.meta.url).pathname}));
  router.get('/api/orders/:token',async(req,res)=>{
   const t=str(req.params.token,128);if(!/^[a-zA-Z0-9_-]{32,80}$/.test(t))return fail(res,404,'ORDER_NOT_FOUND');
-  const {rows}=await q('SELECT id,amount_cents,currency,description,status,created_at,completed_at FROM pilot_orders WHERE payment_token_hash=$1',[hash(t)]);
+  const {rows}=await q('SELECT id,offer_type,amount_cents,currency,description,status,created_at,completed_at FROM pilot_orders WHERE payment_token_hash=$1',[hash(t)]);
   if(!rows.length)return fail(res,404,'ORDER_NOT_FOUND');
   res.json({order:rows[0],checkout_available:!!(stripe&&process.env.STRIPE_WEBHOOK_SECRET),receipt_verified:['paid','fulfilled'].includes(rows[0].status)});
  });
@@ -227,7 +227,7 @@ export function expansionRouter({auth,operator,stripe}){
     mode:'payment',customer_email:order.email,
     line_items:[{price_data:{currency:order.currency,unit_amount:order.amount_cents,
        product_data:{name:'MCP Foundry — scoped integration delivery',description:order.description.slice(0,300)}},quantity:1}],
-    metadata:{foundry_pilot_order_id:order.id,product:'mcp-foundry'},
+    metadata:{foundry_pilot_order_id:order.id,product:'mcp-foundry',offer_type:order.offer_type||'custom'},
     client_reference_id:order.id,
     success_url:base+'/order/'+t+'?checkout=returned',
     cancel_url:base+'/order/'+t+'?checkout=cancelled',
