@@ -76,6 +76,15 @@ try{
    assert.equal(value.isError,undefined);assert.ok(Number.isInteger(Number(value.content[0].text))&&Number(value.content[0].text)>0);
    const usage=result(await client.callTool({name:'get_server_usage',arguments:{server_id:server.id}})).usage;
    assert.ok(usage.calls>=1&&usage.successes>=1,'real persisted invocation observed');
+   const diagnostics=await fetch(base+'/api/servers/'+server.id+'/diagnostics',{headers:{cookie},signal:AbortSignal.timeout(9000)});
+   assert.equal(diagnostics.status,200,'owner-scoped diagnostics available for genuine managed calls');
+   const evidence=await diagnostics.json();
+   assert.ok(evidence.summary.calls>=1&&evidence.summary.success>=1,'actual managed execution in diagnostics');
+   assert.ok(evidence.summary.p95_ms>=0,'observed p95 from PostgreSQL');
+   assert.ok(evidence.recent.some(t=>t.tool_name==='max_hn_item'&&t.success),'real tool call stored');
+   assert.ok(evidence.redacted,'no raw arguments or credential logging');
+   const other=await fetch(base+'/api/servers/'+server.id+'/diagnostics',{signal:AbortSignal.timeout(9000)});
+   assert.equal(other.status,401,'no anonymous access to diagnostics');
    const stopped=await post('/api/servers/'+server.id+'/unpublish',{});
    assert.equal(stopped.status,'draft');
    const disabled=await fetch(base+'/mcp/'+slug,{method:'GET',signal:AbortSignal.timeout(8000)});
