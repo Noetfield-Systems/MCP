@@ -78,9 +78,9 @@ function renderDetail(){
  const s=state.detail.server,t=state.detail.tools;
  const preset=state.templates.find(x=>s.slug.startsWith(x.id.replaceAll('_','-')+'-'));
  const sampleArgs=JSON.stringify(preset?.sampleArgs||{},null,2);
- $('#server-detail').innerHTML=`<div class="detail-header"><div><span class="workspace-eyebrow">SELECTED SERVER · ${esc(s.status)}</span><h4>${esc(s.name)}</h4></div><button class="btn btn-outline btn-small" id="close-detail">Back to all servers</button></div><div class="detail-tabs">${detailTabs()}</div><div id="detail-content" class="detail-content"></div>`;
+ $('#server-detail').innerHTML=`<div class="detail-header"><div><span class="workspace-eyebrow">SELECTED SERVER · ${esc(s.status)}${s.published_revision?' · LIVE v'+esc(s.published_revision):''}${s.has_unpublished_changes?' · UNPUBLISHED DRAFT CHANGES':''}</span><h4>${esc(s.name)}</h4></div><button class="btn btn-outline btn-small" id="close-detail">Back to all servers</button></div><div class="detail-tabs">${detailTabs()}</div><div id="detail-content" class="detail-content"></div>`;
  const pane=$('#detail-content');
- if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Republish changes':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button><a href="/connect?server=${esc(s.slug)}${s.visibility==='private'?'&private=1':''}" class="btn btn-outline btn-small">Client setup ↗</a>${s.status==='published'&&s.visibility==='public'?'<a class="btn btn-outline btn-small" href="/marketplace">List in marketplace ↗</a>':''}${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
+ if(state.tab==='overview')pane.innerHTML=`<div class="endpoint-box"><small class="workspace-eyebrow">ENDPOINT</small><div><code>${esc(location.origin+'/mcp/'+s.slug)}</code></div></div><p class="hint">${esc(s.description||'No description yet')} · ${s.visibility==='private'?'Private: use a Foundry API key':'Public read-only tool endpoint'}</p><p class="hint">${s.status==='published'?(s.has_unpublished_changes?'Live revision remains available while these draft tools are edited. Publish the draft only after testing.':'This endpoint serves the last verified published revision. Changes are staged until you publish again.'):'This endpoint is an unpublished draft; test a tool before publishing.'}</p><div class="tool-list">${t.length?t.map(x=>`<div class="tool-item"><div><b>${esc(x.name)}</b><small>${esc(x.description)}</small></div><span class="status published">GET</span></div>`).join(''):'<div class="empty-state">Add or import a GET operation to publish this server.</div>'}</div><div class="inline-form"><button class="btn btn-primary btn-small" id="publish-server">${s.status==='published'?'Publish draft revision':'Publish server'}</button><select class="input" id="server-visibility" style="max-width:170px"><option value="public" ${s.visibility==='public'?'selected':''}>Public</option><option value="private" ${s.visibility==='private'?'selected':''}>Private</option></select><button class="btn btn-outline btn-small" data-copy="endpoint">Copy URL</button><a href="/connect?server=${esc(s.slug)}${s.visibility==='private'?'&private=1':''}" class="btn btn-outline btn-small">Client setup ↗</a>${s.status==='published'&&s.visibility==='public'?'<a class="btn btn-outline btn-small" href="/marketplace">List in marketplace ↗</a>':''}${s.status==='published'?'<button class="btn btn-outline btn-small" data-copy="mcp-config">Copy client config</button>':''}</div>`;
  if(state.tab==='overview'){
    $$('.tool-item',pane).forEach((element,index)=>{
      const tool=t[index];if(!tool)return;
@@ -200,18 +200,18 @@ document.addEventListener('click',async e=>{
     return;
  }
  if(b.dataset.removeTool){
-    if(!confirm('Remove this tool? Its published endpoint will return to draft until republished.'))return;
+    if(!confirm('Remove this draft tool? The active published revision stays online until you publish the changed draft.'))return;
     await request('DELETE','/api/tools/'+b.dataset.removeTool);
-    state.editToolId=null;state.tab='overview';await loadServers();feedback('Tool removed; server returned to draft');return;
+    state.editToolId=null;state.tab='overview';await loadServers();feedback('Draft tool removed. Existing published revision remains online until you publish changes');return;
  }
  if(b.id==='unpublish-server'){
     await request('POST','/api/servers/'+state.selected+'/unpublish',{});
     state.tab='overview';await loadServers();await loadCatalog();feedback('MCP endpoint unpublished');return;
  }
  if(b.dataset.restoreRevision){
-   if(!confirm('Restore this published revision as a draft? All current tools will be replaced and the endpoint unpublished until you publish again.'))return;
+   if(!confirm('Restore this revision into the editable draft? Your current live endpoint will remain unchanged until you republish.'))return;
    const r=await request('POST','/api/servers/'+state.selected+'/revisions/'+b.dataset.restoreRevision+'/restore',{});
-   state.tab='overview';await loadServers();await loadCatalog();feedback('Version '+r.restored+' restored as draft. Review and republish to enable endpoint.');return;
+   state.tab='overview';await loadServers();await loadCatalog();feedback('Version '+r.restored+' restored into draft. The live endpoint is unchanged; review and republish when ready.');return;
  }
  if(b.id==='delete-server'){
     if(!confirm('Delete this server and all its tools and usage events? This cannot be undone.'))return;
