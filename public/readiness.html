@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b141f">
+<title>AI Agent Readiness Assessment — MCP Foundry</title>
+<meta name="description" content="Evaluate how ready your API is for an AI agent integration. Get a 12-point launch checklist and an actionable path to a tested MCP endpoint.">
+<link rel="canonical" href="https://mcp-foundry-web-production.up.railway.app/readiness">
+<link rel="stylesheet" href="/growth.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-graphite">
+<style>
+.rdy{max-width:1120px;margin:0 auto;padding:48px 24px 100px;color:var(--text,#e9f0f6)}
+.rdy h1{font-size:clamp(2.3rem,5vw,4.2rem);letter-spacing:-.052em;line-height:1.1;margin:.45em 0}
+.rdy h2{font-size:clamp(1.4rem,3vw,2.3rem);letter-spacing:-.035em;margin:0 0 12px}
+.rdy p,.rdy li{line-height:1.65;color:#b8c4d0}
+.rdy-intro{max-width:780px;margin:0 0 32px}
+.rdy-mark{font-size:.76rem;font-weight:750;color:#95b5cf;letter-spacing:.14em;text-transform:uppercase}
+.rdy-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.9fr);gap:20px}
+.rdy-panel{background:#111c2a;border:1px solid #324150;border-radius:13px;padding:26px}
+.rdy-field{padding:17px 0;border-bottom:1px solid #2c3b4b}
+.rdy-field:last-child{border:0}
+.rdy-field fieldset{border:0;padding:0;margin:0;min-width:0}
+.rdy-field legend{color:#eef2f6;font-weight:650;margin-bottom:11px;font-size:1rem}
+.rdy-radio{display:grid;gap:8px}
+.rdy-radio label{display:flex;align-items:flex-start;gap:9px;color:#c7d3df;font-size:.94rem;cursor:pointer;line-height:1.4}
+.rdy-radio input{accent-color:#78a9cb;flex-shrink:0;margin-top:4px}
+.rdy-sub{font-size:.85rem;color:#a1b2c2}
+.rdy-button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #709dbf;background:#c5deee;color:#0b1520;border-radius:7px;font:inherit;font-weight:700;padding:12px 17px;text-decoration:none;cursor:pointer;margin:8px 9px 8px 0}
+.rdy-button.secondary{background:transparent;color:#d1e4f2;border-color:#50677a}
+.rdy-button:focus-visible,.rdy input:focus-visible{outline:3px solid #7cbbec;outline-offset:3px}
+.rdy-result{border-left:3px solid #8ab3d0;padding:5px 0 5px 16px;margin:18px 0}
+.rdy-status{min-height:25px}
+.rdy-panel input[type=text],.rdy-panel input[type=email],.rdy-panel input[type=url]{font:inherit;background:#0d1621;color:#f2f5f7;border:1px solid #536575;border-radius:6px;min-width:0;width:100%;box-sizing:border-box;padding:12px;margin:5px 0 15px}
+.rdy-consent{display:flex;gap:9px;align-items:flex-start;margin:11px 0;color:#d4dde5;font-size:.86rem}
+.rdy-consent input{margin-top:4px;accent-color:#8ab3d0}
+.rdy-steps{padding-left:24px;columns:2;column-gap:32px}
+.rdy-steps li{break-inside:avoid;padding:2px 0 9px}
+.rdy-foot{font-size:.88rem;margin-top:13px}
+@media(max-width:760px){.rdy{padding:28px 17px 65px}.rdy-grid{grid-template-columns:1fr}.rdy-panel{padding:19px}.rdy-steps{columns:1}}
+@media print{header,footer,.rdy-assessment,.rdy-actions,.rdy-contact,.rdy-no-print{display:none!important}
+ body,.growth-body,.rdy{background:#fff!important;color:#151b21!important}
+ .rdy-grid{display:block}.rdy-panel{background:#fff!important;color:#151b21!important;border:0;padding:0}
+ .rdy-steps li,.rdy p{color:#111!important}.rdy{padding:0}.rdy h1{font-size:28pt}}
+</style></head><body class="growth-body">
+<a href="#main" class="skip-link">Skip to content</a>
+<header class="nav foundry-nav">
+<a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
+<nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions" aria-current="page">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
+<div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio</a></div>
+<button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
+</header>
+<main id="main" class="rdy">
+<div class="rdy-mark">Free technical assessment · No signup required</div>
+<div class="rdy-intro">
+<h1>Is your API ready<br>for AI agents?</h1>
+<p>Answer six practical questions. Get a short integration recommendation, a 12-point checklist you can print as a PDF, and a clear next step. This is a self-assessment, not a security certification or a promise of compatibility.</p>
+</div>
+<div class="rdy-grid">
+<section class="rdy-panel rdy-assessment" aria-labelledby="assessment-heading">
+<h2 id="assessment-heading">Your integration profile</h2>
+<p class="rdy-sub">Pick the closest answer for each area. No business information leaves your browser unless you explicitly send an enquiry.</p>
+<form id="readiness-assessment">
+<div class="rdy-field"><fieldset><legend>1. Do you have an API that your organization owns or is authorized to expose?</legend><div class="rdy-radio">
+<label><input type="radio" name="source" value="public" required>Yes, a documented public HTTPS API</label>
+<label><input type="radio" name="source" value="private">Yes, but private or internal</label>
+<label><input type="radio" name="source" value="none">Not yet / we only have a website</label>
+</div></fieldset></div>
+<div class="rdy-field"><fieldset><legend>2. How is your API documented?</legend><div class="rdy-radio">
+<label><input type="radio" name="docs" value="openapi" required>OpenAPI / Swagger JSON or YAML</label>
+<label><input type="radio" name="docs" value="manual">API reference or developer documentation</label>
+<label><input type="radio" name="docs" value="none">Undocumented or unknown</label>
+</div></fieldset></div>
+<div class="rdy-field"><fieldset><legend>3. What should an AI assistant accomplish?</legend><div class="rdy-radio">
+<label><input type="radio" name="job" value="clear" required>One repeatable customer task is clear</label>
+<label><input type="radio" name="job" value="exploratory">We need help identifying a high-value task</label>
+</div></fieldset></div>
+<div class="rdy-field"><fieldset><legend>4. What access do those tasks need?</legend><div class="rdy-radio">
+<label><input type="radio" name="operations" value="read" required>Read-only lookups (GET)</label>
+<label><input type="radio" name="operations" value="write">Updates, payments, or other write actions</label>
+</div></fieldset></div>
+<div class="rdy-field"><fieldset><legend>5. Who may access the source information?</legend><div class="rdy-radio">
+<label><input type="radio" name="access" value="public" required>Public information only</label>
+<label><input type="radio" name="access" value="authenticated">Only customers/staff with their own permissions</label>
+</div></fieldset></div>
+<div class="rdy-field"><fieldset><legend>6. Is there one AI client you want to support first?</legend><div class="rdy-radio">
+<label><input type="radio" name="client" value="selected" required>Yes, we can name it</label>
+<label><input type="radio" name="client" value="unknown">Not yet — recommend a suitable first client</label>
+</div></fieldset></div>
+<div class="rdy-actions"><button class="rdy-button" type="submit">Show my integration path</button></div>
+</form>
+<div class="rdy-result" id="rdy-result" role="status" aria-live="polite" hidden>
+<strong id="rdy-title"></strong><p id="rdy-description"></p><p id="rdy-actions-text"></p><a id="rdy-offer" class="rdy-button secondary" href="/#implementation">Discuss the integration</a>
+</div>
+</section>
+<aside class="rdy-panel rdy-contact" aria-labelledby="contact-heading">
+<div class="rdy-mark">Optional · Talk to an integration specialist</div>
+<h2 id="contact-heading">Get a scoped review.</h2>
+<p>We can inspect your authorized API and propose a practical MCP implementation. No blanket “any website” promise and no unconfigured automatic checkout.</p>
+<form id="rdy-enquiry">
+<label for="rdy-name">Your name</label><input id="rdy-name" type="text" name="contact_name" autocomplete="name" maxlength="120" required>
+<label for="rdy-email">Work email</label><input id="rdy-email" type="email" name="email" autocomplete="email" maxlength="180" required>
+<label for="rdy-company">Company (optional)</label><input id="rdy-company" type="text" name="company" autocomplete="organization" maxlength="160">
+<label for="rdy-website">Your API/company website (optional)</label><input id="rdy-website" type="url" name="website" maxlength="300" placeholder="https://example.com">
+<div class="rdy-consent"><input type="checkbox" id="rdy-accept" name="contact_consent" required><label for="rdy-accept">I request a reply about my API integration and agree to be contacted for this enquiry.</label></div>
+<div class="rdy-consent"><input type="checkbox" id="rdy-marketing" name="marketing_consent"><label for="rdy-marketing">Optional: Send me occasional MCP Foundry product updates.</label></div>
+<input name="nickname" type="text" aria-hidden="true" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px">
+<button type="submit" class="rdy-button" id="rdy-submit">Request a scoped review</button>
+<p role="status" aria-live="polite" id="rdy-feedback" class="rdy-status"></p>
+<p class="rdy-foot">A request is not a booking, accepted order, guaranteed response time or completed payment. <a href="/privacy">Privacy notice</a>.</p>
+</form>
+</aside>
+</div>
+<section class="rdy-panel" style="margin-top:22px" aria-labelledby="checklist-heading">
+<div class="rdy-mark">Actionable download · No email gate</div><h2 id="checklist-heading">12-point API-to-Agent launch checklist</h2>
+<p>Use this with your engineering lead or vendor. Select Print / Save as PDF to keep a portable copy.</p>
+<ol class="rdy-steps">
+<li>Identify the authorized source API owner and maintenance contact.</li>
+<li>Name one real customer task with observable success criteria.</li>
+<li>Inventory supported endpoints, data fields and expected freshness.</li>
+<li>Document credentials, per-user authorization and approved scopes.</li>
+<li>Choose a small set of well-named tools, not every endpoint.</li>
+<li>Define input and output schemas, errors, and data limits.</li>
+<li>Confirm any write action needs permission, confirmation and idempotency.</li>
+<li>Declare upstream rate limits, quotas and failure behavior.</li>
+<li>Run real positive, negative and permission-denied test cases.</li>
+<li>Test a named AI host, version, transport and authentication mode.</li>
+<li>Provide an installation page with no passwords or private tokens.</li>
+<li>Record owner acceptance, usage, changes and recovery responsibility.</li>
+</ol>
+<div class="rdy-actions"><button class="rdy-button secondary" id="rdy-print" type="button">Print / Save as PDF</button><a class="rdy-button secondary" href="/#studio">Try the free MCP Builder</a><a class="rdy-button secondary" href="/#quickstart">View CA$199 Quickstart</a></div>
+<p class="rdy-foot">This educational checklist does not certify compliance, provide an SLA, or replace customer-specific testing.</p>
+</section>
+</main>
+<footer class="foundry-footer"><div class="foundry-footer-inner"><div class="foundry-footer-intro"><a class="foundry-brand" href="/">MCP <b>Foundry</b></a><p>Working integrations. Tested in real AI clients.</p></div><div class="foundry-footer-links"><div><strong>EXPLORE</strong><a href="/solutions">For API owners</a><a href="/developers">Developer documentation</a><a href="/privacy">Privacy</a></div></div></div><div class="foundry-footer-bottom"><span>© 2026 MCP Foundry · Noetfield Systems Inc.</span></div></footer>
+<script src="/site-shell.js?v=20261118-b" defer></script><script src="/readiness.js" defer></script>
+</body></html>
