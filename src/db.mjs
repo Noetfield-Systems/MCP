@@ -124,6 +124,31 @@ export async function initDb(){
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS pilot_orders_status_idx ON pilot_orders(status,created_at DESC);
+  CREATE TABLE IF NOT EXISTS oauth_flows (
+    state_hash text PRIMARY KEY,
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    provider text NOT NULL CHECK(provider='github'),
+    verifier_cipher text NOT NULL,
+    expires_at timestamptz NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS oauth_flows_expiry_idx ON oauth_flows(expires_at);
+  CREATE TABLE IF NOT EXISTS oauth_connections (
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    provider text NOT NULL CHECK(provider='github'),
+    access_cipher text NOT NULL,
+    refresh_cipher text,
+    scopes text NOT NULL DEFAULT '',
+    expires_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY(account_id,provider)
+  );
+  CREATE TABLE IF NOT EXISTS server_oauth_bindings (
+    server_id uuid PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+    provider text NOT NULL CHECK(provider='github'),
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
