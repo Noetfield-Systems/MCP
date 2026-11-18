@@ -28,6 +28,14 @@
      <div class="inner-title" style="margin-top:42px"><h4>Scoped commercial orders</h4><p>Create a buyer-specific service quote for a consented lead. Payment is recorded only after a valid signed Stripe event; an offered order or Checkout visit is never counted as revenue.</p></div>
      <form id="operator-order-form" class="tool-form" style="max-width:780px">
        <label>Select consented implementation enquiry<select class="input" id="order-lead-id" required></select></label>
+       <label>Offer template<select class="input" id="order-offer">
+         <option value="launch">API Agent Launch · CA$799 experimental start</option>
+         <option value="quickstart">Public API Quickstart · CA$199</option>
+         <option value="private">Private API Launch · CA$1,499 starting hypothesis</option>
+         <option value="care">Managed Care · quote after scope</option>
+         <option value="agency">Agency integration package · custom quote</option>
+         <option value="custom">Custom scope and amount</option>
+       </select></label>
        <label>Exact quote description<textarea id="order-scope" required minlength="20" maxlength="300" placeholder="Specific bounded deliverable, acceptance criteria and any exclusions."></textarea></label>
        <div class="inline-form"><label>Amount, in cents<input class="input" id="order-amount" type="number" min="1000" max="2500000" step="1" value="19900" required></label><label>Currency<select class="input" id="order-currency"><option value="cad">CAD</option><option value="usd">USD</option></select></label></div>
        <button type="submit" class="btn btn-primary">Create scoped quote link</button>
