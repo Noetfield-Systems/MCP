@@ -1,0 +1,57 @@
+/* MCP Foundry — P0/P2 experience. Only real records, no illustrative customer cards. */
+.expansion-main{padding-top:90px;padding-bottom:110px;min-height:70vh}
+.expansion-main>h1{font-size:clamp(47px,6vw,78px);letter-spacing:-.068em;line-height:1.03;margin:23px 0}
+.expansion-main>h1 em{color:#c4b8ff;font-style:normal}
+.expansion-intro{font-size:17px;max-width:760px;color:#b0c1d5;line-height:1.8;margin:18px 0 34px}
+.connect-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px;align-items:start}
+.product-panel{background:linear-gradient(140deg,#19273e,#101b2d);border:1px solid #4a5875;border-radius:16px;padding:30px;min-width:0;box-shadow:0 24px 65px #0003}
+.product-panel h3{font-size:25px;margin:15px 0}
+.product-panel p{color:#abbcd3;font-size:13px;line-height:1.85}
+.expansion-label{display:grid;gap:9px;margin-top:22px;color:#dce5f2;font-size:12px;font-weight:600}
+.expansion-label input,.expansion-label select,.expansion-label textarea,.market-search input,.market-search select{padding:14px;border-radius:9px;background:#0c1728;border:1px solid #485c79;color:#f1efff;width:100%;font:14px 'DM Sans',sans-serif}
+.expansion-label textarea{min-height:100px;resize:vertical}
+.expansion-label input:focus-visible,.expansion-label select:focus-visible,.expansion-label textarea:focus-visible{outline:2px solid #b8a9ff}
+.expansion-check{display:flex;gap:12px;align-items:flex-start;margin-top:22px;font-size:13px;color:#cbd7ea}
+.expansion-check input{margin-top:3px;width:16px;height:16px;accent-color:#c1b2ff}
+.expansion-note{font-size:12px!important;color:#92a9c6!important;margin-top:15px}
+.installer-destination{display:flex;justify-content:space-between;gap:12px;margin:28px 0 10px}
+.installer-destination strong{font:600 12px ui-monospace,monospace;color:#d7c4ff}
+.installer-code{white-space:pre-wrap;overflow-wrap:anywhere;min-height:135px;margin:0 0 18px;border:1px solid #3a506d;border-radius:11px;background:#080f21;padding:21px;color:#c4e6f8;line-height:1.8;font-size:12px}
+.connect-checklist{display:grid;gap:10px;margin:26px 0}
+.connect-checklist>div{display:flex;gap:13px;align-items:center;border:1px solid #32465f;border-radius:9px;padding:13px 15px;color:#cbd4e7;font-size:12px}
+.connect-checklist span{background:#383357;border-radius:7px;color:#c7b8ff;padding:6px 7px;font-weight:700;font-size:10px}
+.connect-status{background:#162d31;color:#a5e3cc;border:1px solid #426c64;border-radius:9px;padding:13px 15px;margin:16px 0;font-size:12px}
+.connect-sidebar>a{display:inline-block;color:#d7cbff;margin-top:19px;font-size:12px;font-weight:700}
+.market-search{display:flex;gap:12px;margin:20px 0 26px;flex-wrap:wrap}
+.market-search input{flex:1;min-width:220px}
+.market-search select{width:210px}
+.market-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.market-card{display:flex;flex-direction:column;min-height:250px;background:linear-gradient(140deg,#1b2a42,#111d31);border:1px solid #455672;border-radius:15px;padding:23px}
+.market-card:hover{border-color:#a79cd7;transform:translateY(-2px)}
+.market-card-top{display:flex;justify-content:space-between;gap:10px;color:#b8a7fb;text-transform:uppercase;font-size:10px;letter-spacing:.09em;font-weight:700}
+.market-card h3{font-size:21px;margin:24px 0 9px}
+.market-card p{flex:1;color:#aabbd0;line-height:1.7;font-size:12px}
+.market-card-footer{display:flex;justify-content:space-between;gap:13px;align-items:center;border-top:1px solid #324760;padding-top:15px;margin-top:22px}
+.market-card-footer small{color:#9bb1ca}
+.market-card a{color:#d6ccff}
+.market-details{margin:20px 0;border:1px solid #475679;border-radius:14px;background:#1b2841;padding:25px;line-height:1.8}
+.market-details h3{font-size:25px;margin-bottom:10px}
+.market-details code{font-size:11px;color:#a6e1d1;overflow-wrap:anywhere}
+.market-details .btn{margin-top:18px}
+.market-split{display:grid;grid-template-columns:1fr .9fr;gap:20px;align-items:start;margin-top:40px}
+.market-form{display:grid;gap:13px}
+.team-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.team-list{display:grid;gap:10px;margin-top:20px}
+.team-item{display:flex;justify-content:space-between;gap:15px;align-items:center;background:#111d30;border:1px solid #3a506d;border-radius:9px;padding:15px 17px}
+.team-item b{font-size:13px;color:#f4ecff}
+.team-item small{display:block;color:#9bafc8;font-size:10px;margin-top:3px}
+.team-item .btn{font-size:11px}
+.product-panel .btn{margin-top:14px}
+.status-readout{font-size:12px;color:#a7bad2;padding:13px 0;min-height:32px}
+.order-summary{max-width:680px;margin:25px auto}
+.order-price{font:600 48px 'Space Grotesk',sans-serif;color:#f5e7ff;margin:22px 0 9px}
+.order-status{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d2c4ff}
+.order-summary .btn{width:100%;margin-top:28px}
+.order-summary p{line-height:1.85}
+@media(max-width:950px){.connect-layout,.market-split,.team-columns{grid-template-columns:1fr}.market-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.expansion-main{padding-top:60px;padding-bottom:75px}.expansion-main>h1{font-size:clamp(44px,11vw,62px)}.product-panel{padding:20px}.market-list{grid-template-columns:1fr}.market-search select{width:100%}.market-search input{min-width:100%}.installer-destination{flex-direction:column}.team-item{flex-wrap:wrap}}
