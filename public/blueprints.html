@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1121"><title>AI Integration Blueprints | MCP Foundry</title>
+<meta name="description" content="Ten practical API-to-agent integration blueprints, with real task definitions and measurable acceptance criteria. No invented client case studies.">
+<link rel="canonical" href="https://mcp-foundry-web-production.up.railway.app/blueprints">
+<link rel="stylesheet" href="/growth.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-graphite">
+<style>
+.bp-wrap{max-width:1170px;margin:auto;padding:54px 24px 110px;color:#e8eff6}
+.bp-intro{max-width:850px;margin-bottom:45px}
+.bp-overline{font-size:.75rem;letter-spacing:.14em;font-weight:700;color:#96b5cd}
+.bp-wrap h1{font-size:clamp(2.5rem,5.4vw,4.6rem);line-height:1.04;letter-spacing:-.05em;margin:20px 0}
+.bp-wrap h2{font-size:clamp(1.5rem,3vw,2.4rem);letter-spacing:-.03em;margin:0 0 14px}
+.bp-wrap p{color:#b6c6d4;line-height:1.65}
+.bp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.bp-card{background:#111d2b;border:1px solid #334657;border-radius:13px;padding:25px;display:flex;flex-direction:column;gap:13px}
+.bp-card h3{font-size:1.45rem;letter-spacing:-.02em;margin:0}
+.bp-card p{margin:0}
+.bp-top{display:flex;justify-content:space-between;gap:12px;font-size:.73rem;letter-spacing:.08em;color:#93b0c9;font-weight:700}
+.bp-card code{font-size:.83rem;line-height:1.7;overflow-wrap:anywhere;color:#b9d9ef;background:#0b1520;border:1px solid #2b465c;padding:10px 11px;border-radius:6px;white-space:normal}
+.bp-proof{border-top:1px solid #324558;padding-top:14px;font-size:.88rem;color:#d3dde6;line-height:1.5;margin-top:auto}
+.bp-card a,.bp-link{color:#bfe2fd;text-underline-offset:4px;font-weight:600}
+.bp-cta{background:#152637;border:1px solid #39516a;padding:24px;border-radius:13px;margin:33px 0}
+.bp-demos{margin-top:54px}
+.bp-demos-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.bp-demos-list article{border:1px solid #324455;border-radius:9px;padding:22px}
+.bp-button{display:inline-block;background:#beddf3;color:#091421;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;margin:8px 12px 8px 0}
+@media(max-width:760px){.bp-wrap{padding:27px 17px 70px}.bp-grid,.bp-demos-list{grid-template-columns:1fr}.bp-card{padding:20px}}
+</style></head><body class="growth-body">
+<a href="#main" class="skip-link">Skip to content</a>
+<header class="nav foundry-nav"><a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a><nav id="primary-nav" aria-label="Primary navigation">
+<a href="/">Platform</a><a href="/solutions" aria-current="page">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
+<div class="nav-actions"><a href="/#studio" class="foundry-launch">Open Studio</a></div><button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button></header>
+<main id="main" class="bp-wrap"><div class="bp-intro"><div class="bp-overline">INTEGRATION CLINIC / REAL BUSINESS TASKS</div><h1>Useful tools.<br>Measurable outcomes.</h1>
+<p>These are ten engineering blueprints for real classes of software businesses. They define the customer task, candidate tools and acceptance criteria before implementation. <strong>They are not completed client projects, testimonials or endorsements by the companies discussed in our private research.</strong></p>
+<a class="bp-button" href="/readiness">Assess your API</a><a class="bp-link" href="/#agent-launch">Request an API Agent Launch quote ↗</a></div>
+<section aria-labelledby="blueprint-heading"><h2 id="blueprint-heading">Ten business-specific integration blueprints</h2>
+<div class="bp-grid"><article class="bp-card"><div class="bp-top"><span>BLUEPRINT 01 / 10</span><span>Agent Launch</span></div>
+<h3>E-commerce reviews</h3><p>Find verified published customer feedback for a given product.</p><code>find_product_reviews · summarize_rating</code><div class="bp-proof"><strong>Acceptance:</strong> 20 product queries return only attributable, published review data.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 02 / 10</span><span>Private scope</span></div>
+<h3>Customer experience</h3><p>Look up survey status and response aggregates without exporting personal responses.</p><code>list_surveys · response_summary</code><div class="bp-proof"><strong>Acceptance:</strong> Correct survey counts, date range and authorized tenant.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 03 / 10</span><span>Agent Launch</span></div>
+<h3>SMB online commerce</h3><p>Check a specific product and live source-backed availability.</p><code>find_catalog_item · check_stock</code><div class="bp-proof"><strong>Acceptance:</strong> Unknown items return explicit not-found; no invented stock.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 04 / 10</span><span>Agent Launch</span></div>
+<h3>Print-on-demand</h3><p>Inspect product metadata and variant options before production.</p><code>search_product_catalog · list_variants</code><div class="bp-proof"><strong>Acceptance:</strong> Variants and source timestamps match provider data.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 05 / 10</span><span>Quickstart / Launch</span></div>
+<h3>Publishing platforms</h3><p>Search publicly published content and retrieve source URLs.</p><code>search_public_posts · read_post</code><div class="bp-proof"><strong>Acceptance:</strong> Only public content; links to canonical source.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 06 / 10</span><span>Private scope</span></div>
+<h3>Web analytics</h3><p>Compare consented site metrics across explicit date ranges.</p><code>get_trends · compare_periods</code><div class="bp-proof"><strong>Acceptance:</strong> Metric definitions and period alignment validated.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 07 / 10</span><span>Private scope</span></div>
+<h3>CRM and quotations</h3><p>Read authorized pipeline and quotation status.</p><code>list_opportunities · get_quote_status</code><div class="bp-proof"><strong>Acceptance:</strong> Correct permission boundary and no cross-account disclosure.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 08 / 10</span><span>Partner scope</span></div>
+<h3>Retail and inventory</h3><p>Query SKU inventory across approved locations.</p><code>find_sku · stock_by_location</code><div class="bp-proof"><strong>Acceptance:</strong> Inventory location and freshness correctly reported.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 09 / 10</span><span>Private scope</span></div>
+<h3>Subscriptions</h3><p>Retrieve subscription status and applicable plan metadata.</p><code>get_subscription · get_plan_policy</code><div class="bp-proof"><strong>Acceptance:</strong> Read-only first; no billable mutation or cancellation.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article>
+<article class="bp-card"><div class="bp-top"><span>BLUEPRINT 10 / 10</span><span>Partner scope</span></div>
+<h3>Field service</h3><p>Inspect permitted work-order status and scheduled visits.</p><code>get_job_status · get_visits</code><div class="bp-proof"><strong>Acceptance:</strong> Only authorized jobs returned, with clear no-match behavior.</div>
+<a href="/#implementation">Discuss a scoped integration ↗</a></article></div></section>
+<section class="bp-demos" aria-labelledby="real-demo-heading"><div class="bp-overline">SOURCE-BACKED STARTERS · NOT CLIENT ENDORSEMENTS</div><h2 id="real-demo-heading">Start with working public API examples.</h2>
+<p>Foundry already includes real-source read-only starter templates. They show the build → source test → publish workflow. They are not presented as projects commissioned by the API providers.</p>
+<div class="bp-demos-list">
+<article><h3>GitHub repository reader</h3><p>Source-backed GitHub REST repository metadata through Foundry's existing public starter.</p><a class="bp-link" href="/?starter=github_repository#studio">Open GitHub starter ↗</a></article>
+<article><h3>World Bank country facts</h3><p>Country metadata from the World Bank public API, with source-specific parameters.</p><a class="bp-link" href="/?starter=world_bank_countries#studio">Open World Bank starter ↗</a></article></div>
+</section>
+<section class="bp-cta"><div class="bp-overline">ENGINEERING CLINIC · SCOPED COMMERCIAL DELIVERY</div><h2>We sell a tested customer task, not a generated endpoint count.</h2>
+<p>Start from an authorized source API. Define the task, select a small toolset, verify an actual upstream response, test a named AI client, and hand over a credential-free install guide. Public read-only tools are available now; private auth and write operations require separate technical scoping.</p>
+<a class="bp-button" href="/#implementation">Request a project review</a><a class="bp-link" href="/#quickstart">See CA$199 Public API Quickstart ↗</a></section></main>
+<footer class="foundry-footer"><div class="foundry-footer-inner"><div class="foundry-footer-intro"><a href="/" class="foundry-brand">MCP <b>Foundry</b></a><p>Your APIs. Ready for agents.</p></div><div class="foundry-footer-links"><div><strong>PRODUCT</strong><a href="/solutions">Solutions</a><a href="/readiness">API readiness</a><a href="/developers">Developers</a></div></div></div><div class="foundry-footer-bottom"><span>© 2026 MCP Foundry · Noetfield Systems Inc.</span></div></footer>
+<script src="/site-shell.js?v=20261118-b" defer></script></body></html>

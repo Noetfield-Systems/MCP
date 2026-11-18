@@ -202,6 +202,19 @@ export async function initDb(){
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
   );
+  -- Operator-only researched B2B accounts: NOT consented inbound leads or customers.
+  CREATE TABLE IF NOT EXISTS prospect_accounts (
+    id text PRIMARY KEY,company text NOT NULL,segment text NOT NULL,
+    api_docs_url text NOT NULL,contact_url text NOT NULL,contact_email text NOT NULL DEFAULT '',
+    mcp_status text NOT NULL,evidence jsonb NOT NULL DEFAULT '[]'::jsonb,
+    proposed_task text NOT NULL,offer text NOT NULL,rank integer NOT NULL,
+    research_as_of date NOT NULL,stage text NOT NULL DEFAULT 'researched'
+      CHECK(stage IN ('researched','qualified','contacted','replied','discovery','proposal','won','lost','not_fit')),
+    next_action text NOT NULL DEFAULT '',operator_notes text NOT NULL DEFAULT '',contact_receipt text NOT NULL DEFAULT '',
+    last_contact_at timestamptz,created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS prospect_accounts_stage_rank_idx ON prospect_accounts(stage,rank);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }

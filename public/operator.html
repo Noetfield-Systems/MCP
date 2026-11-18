@@ -16,6 +16,13 @@
    <div id="operator-dashboard" class="hidden">
      <div class="workspace-title"><div><span class="workspace-eyebrow">SOURCE-OBSERVED DATA</span><h3>Foundry operations</h3></div><button id="operator-refresh" class="btn btn-outline btn-small">Refresh observations</button><button id="operator-lock" class="btn btn-outline btn-small">Lock desk</button></div>
      <div id="operator-stats" class="usage-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+     <div class="inner-title" style="margin-top:42px"><h4>Research CRM · 10 real API companies</h4>
+       <p>Publicly researched target organizations, not contacted clients. Each record includes API evidence, existing MCP position, a specific hypothesis and a draft outreach message. Stages change only from actual operator actions.</p>
+     </div>
+     <p class="form-feedback" id="operator-prospect-feedback" role="status"></p>
+     <div style="margin:10px 0 18px"><button id="prospect-export" class="btn btn-outline btn-small" type="button">Export researched prospects CSV</button></div>
+     <div class="operator-table-wrap"><table class="operator-table"><thead><tr><th>Company / ranking</th><th>Verified API & existing MCP</th><th>Specific proposal / draft</th><th>Stage & outreach proof</th><th>Next action</th></tr></thead>
+      <tbody id="operator-prospects"><tr><td colspan="5">Loading research pipeline…</td></tr></tbody></table></div>
      <div class="inner-title"><h4>Activation funnel · past 30 days</h4><p>Distinct observed account operations only. No estimates of visitors, paying customers or revenue.</p></div>
      <div id="operator-funnel" class="operator-funnel"><div class="empty-state">Loading verified activation events…</div></div>
      <div class="inner-title"><h4>Implementation enquiries</h4><p>Only real, consented submissions stored in the MCP Foundry database. “Qualified” indicates an operator's assessment, not a collected payment.</p></div>

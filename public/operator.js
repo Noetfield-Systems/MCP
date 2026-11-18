@@ -74,15 +74,56 @@ function displayOrders(orders){
   return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.offer_type||'custom')+' · '+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+(o.status==='paid'?'<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'">Mark fulfilled</button>':paid?'Verified by webhook':'Not paid')+'</td></tr>';
  }).join(''):'<tr><td colspan="5">No scoped orders created. Enquiries are not sales.</td></tr>';
 }
+const PROSPECT_STAGES=['researched','qualified','contacted','replied','discovery','proposal','won','lost','not_fit'];
+function displayProspects(list){
+ $('#operator-prospects').innerHTML=list.length?list.map(p=>{
+   const opts=PROSPECT_STAGES.map(x=>'<option value="'+x+'"'+(p.stage===x?' selected':'')+'>'+x+'</option>').join('');
+   const link=(url,label)=>'<a href="'+escapeHtml(url)+'" target="_blank" rel="noopener noreferrer">'+label+'</a>';
+   const read=(field,text)=>'<label>'+text+'<input class="input" data-prospect-field="'+field+'" value="'+escapeHtml(p[field]||'')+'"></label>';
+   return '<tr data-prospect-id="'+escapeHtml(p.id)+'">'+
+    '<td><strong>#'+escapeHtml(p.rank)+' '+escapeHtml(p.company)+'</strong><small>'+escapeHtml(p.segment)+'</small><small>'+escapeHtml(p.contact_email||'Public form')+'</small></td>'+
+    '<td>'+link(p.api_docs_url,'API documentation')+'<small>'+escapeHtml(p.mcp_status)+'</small>'+link(p.contact_url,'Public contact channel')+'</td>'+
+    '<td class="brief">'+escapeHtml(p.proposed_task)+'<small>'+escapeHtml(p.offer)+'</small><details><summary>Outreach draft</summary><b>'+escapeHtml(p.outreach_subject)+'</b><p>'+escapeHtml(p.outreach_draft)+'</p></details></td>'+
+    '<td><select class="input" data-prospect-field="stage">'+opts+'</select>'+read('contact_receipt','Actual sent-message reference')+'</td>'+
+    '<td>'+read('next_action','Next action')+'<label>Internal notes<textarea class="input" data-prospect-field="operator_notes" rows="2">'+escapeHtml(p.operator_notes||'')+'</textarea></label>'+
+    '<button class="btn btn-outline btn-small" data-prospect-save="'+escapeHtml(p.id)+'" type="button">Save stage</button></td></tr>';
+ }).join(''):'<tr><td colspan="5">No researched accounts.</td></tr>';
+}
+document.addEventListener('click',async event=>{
+ const button=event.target.closest('[data-prospect-save]');if(!button)return;
+ const row=button.closest('[data-prospect-id]'),get=field=>row.querySelector('[data-prospect-field="'+field+'"]').value;
+ button.disabled=true;
+ try{
+  const out=await operatorRequest('PATCH','/api/admin/prospects/'+encodeURIComponent(button.dataset.prospectSave),{
+   stage:get('stage'),next_action:get('next_action'),operator_notes:get('operator_notes'),contact_receipt:get('contact_receipt')});
+  $('#operator-prospect-feedback').textContent=out.prospect.company+' updated to '+out.prospect.stage+'. No outreach or revenue is inferred.';
+  await load();
+ }catch(e){$('#operator-prospect-feedback').textContent='Not saved: '+e.message;}
+ finally{button.disabled=false;}
+});
+$('#prospect-export')?.addEventListener('click',async()=>{
+ const btn=$('#prospect-export');btn.disabled=true;
+ try{
+  if(!operatorToken)throw Error('Operator token required');
+  const response=await fetch('/api/admin/prospects.csv',{headers:{Authorization:'Bearer '+operatorToken},credentials:'omit'});
+  if(!response.ok)throw Error('Export HTTP '+response.status);
+  const blob=await response.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='foundry-researched-prospects.csv';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
+  $('#operator-prospect-feedback').textContent='Export prepared: researched organizations, not clients.';
+ }catch(e){$('#operator-prospect-feedback').textContent=e.message;}
+ finally{btn.disabled=false;}
+});
 async function load(){
- const [stats,leads,funnel,orders,opportunities]=await Promise.all([
+ const [stats,leads,funnel,orders,opportunities,prospects]=await Promise.all([
   operatorRequest('GET','/api/admin/overview'),
   operatorRequest('GET','/api/admin/pilot-interest'),
   operatorRequest('GET','/api/admin/funnel'),
   operatorRequest('GET','/api/admin/pilot-orders'),
-  operatorRequest('GET','/api/admin/opportunities')
+  operatorRequest('GET','/api/admin/opportunities'),
+  operatorRequest('GET','/api/admin/prospects')
  ]);
  displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);displayOrders(orders.orders);displayOpportunities(opportunities.applications,opportunities.counts);
+ displayProspects(prospects.prospects||[]);
  $('#order-lead-id').innerHTML=leads.leads.map(l=>'<option value="'+escapeHtml(l.id)+'">'+escapeHtml(l.contact_name)+' — '+escapeHtml(l.company||l.email)+'</option>').join('');
  $('#operator-order-form button[type=submit]').disabled=!leads.leads.length;
  $('#operator-action-feedback').textContent='Observed as of '+new Date().toLocaleString();

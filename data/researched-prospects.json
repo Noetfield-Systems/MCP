@@ -1,0 +1,275 @@
+{
+  "as_of": "2026-11-18",
+  "evidence_policy": "Real organizations and public URLs, not customers, partners, verified demand, sent outreach or delivered projects.",
+  "stage": "researched_not_contacted",
+  "prospects": [
+    {
+      "rank": 1,
+      "slug": "judgeme",
+      "company": "Judge.me",
+      "segment": "E-commerce reviews & trust",
+      "website": "https://judge.me",
+      "api_docs": "https://judge.me/api/docs",
+      "contact": "https://judge.me/help/en/articles/8278390-build-integrations-with-judge-me",
+      "contact_email": "partnerships@judge.me",
+      "mcp_status": "A Judge.me Email MCP is documented; a first-party reviews API MCP was not confirmed in this research.",
+      "evidence": [
+        "https://judge.me/api/docs",
+        "https://judge.me/help/en/articles/8278390-build-integrations-with-judge-me",
+        "https://judge.me/help/en/articles/16619983-judge-me-email-connecting-ai-assistants-and-other-apps-with-api-tokens"
+      ],
+      "task": "Let merchant agents retrieve source-backed rating summaries and published review evidence for one product.",
+      "tools": [
+        "find_product_reviews",
+        "get_product_rating"
+      ],
+      "offer": "API Agent Launch; scoped reviews data access",
+      "priority": "P1",
+      "hypothesis": "A specific reviews intelligence workflow can complement its existing integrations without duplicating its Email MCP.",
+      "contact_role": "Technology partnerships",
+      "subject": "Judge.me reviews API → verified product-review tools for AI merchants",
+      "pitch": "Your Reviews API and technology partner pathway suggest a practical opportunity: a small, source-backed MCP toolset for merchants to ask for product rating summaries and supporting published reviews in one named AI client. We know Judge.me Email has an MCP connection; this proposal targets review retrieval, not the Email MCP. Could we agree on one approved merchant use case and API scope for a test?"
+    },
+    {
+      "rank": 2,
+      "slug": "surveysparrow",
+      "company": "SurveySparrow",
+      "segment": "Customer feedback and CX",
+      "website": "https://surveysparrow.com",
+      "api_docs": "https://developers.surveysparrow.com/rest-apis/",
+      "contact": "https://surveysparrow.com/partners/",
+      "contact_email": "",
+      "mcp_status": "Public REST API is documented; general first-party customer-data MCP was not verified here. Re-check before pitching.",
+      "evidence": [
+        "https://developers.surveysparrow.com/rest-apis/",
+        "https://surveysparrow.com/partners/"
+      ],
+      "task": "Let authorized CX analysts retrieve survey status and response aggregates in an agent without exporting raw customer responses.",
+      "tools": [
+        "list_surveys",
+        "get_response_summary"
+      ],
+      "offer": "Scoped private read-only pilot",
+      "priority": "P1",
+      "hypothesis": "CX teams may value a narrow, approved summary layer over exposing entire survey APIs.",
+      "contact_role": "Technology partnerships",
+      "subject": "SurveySparrow API: scoped AI assistant access to survey insights",
+      "pitch": "Your REST API and partner ecosystem could support a narrow agent-facing use case: an authorized CX user asks for survey status and response summaries without manually exporting data. We would start with an approved read-only source, two agreed acceptance tests and one supported client. Is there a relevant integrations owner to evaluate this with?"
+    },
+    {
+      "rank": 3,
+      "slug": "ecwid",
+      "company": "Ecwid by Lightspeed",
+      "segment": "SMB commerce platforms",
+      "website": "https://www.ecwid.com",
+      "api_docs": "https://docs.ecwid.com/api-reference",
+      "contact": "https://support.ecwid.com/hc/en-us/articles/5427022336796-Ecwid-developer-program-for-selling-apps",
+      "contact_email": "ec.apps@lightspeedhq.com",
+      "mcp_status": "Public store API and app-submission pathway documented; an official Ecwid store-data MCP was not verified here.",
+      "evidence": [
+        "https://docs.ecwid.com/api-reference",
+        "https://support.ecwid.com/hc/en-us/articles/5427022336796-Ecwid-developer-program-for-selling-apps"
+      ],
+      "task": "Merchant-authorized read-only lookup of catalog and inventory through a customer AI assistant.",
+      "tools": [
+        "search_store_products",
+        "get_item_availability"
+      ],
+      "offer": "Agency/marketplace pilot, private auth scoped separately",
+      "priority": "P1",
+      "hypothesis": "A focused merchant use case and install guide could be submitted through the existing Ecwid app process.",
+      "contact_role": "Developer ecosystem/app review",
+      "subject": "Ecwid merchant catalog: focused agent-readiness pilot",
+      "pitch": "Ecwid already has a documented store API and app marketplace. We would like to validate a deliberately small merchant-owned AI workflow: product search and current availability, with permissions and tested connection steps. This is not a claim that Ecwid lacks its own AI roadmap; could you point us to the integration-review process for an approved pilot?"
+    },
+    {
+      "rank": 4,
+      "slug": "printful",
+      "company": "Printful",
+      "segment": "Print-on-demand fulfillment",
+      "website": "https://www.printful.com",
+      "api_docs": "https://developers.printful.com/docs/",
+      "contact": "https://www.printful.com/contacts",
+      "contact_email": "",
+      "mcp_status": "Public API confirmed. Third-party MCP integrations exist; first-party general fulfillment MCP not confirmed.",
+      "evidence": [
+        "https://developers.printful.com/docs/",
+        "https://mcp.pipedream.com/app/printful",
+        "https://www.printful.com/contacts"
+      ],
+      "task": "Allow print-on-demand sellers to check approved catalog variant availability and product metadata in an AI client.",
+      "tools": [
+        "find_printful_products",
+        "check_variant_availability"
+      ],
+      "offer": "Scoped Launch or API partner integration",
+      "priority": "P2",
+      "hypothesis": "Catalog research is safer to pilot than fulfillment mutations or billable order placement.",
+      "contact_role": "API developer / integration support",
+      "subject": "Printful API: read-only product research in customer AI assistants",
+      "pitch": "We are exploring a read-only, merchant-authorized Printful API workflow for product and variant lookup directly from a named AI assistant. Unlike generic API conversion, we would define accepted tasks, source freshness, and install instructions. Would your developer or partner team consider reviewing a narrowly scoped external integration?"
+    },
+    {
+      "rank": 5,
+      "slug": "ghost",
+      "company": "Ghost Foundation / Ghost CMS",
+      "segment": "Publishing and memberships",
+      "website": "https://ghost.org",
+      "api_docs": "https://ghost.org/docs/content-api/",
+      "contact": "https://forum.ghost.org/c/integrations/26",
+      "contact_email": "",
+      "mcp_status": "Community MCP proposals/third-party implementations exist; first-party supported core MCP not established from official sources reviewed.",
+      "evidence": [
+        "https://ghost.org/docs/",
+        "https://forum.ghost.org/t/proposal-first-party-mcp-model-context-protocol-server-for-the-admin-api/62774",
+        "https://ghost.org/integrations/"
+      ],
+      "task": "Give publication editors read-only access to published article metadata and topic discovery through an assistant.",
+      "tools": [
+        "search_published_posts",
+        "get_public_post"
+      ],
+      "offer": "Open-source adapter demo plus integration distribution",
+      "priority": "P2",
+      "hypothesis": "A content-read use case can validate demand before authenticated Admin API work.",
+      "contact_role": "Community integrations forum",
+      "subject": "Ghost Content API: reproducible read-only agent workflow proposal",
+      "pitch": "I saw the Ghost community discussions around native MCP. We can contribute a narrow, testable Content API use case for assistants—searching and retrieving published posts, with no admin tokens. If useful, we can post a reproducible demonstration and get community feedback before asking for any formal integration listing."
+    },
+    {
+      "rank": 6,
+      "slug": "plausible",
+      "company": "Plausible Analytics",
+      "segment": "Privacy-first analytics",
+      "website": "https://plausible.io",
+      "api_docs": "https://plausible.io/docs/data-access",
+      "contact": "https://feedback.plausible.io/697",
+      "contact_email": "hello@plausible.io",
+      "mcp_status": "A Sentry-built community MCP is acknowledged in Plausible docs; a first-party supported MCP is an official roadmap request.",
+      "evidence": [
+        "https://plausible.io/docs/data-access",
+        "https://feedback.plausible.io/697",
+        "https://plausible.io/contact"
+      ],
+      "task": "Query website trend summaries with explicit metric definitions, time windows and no raw personal event data.",
+      "tools": [
+        "get_site_trends",
+        "compare_campaign_periods"
+      ],
+      "offer": "Agent tool-evaluation / reliable hosted integration collaboration",
+      "priority": "P2",
+      "hypothesis": "Reliability, metric correctness and documented host setup might complement existing community MCP.",
+      "contact_role": "Public feedback / official contact",
+      "subject": "Plausible Stats API + agent answers: accuracy-focused integration test",
+      "pitch": "Plausible already acknowledges the community-built MCP from Sentry and has a dedicated feature request. Rather than suggesting another generic wrapper, we can test a bounded Stats API workflow for accurate period comparisons, explicit metric definitions and reproducible failure handling. Would documented evaluation results help your MCP roadmap?"
+    },
+    {
+      "rank": 7,
+      "slug": "teamleader",
+      "company": "Teamleader Focus",
+      "segment": "CRM, quotations and invoicing",
+      "website": "https://www.teamleader.eu",
+      "api_docs": "https://developer.focus.teamleader.eu/",
+      "contact": "https://marketplace.teamleader.eu/eu/en/build",
+      "contact_email": "marketplace@teamleader.eu",
+      "mcp_status": "Teamleader Orbit has an announced MCP; do not infer that Focus has no AI or MCP capabilities. Focus offers its own API and marketplace.",
+      "evidence": [
+        "https://developer.focus.teamleader.eu/",
+        "https://support.focus.teamleader.eu/hc/en-150/articles/25691048319377-Getting-started-Can-I-build-a-custom-integration-with-Teamleader-Focus",
+        "https://www.teamleader.eu/blog/teamleader-orbit-mcp"
+      ],
+      "task": "Authorized small-business staff query sales pipeline and draft quotation status without modifying records.",
+      "tools": [
+        "list_open_opportunities",
+        "get_quotation_status"
+      ],
+      "offer": "Marketplace tech-partner pilot",
+      "priority": "P2",
+      "hypothesis": "A Focus-specific, tested task layer may be valuable despite existing Orbit MCP.",
+      "contact_role": "Teamleader Marketplace",
+      "subject": "Teamleader Focus API: targeted AI assistant integration for quote lookups",
+      "pitch": "I saw Teamleader Orbit's MCP announcement and Focus's separate developer/Marketplace API. Rather than duplicate Orbit, we would like to discuss a narrowly scoped Focus customer task: read authorized opportunities and quotation status from a named AI client. Is a custom integration submission the right path for a proof-of-value?"
+    },
+    {
+      "rank": 8,
+      "slug": "lightspeed",
+      "company": "Lightspeed Retail (X-Series)",
+      "segment": "Retail inventory and POS",
+      "website": "https://www.lightspeedhq.com",
+      "api_docs": "https://x-series-api.lightspeedhq.com/",
+      "contact": "https://www.lightspeedhq.com/partners/developers/",
+      "contact_email": "api@vendhq.com",
+      "mcp_status": "AI features announced; current X-Series documentation did not establish a broadly supported official MCP interface. Verify with partner team.",
+      "evidence": [
+        "https://x-series-api.lightspeedhq.com/",
+        "https://www.lightspeedhq.com/partners/developers/",
+        "https://www.lightspeedhq.com/news/lightspeed-ai-expands-from-insights-to-action-with-new-agentic-capabilities-for-retail/"
+      ],
+      "task": "Retailer inventory lookup by SKU and location using existing customer-granted API scope.",
+      "tools": [
+        "find_retail_sku",
+        "read_location_stock"
+      ],
+      "offer": "Retail API partner/custom integration",
+      "priority": "P3",
+      "hypothesis": "A merchant-operated agent query may complement native Lightspeed AI, not replace it.",
+      "contact_role": "Developer partner program",
+      "subject": "Lightspeed Retail API: merchant-directed SKU lookup from AI assistants",
+      "pitch": "Lightspeed is already investing in native AI, so we are not pitching a generic MCP generator. We are proposing a small retailer-controlled inventory lookup use case for an external assistant, supported by documented API permissions and named-client tests. Would the developer-partner team review this integration category?"
+    },
+    {
+      "rank": 9,
+      "slug": "recharge",
+      "company": "Recharge",
+      "segment": "Subscription commerce",
+      "website": "https://getrecharge.com",
+      "api_docs": "https://developer.rechargepayments.com/v2",
+      "contact": "https://docs.getrecharge.com/docs/join-the-recharge-tech-partner-program",
+      "contact_email": "",
+      "mcp_status": "Recharge Analytics MCP Early Adopter Program exists; generic analytics MCP creation is not a viable differentiator.",
+      "evidence": [
+        "https://developer.rechargepayments.com/v2",
+        "https://support.getrecharge.com/hc/en-us/articles/43339934359319-Recharge-Analytics-MCP-Early-Adopter-Program",
+        "https://docs.getrecharge.com/docs/join-the-recharge-tech-partner-program"
+      ],
+      "task": "Merchant support agent reads a subscription's state, billing interval and safe change policies before any modification.",
+      "tools": [
+        "get_subscription_summary",
+        "get_plan_policy"
+      ],
+      "offer": "Technology partner pilot for non-analytics merchant support",
+      "priority": "P3",
+      "hypothesis": "Focus on merchant support permissions and source-scoped read workflows, not a second analytics MCP.",
+      "contact_role": "Technology partner team",
+      "subject": "Recharge API: non-analytics merchant-support MCP use case",
+      "pitch": "Recharge already has an Analytics MCP early-adopter offering. Our proposal is different: a permissioned merchant-support read workflow for subscription status and plan policy, with no billing changes or customer action until separately authorized. Is this a relevant gap for your technology-partner team to explore?"
+    },
+    {
+      "rank": 10,
+      "slug": "jobber",
+      "company": "Jobber",
+      "segment": "Field service operations",
+      "website": "https://www.getjobber.com",
+      "api_docs": "https://developer.getjobber.com/docs/getting_started/",
+      "contact": "https://developer.getjobber.com/",
+      "contact_email": "",
+      "mcp_status": "Official Jobber MCP / ChatGPT and Claude connector already launched; do not sell a duplicate general MCP.",
+      "evidence": [
+        "https://help.getjobber.com/en/articles/connect-jobber-to-claude-and-chatgpt/",
+        "https://developer.getjobber.com/",
+        "https://www.getjobber.com/about/media/"
+      ],
+      "task": "Evaluate a specific permitted field-service job-status use case and document AI client acceptance, rather than recreating Jobber MCP.",
+      "tools": [
+        "read_service_request",
+        "get_scheduled_visit"
+      ],
+      "offer": "Integration QA / vertical workflow, only after validated gap",
+      "priority": "P3",
+      "hypothesis": "Existing native MCP lowers fit; only pursue a verified integration/QA pain.",
+      "contact_role": "Developer ecosystem",
+      "subject": "Jobber MCP already exists — proposal to validate a specific customer workflow",
+      "pitch": "We see that Jobber already ships an official MCP connector. We are not proposing another general connector. If there is a documented gap in a field-service workflow or in external client acceptance, Foundry can run targeted task tests and supply reusable technical evidence. Would your developer team consider a narrow gap assessment?"
+    }
+  ]
+}
