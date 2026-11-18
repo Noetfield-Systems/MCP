@@ -3,6 +3,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1121">
 <meta name="description" content="MCP Foundry: turn existing APIs into production MCP servers. Build, test, publish, connect, and measure real usage.">
+<link rel="canonical" href="https://mcp-foundry-web-production.up.railway.app/">
+<meta property="og:type" content="website"><meta property="og:title" content="MCP Foundry — Your API. Everywhere AI Works.">
+<meta property="og:description" content="Build, test, publish and operate live MCP servers from your existing APIs. Official MCP Registry-listed.">
+<meta property="og:url" content="https://mcp-foundry-web-production.up.railway.app/">
 <title>MCP Foundry — Your API. Everywhere AI Works.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -10,7 +14,7 @@
 <div class="page-bg" aria-hidden="true"></div>
 <header class="nav">
  <a href="#home" class="brand"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a>
- <nav aria-label="Main navigation"><a href="#capabilities">Platform</a><a href="#catalog">Explore servers</a><a href="#studio">Studio</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></nav>
+ <nav aria-label="Main navigation"><a href="#capabilities">Platform</a><a href="#catalog">Explore servers</a><a href="#studio">Studio</a><a href="/developers">Developers</a><a href="#pricing">Pricing</a></nav>
  <div class="nav-actions"><span class="live-indicator"><span class="pulse"></span> Public directory</span><button class="btn btn-small btn-outline" id="nav-login">Sign in</button><a class="btn btn-small btn-primary" href="#studio">Launch studio <span>↗</span></a></div>
  <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">☰</button>
 </header>
@@ -20,8 +24,8 @@
   <div class="eyebrow"><span class="tiny-star">✦</span> MODEL CONTEXT PROTOCOL INFRASTRUCTURE <span class="eyebrow-rule"></span> SPEC 2026-07-28</div>
   <h1>Your API.<br><em>Everywhere</em><br>AI works<span class="period">.</span></h1>
   <p>Build a real MCP server from an existing API. Test tools against live endpoints. Publish once, connect from compatible AI clients, and understand every invocation.</p>
-  <div class="hero-actions"><a href="#studio" class="btn btn-primary btn-large">Build your first server <span>↗</span></a><a href="#developers" class="btn btn-ghost btn-large">Explore documentation <span>↗</span></a></div>
-  <div class="hero-proof"><span class="proof-icon">✓</span> Open protocol <span class="proof-separator"></span> Portable endpoints <span class="proof-separator"></span> No vendor lock-in</div>
+  <div class="hero-actions"><a href="#studio" class="btn btn-primary btn-large">Build your first server <span>↗</span></a><a href="/developers" class="btn btn-ghost btn-large">Explore documentation <span>↗</span></a></div>
+  <div class="hero-proof"><span class="proof-icon">✓</span> <a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener" style="color:#c3b8ff">Official Registry listed ↗</a> <span class="proof-separator"></span> Open protocol <span class="proof-separator"></span> Portable endpoints <span class="proof-separator"></span> No vendor lock-in</div>
  </div>
  <div class="hero-art">
   <div class="art-grid"></div>
@@ -88,7 +92,7 @@
 </section>
 <section class="section developers-section" id="developers"><div class="wrap">
  <div class="section-kicker">FOR DEVELOPERS <span>04 / 05</span></div><div class="section-head"><h2>Standard first.<br><em>Fully portable.</em></h2><p>Our built-in MCP directory uses the official TypeScript SDK v2. Publish your own endpoints or integrate Foundry with an existing MCP client.</p></div>
- <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>Public access discovers genuine published servers. Add your personal Foundry API key to the same MCP endpoint to unlock create_server, import_openapi, test_readonly_tool and publish_server directly from your AI client.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" class="text-link">Read the MCP specification ↗</a></div>
+ <div class="dev-layout"><div class="dev-text"><span class="dev-pill">MCP SDK V2</span><h3>Connect the Foundry directory.</h3><p>Public access discovers genuine published servers. Add your personal Foundry API key to the same MCP endpoint to unlock create_server, import_openapi, test_readonly_tool and publish_server directly from your AI client.</p><div class="dev-steps"><div><b>01</b> Open your MCP-compatible client</div><div><b>02</b> Add the remote URL</div><div><b>03</b> Discover available tools</div></div><a href="/developers" class="text-link">Read installation and SDK docs ↗</a></div>
  <div class="dev-code"><div class="code-top"><span><i></i><i></i><i></i></span><b>mcp-client.json</b><button data-copy="mcp-url" class="copy-btn">COPY URL</button></div><pre id="dev-code">{
   "mcpServers": {
     "foundry": {
@@ -119,7 +123,7 @@
 </section>
 <section class="final-cta wrap"><div><div class="eyebrow">FROM ENDPOINT TO ECOSYSTEM</div><h2>Make your software<br><em>agent-ready.</em></h2></div><a href="#studio" class="btn btn-light btn-large">Open the Foundry <span>↗</span></a></section>
 </main>
-<footer class="footer wrap"><div class="footer-brand"><span class="mark small"><i></i><i></i><i></i><i></i></span><span>MCP FOUNDRY</span><small>Built for the open agent ecosystem.</small></div><div class="footer-links"><a href="#capabilities">Platform</a><a href="#catalog">Directory</a><a href="#developers">Developers</a><a href="/privacy">Privacy</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Independent product in the Noetfield portfolio.</div></footer>
+<footer class="footer wrap"><div class="footer-brand"><span class="mark small"><i></i><i></i><i></i><i></i></span><span>MCP FOUNDRY</span><small>Built for the open agent ecosystem.</small></div><div class="footer-links"><a href="#capabilities">Platform</a><a href="#catalog">Directory</a><a href="/developers">Developers</a><a href="/privacy">Privacy</a><a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry ↗</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Independent product in the Noetfield portfolio.</div></footer>
 <div class="toast hidden" role="status" id="toast"></div>
 <script type="module" src="/app.js"></script>
 </body></html>
