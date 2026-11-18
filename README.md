@@ -51,6 +51,14 @@ Your Studio can now rename and describe servers, edit/remove tools, unpublish a 
 ## Private commercial operations
 [Operator Desk](https://mcp-foundry-web-production.up.railway.app/operator) shows genuine account/server usage counts and consented implementation enquiry records. Configure a long random `FOUNDRY_ADMIN_TOKEN` in the Railway service (never in GitHub), then enter it once into the Desk. The token stays in page memory and is not stored in browser storage. Lead status is an operator classification, not a paid receipt. Without the secret the endpoint fails closed.
 
+## Premium product experience and 100-question acceptance
+
+The premium public site is an evolution of the original dark Foundry visual identity, not a replacement landing page. It now includes an intelligible source API → guarded build/test → remote MCP workflow, three production-grounded product use cases, full public FAQ, polished responsive UI, accessible skip/focus/mobile navigation, live gateway health, and actionable directory MCP URL copy.
+
+**[Read the full 10-persona / 100-question answer matrix](docs/UX-100-QUESTION-REVIEW.md).** All 100 items have candid answers and explicit SHIPPED / IMPROVED / PARTIAL / NOT_YET / NEXT statuses. Personas are simulated evaluation perspectives, never presented as real interviewed customers.
+
+CI exercises the new HTML semantics and coverage, and an independent Chromium workflow checks desktop/mobile, responsive overflow, FAQ, menu access, live API starter, successful test, publish, connection config, authenticated analytics and safe deletion. Public screenshots are attached as CI artifacts so visual changes are auditable.
+
 ## Portfolio boundaries
 MCP Foundry owns its customer experiences, MCP hosting, private tenant state and commercial billing. Other Noetfield ventures (SignalForge, SourceA, ARQANT, Fieldwork and others) remain independent providers whose external APIs can be wrapped through consented adapters. It never assumes ownership of their data, customers, agent runtime or treasury.
 
