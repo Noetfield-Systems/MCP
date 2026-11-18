@@ -15,7 +15,7 @@ The core product is usable: real remote GET MCP tools, ownership, authentication
    **Answer — SHIPPED:** No. Free workspace creation and starter tool execution do not require a card; optional paid Checkout is not currently configured.
 
 3. **Can I avoid designing JSON by hand?**  
-   **Answer — PARTIAL:** Yes for the built-in public API starters. Custom tools require declared parameters or OpenAPI JSON; a full visual schema editor remains future work.
+   **Answer — PARTIAL:** Yes for the built-in public API starters. Custom tools can use declared parameters or JSON/YAML OpenAPI import, with a read-only tool preview. A full visual schema editor remains future work.
 
 4. **Will a starter call a genuine API?**  
    **Answer — SHIPPED:** Yes. Hacker News and GitHub examples call the corresponding public endpoints. Upstream rate limits or failures can still occur.
@@ -41,10 +41,10 @@ The core product is usable: real remote GET MCP tools, ownership, authentication
 ## 02 · SaaS API founder and owner
 
 11. **Can Foundry wrap my existing SaaS API?**  
-   **Answer — PARTIAL:** Yes for publicly reachable HTTPS GET operations, with manual registration or OpenAPI JSON import. It is not a universal authenticated proxy yet.
+   **Answer — PARTIAL:** Yes for publicly reachable HTTPS GET operations, with manual registration or JSON/YAML OpenAPI import, including a guarded public spec URL. It is not a universal authenticated proxy yet.
 
 12. **Does it accept a YAML OpenAPI file?**  
-   **Answer — NOT_YET:** The current importer requires a pasted JSON document; YAML import and file upload are not implemented.
+   **Answer — SHIPPED:** The import wizard accepts OpenAPI JSON/YAML pasted text, local .json/.yaml/.yml files and public HTTPS specification URLs. It previews supported GET tools without writing to the workspace. OAuth/private upstreams are not supported.
 
 13. **Will it import POST/PUT/PATCH/DELETE?**  
    **Answer — NOT_YET:** No. This release deliberately supports read-only GET operations; unsafe write actions and payment execution are not available.
@@ -329,7 +329,7 @@ The core product is usable: real remote GET MCP tools, ownership, authentication
 ## Coverage & interpretation
 
 - **100 / 100** questions have an explicit answer; zero are discarded or described as “handled” without an answer.
-- Status breakdown: SHIPPED 52 · PARTIAL 15 · NOT_YET 22 · IMPROVED 10 · NEXT 1.
+- Status breakdown: SHIPPED 53 · PARTIAL 15 · NOT_YET 21 · IMPROVED 10 · NEXT 1.
 - Each question is linked to a persona and concrete product behavior or limitation. These are **design/acceptance hypotheses**, not observed market research.
 - Browser and MCP tests can verify working flows but cannot substitute for paid-customer proof, accessibility audit, an enterprise security review or real buyer interviews.
 
