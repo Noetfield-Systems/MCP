@@ -7,6 +7,12 @@ OAuth has two distinct uses:
 
 Do not market the first as the second.
 
+## Separate owner-supplied upstream bearer key
+For API providers that offer a fixed read-only HTTPS endpoint using a customer's own server-to-server bearer token, Foundry now has a deliberately narrow **BYOK** flow under the existing Connections page. This is independent of GitHub OAuth; only one fixed public HTTPS upstream host is allowed per server, every GET tool must target that host, and the resulting MCP endpoint is private and owner-key authenticated. Secrets use a separate `FOUNDRY_UPSTREAM_ENCRYPTION_KEY` (64 hex characters) and AES-256-GCM AAD binding to server and host; configured host/status can be read back, but the secret cannot. The production feature is disabled until this environment secret is configured. Saving or revoking credentials returns the endpoint to draft; test privately and republish.
+
+This is **not** a general-purpose delegated OAuth broker, an end-user authorization service, private-network connector, support for writes or a key-sharing mechanism. Owner API keys must stay in a private client credential store.
+
+
 ## Current implementation
 
 - Authorization-code flow with state bound to the signed-in Foundry account, single-use hashed state and **PKCE S256** challenge/verifier.
