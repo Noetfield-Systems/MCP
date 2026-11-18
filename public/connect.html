@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1121">
+<title>Connect your MCP — MCP Foundry</title><meta name="description" content="Install a live MCP Foundry server into Cursor, VS Code, Claude Code or compatible remote MCP clients.">
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"></head>
+<body><header class="nav"><a class="brand" href="/"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a><nav><a href="/">Platform</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/team">Teams</a></nav><div class="nav-actions"><a class="btn btn-small btn-primary" href="/#studio">Open Studio</a></div></header>
+<main class="wrap expansion-main"><div class="section-kicker">P0 / INTEGRATION ACTIVATION</div>
+<h1>Connect a real<br><em>MCP endpoint.</em></h1><p class="expansion-intro">Choose a supported host, copy the configuration and invoke a real tool. Host setup differs by client version; this wizard does not install software on your device.</p>
+<div class="connect-layout"><section class="product-panel"><span class="workspace-eyebrow">01 / YOUR ENDPOINT</span>
+<label class="expansion-label">Server slug<input id="client-slug" value="foundry" pattern="[a-z][a-z0-9-]{2,48}" spellcheck="false"></label>
+<label class="expansion-label">MCP host<select id="client-host"><option value="cursor">Cursor</option><option value="vscode">VS Code</option><option value="claude">Claude Code</option><option value="generic">Generic Streamable HTTP</option></select></label>
+<label class="expansion-check"><input type="checkbox" id="client-private"> This server is private (bearer API key required)</label>
+<p class="expansion-note">Private keys are never requested or stored by this wizard. Replace the placeholder inside your host's secure configuration.</p>
+<div class="installer-destination"><span class="workspace-eyebrow">02 / INSTALL FILE OR COMMAND</span><strong id="client-file"></strong></div>
+<pre class="installer-code" id="client-code" aria-live="polite"></pre>
+<button id="client-copy" class="btn btn-primary btn-large">Copy configuration</button><p class="form-feedback" id="client-feedback" role="status"></p></section>
+<aside class="product-panel connect-sidebar"><span class="workspace-eyebrow">03 / REAL CONNECTION CHECK</span><h3>Verify your first call.</h3><p>Open the configuration in your MCP-compatible host, connect, list the server tools and invoke a supported read-only tool. Foundry records real managed-tool executions; copying a config is not counted as a successful installation.</p>
+<div class="connect-checklist"><div><span>01</span> Add host-specific configuration</div><div><span>02</span> Authorize private endpoint if applicable</div><div><span>03</span> List tools in your host</div><div><span>04</span> Invoke one real upstream GET tool</div></div>
+<div class="connect-status" id="client-status">Checking gateway…</div><p class="expansion-note" id="client-hint"></p>
+<a href="/developers">Read SDK documentation ↗</a></aside></div>
+</main><footer class="footer wrap"><span>MCP FOUNDRY · OPEN TOOL INFRASTRUCTURE</span><a href="/privacy">Privacy</a></footer>
+<script type="module" src="/connect.js"></script></body></html>
