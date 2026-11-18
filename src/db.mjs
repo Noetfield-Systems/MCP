@@ -61,6 +61,69 @@ export async function initDb(){
   );
   CREATE INDEX IF NOT EXISTS activation_events_account_date_idx ON activation_events(account_id,created_at DESC);
   CREATE INDEX IF NOT EXISTS activation_events_name_date_idx ON activation_events(name,created_at DESC);
+  CREATE TABLE IF NOT EXISTS growth_links (
+    owner_id uuid PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+    code text NOT NULL UNIQUE,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS growth_referrals (
+    invitee_id uuid PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+    inviter_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT no_self_referral CHECK(invitee_id<>inviter_id)
+  );
+  CREATE INDEX IF NOT EXISTS growth_referrals_inviter_idx ON growth_referrals(inviter_id);
+  CREATE TABLE IF NOT EXISTS marketplace_listings (
+    server_id uuid PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+    category text NOT NULL DEFAULT 'developer-tools',
+    tagline text NOT NULL DEFAULT '',
+    docs_url text NOT NULL DEFAULT '',
+    readme text NOT NULL DEFAULT '',
+    verified_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS server_revisions (
+    id uuid PRIMARY KEY,
+    server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    version integer NOT NULL,
+    snapshot jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE(server_id,version)
+  );
+  CREATE TABLE IF NOT EXISTS server_invitations (
+    id uuid PRIMARY KEY,
+    server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    inviter_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    invitee_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    role text NOT NULL CHECK(role IN ('viewer','editor')),
+    status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','revoked')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    expires_at timestamptz NOT NULL DEFAULT now()+interval '7 days'
+  );
+  CREATE INDEX IF NOT EXISTS server_invitations_target_idx ON server_invitations(invitee_id,status);
+  CREATE TABLE IF NOT EXISTS server_members (
+    server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    role text NOT NULL CHECK(role IN ('viewer','editor')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY(server_id,account_id)
+  );
+  CREATE TABLE IF NOT EXISTS pilot_orders (
+    id uuid PRIMARY KEY,
+    lead_id uuid NOT NULL REFERENCES pilot_leads(id) ON DELETE RESTRICT,
+    payment_token_hash text NOT NULL UNIQUE,
+    amount_cents integer NOT NULL CHECK(amount_cents BETWEEN 1000 AND 2500000),
+    currency text NOT NULL CHECK(currency IN ('cad','usd')),
+    description text NOT NULL,
+    status text NOT NULL DEFAULT 'offered' CHECK(status IN ('offered','checkout_pending','paid','failed','fulfilled','refunded')),
+    stripe_checkout_session_id text UNIQUE,
+    stripe_payment_intent_id text,
+    completed_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS pilot_orders_status_idx ON pilot_orders(status,created_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
