@@ -110,7 +110,9 @@ export function foundryMcp(principal=null){
         try{doc=JSON.parse(openapi_json);}catch{throw Error('Invalid OpenAPI JSON');}
         const entries=specTools(doc,base_url);let added=0;
         const limit=principal.plan==='pro'?50:10;
-        for(const tool of entries.slice(0,limit)){
+        const existing=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
+        const capacity=Math.max(0,limit-existing.rows[0].n);
+        for(const tool of entries.slice(0,capacity)){
           try{validatedTarget(tool.url);}catch{continue;}
           const out=await q('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(server_id,name) DO NOTHING RETURNING id',[randomUUID(),server.id,tool.name,tool.description,tool.url,JSON.stringify(tool.params)]);
           added+=out.rowCount;
