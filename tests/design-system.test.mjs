@@ -17,13 +17,13 @@ test('canonical 12-page premium design shell is consistent and retains product r
    assert.deepEqual(hrefs,originalNavigation,name+' same canonical destinations');
    assert.equal((doc.match(/<header class="nav foundry-nav">/g)||[]).length,1,name+' one standard header');
    assert.equal((doc.match(/<footer class="foundry-footer">/g)||[]).length,1,name+' one standard footer');
-   assert.ok(doc.includes('href="/ui-system.css?v=20261118-b"'),name+' loads final shared theme');
+   assert.ok(doc.includes('href="/ui-system.css?v=20261118-graphite"'),name+' loads final shared theme');
    assert.ok(doc.includes('<main id="main"'),name+' has skip-link landmark');
    assert.ok(doc.includes('aria-controls="primary-nav" aria-expanded="false"'),name+' accessible mobile nav');
    assert.ok(doc.includes('href="/privacy"'),name+' visible privacy destination');
    assert.ok(doc.includes('/#quickstart'),name+' real fixed-scope commercial handoff');
    if(name==='index')assert.ok(doc.includes('id="nav-login"'), 'homepage auth integration preserved');
-   else assert.ok(doc.includes('src="/site-shell.js?v=20261118-b"'),name+' dedicated secondary navigation logic');
+   else assert.ok(doc.includes('src="/site-shell.js?v=20261118-graphite"'),name+' dedicated secondary navigation logic');
  }
 });
 test('canonical design system establishes responsive layout, keyboard and reduced-motion accessibility',()=>{
@@ -38,4 +38,19 @@ test('canonical design system establishes responsive layout, keyboard and reduce
  assert.match(js,/Escape/);
  assert.match(js,/aria-expanded/);
  assert.match(js,/aria-current/);
+});
+
+test('approved graphite product preview is installed without replacing live Studio',()=>{
+ const home=html('index');
+ assert.ok(home.includes('Your APIs.<br><em>Ready for agents.</em>'));
+ assert.ok(home.includes('class="preview-shell"'));
+ assert.ok(home.includes('id="wb-code-content"'));
+ assert.ok(home.includes('src="/preview-workbench.js"'));
+ for(const id of ['id="auth-form"','id="studio-app"','id="catalog-search"','id="hero-gateway"'])
+   assert.ok(home.includes(id), 'original functional hook '+id);
+ const script=readFileSync(new URL('../public/preview-workbench.js',import.meta.url),'utf8');
+ assert.ok(script.includes('data-wb-tab'));
+ const css=readFileSync(new URL('../public/ui-system.css',import.meta.url),'utf8');
+ for(const token of ['#08090b','#81b4ff','.preview-shell','.growth-hero','.docs-layout','.market-list','.workspace-shell'])
+   assert.ok(css.includes(token),'shared approved design: '+token);
 });
