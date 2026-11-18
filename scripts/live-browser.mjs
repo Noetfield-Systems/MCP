@@ -2,6 +2,7 @@
 // The disposable .invalid account is deleted in finally, even after a failure.
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
+import {mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
 
 const base=(process.env.FOUNDRY_BASE_URL||'https://mcp-foundry-web-production.up.railway.app').replace(/\/$/,'');
@@ -18,6 +19,24 @@ async function click(selector){await page.locator(selector).click({timeout:15000
 try{
  const opened=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:30000});
  assert.equal(opened.status(),200);
+ await mkdir('artifacts',{recursive:true});
+ await page.locator('.console-panel').waitFor({state:'visible',timeout:15000});
+ assert.equal(await page.locator('.console-panel .chain-step').count(),3);
+ assert.equal(await page.locator('.showcase-card').count(),3);
+ assert.equal(await page.locator('.faq-item').count(),10);
+ await page.locator('.faq-item').first().locator('summary').click();
+ assert.equal(await page.locator('.faq-item').first().evaluate(el=>el.open),true,'FAQ opens using native details');
+ await page.locator('.faq-item').first().locator('summary').click();
+ await page.screenshot({path:'artifacts/foundry-desktop.png',fullPage:true,animations:'disabled'});
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'artifacts/foundry-mobile.png',fullPage:true,animations:'disabled'});
+ await page.locator('#menu-toggle').click();
+ assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true','mobile navigation opens');
+ await page.keyboard.press('Escape');
+ assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false','Escape closes navigation');
+ const viewport=await page.evaluate(()=>({screen:innerWidth,content:document.documentElement.scrollWidth}));
+ assert.ok(viewport.content<=viewport.screen+3,'mobile page does not overflow horizontally: '+JSON.stringify(viewport));
+ await page.setViewportSize({width:1440,height:900});
  await page.locator('#auth-email').fill(email);
  await page.locator('#auth-password').fill(password);
  await click('#auth-submit');
@@ -56,7 +75,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
- console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
+ console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
  if(registered){
    try {
