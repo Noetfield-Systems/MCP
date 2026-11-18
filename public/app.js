@@ -72,7 +72,7 @@ function renderServers(){
  $('#server-list').innerHTML=state.servers.length?state.servers.map(s=>`<button class="server-row" data-server="${esc(s.id)}"><span class="server-avatar">⌘</span><span><b>${esc(s.name)}</b><small>/mcp/${esc(s.slug)} · ${s.tool_count} tool(s)</small></span><span class="status ${s.status==='published'?'published':''}">${esc(s.status)}</span></button>`).join(''):'<div class="empty-state">No servers yet. Use “New server” to start with your existing API.</div>';
 }
 async function selectServer(id){state.selected=id;const data=await request('GET','/api/servers/'+encodeURIComponent(id));state.detail=data;$('#server-detail').classList.remove('hidden');renderDetail();}
-function detailTabs(){return ['overview','add tool','import openapi','test','usage','revisions'].map(tab=>`<button class="detail-tab ${state.tab===tab?'active':''}" data-tab="${tab}">${tab[0].toUpperCase()+tab.slice(1)}</button>`).join('');}
+function detailTabs(){return ['overview','add tool','import openapi','test','usage','diagnostics','revisions'].map(tab=>`<button class="detail-tab ${state.tab===tab?'active':''}" data-tab="${tab}">${tab[0].toUpperCase()+tab.slice(1)}</button>`).join('');}
 function renderDetail(){
  const s=state.detail.server,t=state.detail.tools;
  const preset=state.templates.find(x=>s.slug.startsWith(x.id.replaceAll('_','-')+'-'));
@@ -108,6 +108,20 @@ function renderDetail(){
 </form>`;
  if(state.tab==='test')pane.innerHTML=`<div class="inner-title"><h4>Live request playground</h4><p>Tests call the actual endpoint. No simulated response or fabricated latency is returned.</p></div>${t.length?`<form id="test-form" class="tool-form"><label>Select tool<select class="input" name="tool">${t.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}</select></label><label>Arguments JSON<textarea name="args" spellcheck="false">${esc(sampleArgs)}</textarea></label><button class="btn btn-primary btn-small">Run live test</button></form><div id="test-result" class="result-box hidden"></div>`:'<div class="empty-state">Add a tool before running tests.</div>'}`;
  if(state.tab==='usage'){pane.innerHTML='<div class="empty-state">Loading observed usage…</div>';request('GET','/api/servers/'+s.id+'/usage').then(x=>{pane.innerHTML=`<div class="usage-grid"><div class="usage-card"><b>${x.usage.calls}</b><small>Tool calls / 30 days</small></div><div class="usage-card"><b>${x.usage.successes}</b><small>Successful executions</small></div><div class="usage-card"><b>${x.usage.avg_ms} ms</b><small>Average execution time</small></div></div><p class="hint">Observed invocation events only. Calls do not imply distinct users or collected revenue.</p>`;}).catch(e=>pane.textContent=e.message);}
+ if(state.tab==='diagnostics'){
+  pane.innerHTML='<div class="empty-state">Loading observed execution diagnostics…</div>';
+  request('GET','/api/servers/'+s.id+'/diagnostics').then(x=>{
+   if(state.tab!=='diagnostics')return;
+   const metrics=[['Observed calls',x.summary.calls],['Successful',x.summary.success],
+    ['Average latency',x.summary.avg_ms+' ms'],['P95 latency',x.summary.p95_ms+' ms']];
+   pane.innerHTML='<div class="inner-title"><h4>Live execution diagnostics</h4><p>Observed tool calls for the last 30 days. No raw input, tokens, URLs or response bodies are stored here.</p></div>'+
+    '<div class="usage-grid">'+metrics.map(([k,v])=>'<div class="usage-card"><b>'+esc(v)+'</b><small>'+esc(k)+'</small></div>').join('')+'</div>'+
+    '<div class="inner-title"><h4>Tool outcomes</h4></div><div class="team-list">'+
+    (x.tools.length?x.tools.map(t=>'<div class="team-item"><div><b>'+esc(t.tool_name)+'</b><small>'+esc(t.calls)+' calls · '+esc(t.success)+' successes · '+esc(t.avg_ms)+' ms avg</small></div></div>').join(''):'<div class="empty-state">No managed MCP calls recorded yet.</div>')+'</div>'+
+    '<div class="inner-title"><h4>Redacted recent executions</h4></div><div class="team-list">'+
+    (x.recent.length?x.recent.map(e=>'<div class="team-item"><div><b>'+esc(e.tool_name)+'</b><small>'+esc(new Date(e.created_at).toLocaleString())+' · '+esc(e.duration_ms)+' ms · '+esc(e.error_code||'SUCCESS')+'</small></div><span class="status '+(e.success?'published':'')+'">'+(e.success?'PASS':'FAIL')+'</span></div>').join(''):'<div class="empty-state">No recent invocation history.</div>')+'</div>';
+  }).catch(e=>{pane.textContent='Diagnostics unavailable: '+e.message;});
+ }
  if(state.tab==='revisions'){
   pane.innerHTML='<div class="empty-state">Loading published revisions…</div>';
   request('GET','/api/servers/'+s.id+'/revisions').then(x=>{
