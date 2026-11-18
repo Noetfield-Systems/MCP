@@ -1,5 +1,11 @@
 # MCP Foundry architecture and operating contract
 
+## Publication and private upstream delivery (18 November 2026)
+- **Published revision:** The server maintains immutable `published_snapshot`, a version number and an editable draft tool set. Existing published servers are backfilled from current published tools at startup. A single PostgreSQL transaction saves a new `server_revisions` snapshot and atomically switches the published tool set; external MCP execution, directory inventory and marketplace tool lists read the published snapshot only. Draft edits and restoring a prior version do not take existing endpoints offline. Explicit Unpublish disables them.
+- **BYOK boundary:** The private upstream key table stores only a host-pinned, AES-256-GCM ciphertext bound to server ID and host through authenticated associated data. The owner submits the key once via authenticated same-origin session, reads back only host/configuration status, and may revoke. Only owned private servers with all tools on the same HTTPS origin can publish with BYOK. Exact-host DNS pinning, blocked redirects, public-domain port-443 restrictions and bounded response handling remain in effect. `FOUNDRY_UPSTREAM_ENCRYPTION_KEY` is an operational secret required for activation. Credential changes intentionally revert to draft for retest.
+- **Commercial pipeline:** `service_package` on consented leads and `offer_type` on independently priced orders distinguish Launch, Quickstart, private, maintenance, agencies and custom. Custom Checkout must have a real merchant key and signed webhook. Neither created order URL nor Checkout session implies successful payment.
+
+
 ## Current release implementation (v0.1)
 - Node.js 22 / Express 5
 - Official MCP TypeScript SDK v2: `@modelcontextprotocol/server` + `@modelcontextprotocol/node`
