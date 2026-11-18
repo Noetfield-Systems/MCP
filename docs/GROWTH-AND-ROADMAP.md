@@ -1,4 +1,6 @@
-# MCP Foundry — 100 initiatives organized into strategic programs
+# MCP Foundry — Legacy 100 initiatives organized into strategic programs
+
+> **Priority superseded by [Strategy V3](STRATEGY-PRIORITIES-2026-11-18.md).** This remains the historical capability-oriented backlog. The advisor's complete updated ranked 100 actions, including V2 mapping, is preserved in [V3 source](STRATEGY-PRIORITIES-2026-11-18.fa.md). Never treat the older numbering as the active commercial execution order. This note does not mark backlog features as shipped.
 
 **This document is a backlog, not 100 launch blockers.** P0 must prove buyer outcome first. Order by evidence-to-effort, revenue leverage, user retention and protocol correctness. Independently verify each delivery.
 
