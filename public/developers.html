@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1121">
+<meta name="description" content="Install MCP Foundry as a remote MCP server and build your own source-backed MCP tools in minutes. Official Registry-listed, with verified live SDK tests.">
+<link rel="canonical" href="https://mcp-foundry-web-production.up.railway.app/developers">
+<title>Developer Docs — MCP Foundry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<header class="nav"><a href="/" class="brand"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a><nav><a href="/#capabilities">Platform</a><a href="/#studio">Studio</a><a href="/#pricing">Pricing</a></nav><div class="nav-actions"><a class="btn btn-small btn-outline" href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry ↗</a><a class="btn btn-primary btn-small" href="/#studio">Open Studio ↗</a></div></header>
+<main class="wrap docs-page">
+<div class="section-kicker">DEVELOPER DOCUMENTATION <span>VERSION 0.1.0 · MCP 2026-07-28</span></div>
+<div class="docs-hero"><div><div class="eyebrow">OFFICIAL REGISTRY LISTED · REMOTE STREAMABLE HTTP</div><h1>Connect once.<br><em>Build for agents.</em></h1><p>MCP Foundry publishes real HTTPS tools from your APIs. Start without payment, test an actual upstream response, then attach the resulting MCP endpoint to a compatible AI client.</p><div class="hero-actions"><a class="btn btn-primary btn-large" href="/#studio">Create your first server ↗</a><a class="btn btn-outline btn-large" href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">View source code ↗</a></div></div><div class="docs-hero-status"><span class="plan-type">PUBLIC CONNECTION</span><code>https://mcp-foundry-web-production.up.railway.app/mcp/foundry</code><span class="status published">Official Registry v0.1.0</span><p>The public directory works without a key. Add a personal Foundry API key to unlock authenticated creation, import, test and publication tools.</p></div></div>
+<div class="docs-layout"><aside class="docs-nav"><span class="workspace-eyebrow">QUICK NAVIGATION</span><a href="#quickstart">01 · Quickstart</a><a href="#connect">02 · Connect your MCP client</a><a href="#native">03 · Use Foundry as an MCP app</a><a href="#sdk">04 · SDK integration</a><a href="#discovery">05 · Discovery & Registry</a><a href="#boundaries">06 · Limits & safe execution</a><a href="#help">07 · Support & implementation</a></aside>
+<div class="docs-body">
+<section id="quickstart" class="docs-section"><span class="section-kicker">01 / QUICKSTART</span><h2>From zero to a <em>working endpoint.</em></h2>
+<div class="docs-steps"><div><b>01</b><p><strong>Register in Studio.</strong> Create an account, then select a live-source starter: Hacker News, GitHub public profile or public repository. The starter creates a draft MCP server and its first GET tool.</p></div><div><b>02</b><p><strong>Verify the tool.</strong> Open your server’s Test tab and run a real upstream API request. A failed upstream status is reported as a failure rather than a synthetic success.</p></div><div><b>03</b><p><strong>Publish and copy.</strong> Publish public or private, then copy the unique HTTPS endpoint at <code>/mcp/your-server</code>. Private endpoints require an account-issued bearer key.</p></div><div><b>04</b><p><strong>Connect an AI client.</strong> Use a compatible MCP client with Streamable HTTP. When invoked, real tool-call usage is recorded in your own workspace.</p></div></div>
+<a href="/#studio" class="btn btn-primary btn-large">Open the builder ↗</a></section>
+<section id="connect" class="docs-section"><span class="section-kicker">02 / CONNECT</span><h2>Remote MCP <em>configuration.</em></h2><p class="docs-note">Client configuration formats vary. The following is an illustrative <em>generic</em> HTTP MCP configuration; refer to your client’s current documentation for exact fields and authentication support.</p>
+<div class="docs-code"><div class="docs-code-title"><span>PUBLIC DIRECTORY EXAMPLE</span><button type="button" class="docs-copy" data-docs-copy="public">Copy URL</button></div><pre><code>{
+  "mcpServers": {
+    "foundry": {
+      "type": "http",
+      "url": "https://mcp-foundry-web-production.up.railway.app/mcp/foundry"
+    }
+  }
+}</code></pre></div>
+<p>For private server access and builder tools, create a personal API key in Studio → API keys. Add its Authorization header through the client’s supported credentials configuration. Never put real tokens into public screenshots, GitHub commits or GET URLs.</p>
+<div class="docs-code"><div class="docs-code-title"><span>AUTHENTICATED CLIENT EXAMPLE</span><button type="button" class="docs-copy" data-docs-copy="private">Copy template</button></div><pre><code>{
+  "mcpServers": {
+    "foundry": {
+      "type": "http",
+      "url": "https://mcp-foundry-web-production.up.railway.app/mcp/foundry",
+      "headers": {
+        "Authorization": "Bearer YOUR_PERSONAL_FOUNDRY_API_KEY"
+      }
+    }
+  }
+}</code></pre></div></section>
+<section id="native" class="docs-section"><span class="section-kicker">03 / NATIVE BUILDER</span><h2>Foundry is <em>an MCP server itself.</em></h2><p>Use a client with the personal Foundry API key and the same remote directory endpoint. Public tools remain open; authenticated tools are restricted to your own workspace.</p><div class="docs-tool-grid">
+<div><code>search_servers</code><small>Public directory search</small></div><div><code>get_server_tools</code><small>Public published tools</small></div><div><code>create_server</code><small>Make a draft server</small></div><div><code>add_readonly_tool</code><small>Register a GET tool</small></div><div><code>import_openapi</code><small>Import JSON GET operations</small></div><div><code>test_readonly_tool</code><small>Call the real upstream API</small></div><div><code>publish_server</code><small>Activate public/private endpoint</small></div><div><code>get_server_usage</code><small>Read observed tool executions</small></div></div>
+<p>Tool creation and publishing do not automatically issue tokens, move funds or perform customer API write actions. Unpublish and lifecycle controls are also available in Studio.</p></section>
+<section id="sdk" class="docs-section"><span class="section-kicker">04 / OFFICIAL CLIENT SDK</span><h2>Connect directly <em>from Node.js.</em></h2><p>Use the published official MCP client package and a Node.js 22+ environment. This example discovers the anonymous directory tools. For private access, provide a bearer header using your application’s secret handling.</p>
+<div class="docs-code"><div class="docs-code-title"><span>NODE.JS · STREAMABLE HTTP</span><button type="button" class="docs-copy" data-docs-copy="sdk">Copy SDK example</button></div><pre><code>import {Client, StreamableHTTPClientTransport}
+  from '@modelcontextprotocol/client';
+
+const client = new Client({
+  name: 'my-foundry-client',
+  version: '1.0.0'
+});
+const transport = new StreamableHTTPClientTransport(
+  new URL('https://mcp-foundry-web-production.up.railway.app/mcp/foundry')
+);
+
+try {
+  await client.connect(transport);
+  const {tools} = await client.listTools();
+  console.log(tools.map(tool =&gt; tool.name));
+} finally {
+  await client.close();
+}</code></pre></div></section>
+<section id="discovery" class="docs-section"><span class="section-kicker">05 / OFFICIAL DISCOVERY</span><h2>Find us in the <em>MCP Registry.</em></h2><p>Foundry is registered under <code>io.github.Noetfield-Systems/mcp-foundry</code>, with source-verified GitHub identity and an HTTPS remote transport. This is a listing of real metadata, not a certification of security or evidence of customers.</p><div class="docs-links"><a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry entry <span>↗</span></a><a href="/server.json" target="_blank" rel="noopener">Canonical server.json <span>↗</span></a><a href="/.well-known/mcp/server.json" target="_blank" rel="noopener">Well-known manifest <span>↗</span></a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">Public source repository <span>↗</span></a></div></section>
+<section id="boundaries" class="docs-section"><span class="section-kicker">06 / EXECUTION BOUNDARIES</span><h2>Real execution. <em>Explicit limits.</em></h2><div class="docs-tool-grid"><div><b>HTTPS GET only</b><small>No writes or payments by tool proxy</small></div><div><b>Public IP only</b><small>SSRF-resistant pinned IPv4 lookup</small></div><div><b>8 seconds</b><small>Upstream timeout</small></div><div><b>256 KiB</b><small>Maximum response body</small></div><div><b>Private scopes</b><small>Owner-specific keys and tools</small></div><div><b>Observed usage</b><small>Tool call ≠ unique customer</small></div></div><p>Some public upstream APIs, including GitHub, impose anonymous request limits. A 403 or rate limit from an upstream API is reported as an error and must not be interpreted as a successful tool call.</p></section>
+<section id="help" class="docs-section"><span class="section-kicker">07 / IMPLEMENTATION</span><h2>Need a custom <em>MCP integration?</em></h2><p>We also offer scoped development proposals for existing APIs. You can request an implementation assessment through the form; no payment is charged merely for submitting the request. The current paid subscription checkout is not enabled without completed production billing configuration.</p><a href="/#implementation" class="btn btn-primary btn-large">Request implementation ↗</a><p class="hint" style="margin-top:20px">For product source, CI evidence and public issues see <a href="https://github.com/Noetfield-Systems/MCP" style="color:#beb3ff" target="_blank" rel="noopener">GitHub</a>.</p></section>
+</div></div>
+</main>
+<footer class="footer wrap"><div class="footer-brand">MCP FOUNDRY</div><div class="footer-links"><a href="/">Home</a><a href="/privacy">Privacy</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Noetfield Systems Inc.</div></footer>
+<script type="module" src="/developers.js"></script>
+</body></html>
