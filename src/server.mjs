@@ -6,6 +6,7 @@ import path from 'node:path';
 import {q,initDb,requireAuth,ownedServer,pool} from './db.mjs';
 import {token,sha,passwordHash,passwordMatches,validatedTarget,specTools,toolUrl,safeGet,enforceOrigin,throttle} from './security.mjs';
 import {managedMcp,foundryMcp} from './mcp.mjs';
+import {publicTemplates,findTemplate} from './templates.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -102,6 +103,36 @@ app.delete('/api/account',auth,async(req,res)=>{
   res.clearCookie('mcpf_session',{path:'/'});
   res.json({deleted:true});
 });
+app.get('/api/templates',(_req,res)=>res.json({templates:publicTemplates(),kind:'live-public-api-onboarding',note:'Templates are API examples, not customer or marketplace listings'}));
+
+app.post('/api/pilot-interest',async(req,res)=>{
+  const email=string(req.body?.email,180).toLowerCase();
+  const contact_name=string(req.body?.contact_name,120);
+  const company=string(req.body?.company,160);
+  const website=string(req.body?.website,300);
+  const project_brief=string(req.body?.project_brief,2000);
+  // Honeypot is ignored without creating any stored prospect record.
+  if(req.body?.nickname)return res.status(202).json({received:true});
+  if(req.body?.contact_consent!==true)return j(res,400,'CONTACT_CONSENT_REQUIRED');
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||!contact_name||project_brief.length<20)return j(res,400,'NAME_EMAIL_AND_PROJECT_BRIEF_REQUIRED');
+  if(website){try{const parsed=new URL(website);if(parsed.protocol!=='https:')return j(res,400,'HTTPS_WEBSITE_REQUIRED');}catch{return j(res,400,'VALID_WEBSITE_REQUIRED');}}
+  try{
+    const {rows}=await q(`INSERT INTO pilot_leads(id,email,contact_name,company,website,project_brief,marketing_consent)
+      VALUES($1,$2,$3,$4,$5,$6,$7)
+      ON CONFLICT(email) DO UPDATE SET contact_name=excluded.contact_name,company=excluded.company,
+      website=excluded.website,project_brief=excluded.project_brief,marketing_consent=excluded.marketing_consent,
+      updated_at=now()
+      RETURNING id,created_at`,
+      [randomUUID(),email,contact_name,company,website,project_brief,req.body?.marketing_consent===true]);
+    return res.status(202).json({received:true,reference:rows[0].id,kind:'pilot_enquiry',payment_collected:false});
+  }catch(error){console.error('pilot_lead_write_failed',error?.code||'UNKNOWN');return j(res,503,'ENQUIRY_SAVE_UNAVAILABLE');}
+});
+app.get('/api/admin/pilot-interest',auth,async(req,res)=>{
+  const admins=(process.env.FOUNDRY_ADMIN_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  if(!admins.includes(req.user.email))return j(res,403,'ADMIN_ACCESS_REQUIRED');
+  const {rows}=await q('SELECT id,contact_name,email,company,website,project_brief,marketing_consent,status,created_at,updated_at FROM pilot_leads ORDER BY updated_at DESC LIMIT 100');
+  res.json({leads:rows});
+});
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
@@ -116,6 +147,30 @@ app.post('/api/servers',auth,async(req,res)=>{
  if(req.user.plan!=='pro'&&count.rows[0].n>=2)return j(res,403,'FREE_SERVER_LIMIT_REACHED');
  try{const {rows}=await q("INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING *",[randomUUID(),req.user.id,slug,name,description]);res.status(201).json({server:rows[0]});}
  catch(e){return j(res,e.code==='23505'?409:500,e.code==='23505'?'SLUG_TAKEN':'SERVER_CREATE_FAILED');}
+});
+app.post('/api/servers/from-template',auth,async(req,res)=>{
+  const template=findTemplate(string(req.body?.template_id,80));
+  if(!template)return j(res,404,'STARTER_TEMPLATE_NOT_FOUND');
+  const client=await pool.connect();
+  try{
+    await client.query('BEGIN');
+    await client.query('SELECT id FROM accounts WHERE id=$1 FOR UPDATE',[req.user.id]);
+    const count=await client.query('SELECT count(*)::int n FROM servers WHERE owner_id=$1',[req.user.id]);
+    if(req.user.plan!=='pro'&&count.rows[0].n>=2){
+      await client.query('ROLLBACK');return j(res,403,'FREE_SERVER_LIMIT_REACHED');
+    }
+    const id=randomUUID(),slug=template.id.replace(/_/g,'-')+'-'+randomUUID().slice(0,8);
+    const created=await client.query("INSERT INTO servers(id,owner_id,slug,name,description) VALUES($1,$2,$3,$4,$5) RETURNING *",
+      [id,req.user.id,slug,template.name,template.description]);
+    for(const tool of template.tools){
+      validatedTarget(tool.url);
+      await client.query('INSERT INTO tools(id,server_id,name,description,url,params) VALUES($1,$2,$3,$4,$5,$6)',
+        [randomUUID(),id,tool.name,tool.description,tool.url,JSON.stringify(tool.params)]);
+    }
+    await client.query('COMMIT');
+    res.status(201).json({server:created.rows[0],template_id:template.id,sample_args:template.sampleArgs,tools_added:template.tools.length,source:template.source});
+  }catch(error){await client.query('ROLLBACK');console.error('template_create_failed',error?.code||'UNKNOWN');j(res,500,'TEMPLATE_CREATE_FAILED');}
+  finally{client.release();}
 });
 app.get('/api/servers/:id',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
