@@ -507,3 +507,14 @@ a.btn.btn-primary:hover{
   }
   .growth-body .growth-hero-copy,.growth-body .growth-hero>*{min-width:0;max-width:100%}
 }
+
+/* Chromium 768px QA: legacy console ornaments projected outside the root
+   viewport. Keep the diagram entirely inside its tablet column; desktop
+   retains its perspective and mobile retains the existing stacked layout. */
+@media(min-width:601px) and (max-width:1040px){
+  #home.hero{min-width:0}
+  #home .hero-art{width:min(100%,640px);min-width:0;max-width:100%;margin-inline:auto}
+  #home .console-halo{inset:0;border-radius:30px}
+  #home .console-panel{transform:none;margin-inline:12px}
+  #home .console-float{right:5px}
+}
