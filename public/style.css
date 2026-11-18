@@ -97,3 +97,24 @@
 .docs-links span{color:#ad9bf4}
 @media(max-width:1000px){.docs-layout{grid-template-columns:1fr;gap:20px}.docs-nav{position:static;grid-template-columns:1fr 1fr;gap:11px}.docs-nav .workspace-eyebrow{grid-column:1/-1}.docs-hero{grid-template-columns:1fr;gap:25px;padding-bottom:45px}.docs-hero-status{max-width:620px}}
 @media(max-width:650px){.docs-page{padding-top:50px}.docs-hero h1{font-size:53px}.docs-nav{grid-template-columns:1fr}.docs-section{padding-bottom:50px}.docs-section+.docs-section{padding-top:48px}.docs-tool-grid,.docs-links{grid-template-columns:1fr}.docs-code pre{font-size:10px;padding:18px 13px}.docs-steps>div{gap:15px;padding:15px}}
+
+/* Observed activation. The steps are completed only after server receipts. */
+.activation-progress{border:1px solid #354463;border-radius:12px;padding:20px 18px;margin:20px 0 24px;background:linear-gradient(125deg,#1a2541,#101b2e)}
+.activation-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.activation-score{grid-column:1/-1;font-size:11px;font-weight:600;letter-spacing:.05em;color:#b7a6ff}
+.activation-step{display:flex;gap:10px;align-items:flex-start;border:1px solid #314158;background:#121d31;border-radius:9px;padding:12px;min-width:0}
+.activation-step.complete{border-color:#486e65;background:#172e30}
+.activation-icon{width:23px;height:23px;display:grid;place-items:center;flex-shrink:0;border:1px solid #637293;border-radius:50%;font-size:10px;color:#c4d3e9}
+.activation-step.complete .activation-icon{background:#2d6254;color:#d5f8e8;border-color:#4d8476}
+.activation-step b{display:block;font-size:12px;line-height:1.4;color:#e5eafa}
+.activation-step small{display:block;font-size:10px;color:#889db7;line-height:1.5;margin-top:3px}
+.operator-funnel{margin:16px 0 34px;background:#121e30;border:1px solid #36455e;border-radius:11px;padding:22px}
+.funnel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 28px}
+.funnel-item{display:grid;gap:8px}
+.funnel-heading{display:flex;justify-content:space-between;gap:9px;align-items:center}
+.funnel-heading strong{font-size:12px;color:#cbd6e9;font-weight:500}
+.funnel-heading b{font-size:14px;color:#e7e3fe}
+.funnel-track{height:6px;background:#27344d;border-radius:20px;overflow:hidden}
+.funnel-track span{height:100%;display:block;background:#9d91e5;border-radius:20px}
+@media(max-width:1100px){.activation-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.activation-steps,.funnel-grid{grid-template-columns:1fr}.activation-progress,.operator-funnel{padding:16px}}
