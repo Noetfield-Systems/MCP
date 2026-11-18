@@ -1020,3 +1020,49 @@ body .growth-form-feedback:empty{display:none}
 @media(prefers-reduced-motion:reduce){
   .btn,.growth-cta,.showcase-card,.growth-bridge-card,.catalog-card{transition:none!important;transform:none!important}
 }
+
+
+/* Finish 02 / post-Chromium visual review: same CTA and docs typography. */
+#home .hero-actions a.btn.btn-ghost,
+#home .hero-actions a.btn.btn-outline,
+.docs-page .hero-actions a.btn.btn-outline{
+  min-height:51px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #52687a;
+  border-radius:10px;
+  padding:15px 21px;
+  background:#182a3c;
+  color:#e2e9ee;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:none;
+}
+#home .hero-actions a.btn.btn-ghost:hover,
+#home .hero-actions a.btn.btn-outline:hover,
+.docs-page .hero-actions a.btn.btn-outline:hover{
+  border-color:#91a9b8;
+  background:#23384b;
+  color:white;
+}
+.docs-page .docs-hero h1{
+  font-size:clamp(48px,5.1vw,73px);
+  line-height:1.07;
+  letter-spacing:-.069em;
+}
+.docs-page .docs-hero p{color:var(--fd-secondary);font-size:16px;line-height:1.78}
+.docs-page .docs-hero-status{
+  background:linear-gradient(145deg,#1c3144,#132435);
+  border:1px solid var(--fd-line);
+  border-radius:var(--fd-radius);
+  padding:27px;
+  box-shadow:none;
+}
+@media(max-width:600px){
+  #home .hero-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+  #home .hero-actions .btn{width:100%;white-space:normal;text-align:center}
+  .docs-page .docs-hero h1{font-size:clamp(41px,10vw,49px);line-height:1.1}
+  .docs-page .docs-hero p{font-size:15px}
+  .docs-page .docs-hero-status{padding:20px}
+}
