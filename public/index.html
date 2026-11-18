@@ -10,12 +10,12 @@
 <title>MCP Foundry — Your API. Everywhere AI Works.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"></head><body>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/expansion.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="page-bg" aria-hidden="true"></div>
 <header class="nav">
  <a href="#home" class="brand"><span class="mark"><i></i><i></i><i></i><i></i></span><span>MCP<span class="brand-light">FOUNDRY</span></span></a>
- <nav aria-label="Main navigation" id="primary-nav"><a href="#capabilities">Platform</a><a href="#catalog">Explore servers</a><a href="#studio">Studio</a><a href="/developers">Developers</a><a href="#pricing">Pricing</a><a href="#questions">FAQ</a></nav>
+ <nav aria-label="Main navigation" id="primary-nav"><a href="#capabilities">Platform</a><a href="#catalog">Explore servers</a><a href="#studio">Studio</a><a href="/marketplace">Marketplace</a><a href="/connect">Connect</a><a href="/developers">Developers</a><a href="#pricing">Pricing</a><a href="#questions">FAQ</a></nav>
  <div class="nav-actions"><span class="live-indicator"><span class="pulse"></span> Public directory</span><button class="btn btn-small btn-outline" id="nav-login">Sign in</button><a class="btn btn-small btn-primary" href="#studio">Launch studio <span>↗</span></a></div>
  <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
 </header>
@@ -80,7 +80,7 @@
  <div class="section-head"><h2>A directory of<br><em>usable MCP servers.</em></h2><p>Only customer-published servers appear here. No manufactured ratings, businesses, or usage counts.</p></div>
  <div class="catalog-top"><label class="search"><span>⌕</span><input id="catalog-search" placeholder="Search published servers" aria-label="Search servers"></label><div class="catalog-filter">Public · Published</div></div>
  <div id="catalog-list" class="catalog-list"><div class="empty-state">Loading live directory…</div></div>
- <div class="catalog-bottom"><span id="catalog-count">Live registry</span><a href="#studio">Publish your own <span>↗</span></a></div>
+ <div class="catalog-bottom"><span id="catalog-count">Live registry</span><a href="/marketplace">Explore marketplace <span>↗</span></a></div>
 </div></section>
 <section id="studio" class="section wrap">
  <div class="section-kicker">BUILD & MANAGE <span>03 / 06</span></div>
@@ -98,6 +98,7 @@
    <div id="studio-app" class="studio-app hidden">
     <div class="workspace-title"><div><span class="workspace-eyebrow">MY WORKSPACE</span><h3 id="workspace-heading">Your MCP servers</h3></div><button class="btn btn-primary btn-small" id="new-server">+ New server</button></div>
     <div class="activation-progress" id="activation-progress"><span class="workspace-eyebrow">LIVE ACTIVATION CHECKLIST</span><div id="activation-steps" class="activation-steps">Loading verified account progress…</div></div>
+    <div class="builder-growth"><div><span class="workspace-eyebrow">FOUNDING BUILDER NETWORK</span><p>Invite a developer to build and publish a real MCP tool. This tracks actual signups and successful calls, not simulated users or cash rewards.</p><div id="growth-summary" class="hint">Loading your invite link…</div></div><div class="growth-actions"><button class="btn btn-outline btn-small" type="button" id="copy-growth-invite">Copy invite link</button><a class="btn btn-outline btn-small" href="/team">Team access ↗</a><a class="btn btn-outline btn-small" href="/marketplace">Marketplace ↗</a></div></div>
     <p class="form-feedback" id="workspace-feedback" role="status"></p>
     <div id="panel-servers" class="app-panel">
      <div class="starter-picker"><div class="starter-head"><div><span class="workspace-eyebrow">QUICK START</span><h4>Build from a real API.</h4><p>Choose a source-backed starter. Every example calls a genuine public endpoint, not demo data.</p></div></div><div id="template-list" class="template-list"><div class="empty-state">Loading live starter templates…</div></div></div>
@@ -156,7 +157,7 @@
 </section>
 <section class="final-cta wrap"><div><div class="eyebrow">FROM ENDPOINT TO ECOSYSTEM</div><h2>Make your software<br><em>agent-ready.</em></h2></div><a href="#studio" class="btn btn-light btn-large">Open the Foundry <span>↗</span></a></section>
 </main>
-<footer class="footer wrap"><div class="footer-brand"><span class="mark small"><i></i><i></i><i></i><i></i></span><span>MCP FOUNDRY</span><small>Built for the open agent ecosystem.</small></div><div class="footer-links"><a href="#capabilities">Platform</a><a href="#catalog">Directory</a><a href="#questions">FAQ</a><a href="/developers">Developers</a><a href="/privacy">Privacy</a><a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry ↗</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Independent product in the Noetfield portfolio.</div></footer>
+<footer class="footer wrap"><div class="footer-brand"><span class="mark small"><i></i><i></i><i></i><i></i></span><span>MCP FOUNDRY</span><small>Built for the open agent ecosystem.</small></div><div class="footer-links"><a href="#capabilities">Platform</a><a href="#catalog">Directory</a><a href="/connect">Client installer</a><a href="/marketplace">Marketplace</a><a href="/team">Teams</a><a href="#questions">FAQ</a><a href="/developers">Developers</a><a href="/privacy">Privacy</a><a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener">Official Registry ↗</a><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener">GitHub ↗</a></div><div class="footer-last">© 2026 MCP Foundry · Independent product in the Noetfield portfolio.</div></footer>
 <div class="toast hidden" role="status" id="toast"></div>
 <script type="module" src="/app.js"></script>
 </body></html>
