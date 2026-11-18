@@ -14,6 +14,7 @@ import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
 import {oauthRouter,guardedManagedGet} from './oauth.mjs';
 import {opportunityRouter} from './opportunities.mjs';
+import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
@@ -206,6 +207,7 @@ app.get('/api/admin/funnel',operator,async(req,res)=>{
 });
 app.use(expansionRouter({auth,operator,stripe}));
 app.use(opportunityRouter({operator}));
+app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
@@ -410,4 +412,5 @@ app.get('/.well-known/mcp/server.json',(req,res)=>res.redirect(307,'/server.json
 app.use(express.static(ROOT,{extensions:['html'],maxAge:'5m'}));
 app.use((err,req,res,next)=>{console.error('request_error',err?.message);if(res.headersSent)return next(err);return j(res,500,'INTERNAL_ERROR');});
 await initDb();
+await seedProspectAccounts();
 app.listen(port,'0.0.0.0',()=>console.log(JSON.stringify({event:'listening',product:'mcp-foundry',port,protocol:'2026-07-28'})));
