@@ -47,6 +47,14 @@ export async function safeGet(value){
     const data=Buffer.concat(chunks).toString('utf8');
     if(!response.ok) throw new Error('Upstream returned HTTP '+response.status);
     return {status:response.status,body:data.slice(0,262144),contentType:response.headers.get('content-type')||'text/plain'};
+  } catch(error) {
+    // Preserve a bounded machine-readable error instead of an opaque fetch failure.
+    // Never expose the original URL, query string, headers or connection secrets.
+    if(error?.message==='fetch failed'){
+      const reason=String(error.cause?.code||error.cause?.name||'NETWORK_ERROR').replace(/[^A-Z0-9_]/gi,'').slice(0,50);
+      throw new Error('UPSTREAM_CONNECT_'+reason);
+    }
+    throw error;
   } finally {await dispatcher.close();}
 }
 export function toolUrl(record,args){
