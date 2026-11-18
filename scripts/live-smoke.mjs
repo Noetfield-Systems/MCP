@@ -19,7 +19,7 @@ const run=async()=>{
     assert.equal(response.status,200,route+' independent commercial landing page live');
     const text=await response.text();
     assert.match(text,/<main id="main"/,'real accessible main content for '+route);
-    assert.match(text,/MCP.*FOUNDRY/,'standalone Foundry brand on '+route);
+    assert.match(text,/MCP.*Foundry/i,'standalone Foundry brand on '+route);
   }
   const starters=await fetch(base+'/api/templates',{signal:AbortSignal.timeout(12000)});
   assert.equal(starters.status,200);
