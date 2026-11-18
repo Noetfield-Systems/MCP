@@ -92,6 +92,16 @@ app.post('/api/auth/logout',async(req,res)=>{
  res.clearCookie('mcpf_session',{path:'/'});res.json({ok:true});
 });
 app.get('/api/me',auth,(req,res)=>res.json({account:req.user}));
+app.delete('/api/account',auth,async(req,res)=>{
+  // Account owner must re-enter the password. This also makes temporary live
+  // conformance accounts safely removable without leaving test traffic behind.
+  if(typeof req.body?.password!=='string')return j(res,400,'PASSWORD_REQUIRED');
+  const {rows}=await q('SELECT password_hash FROM accounts WHERE id=$1',[req.user.id]);
+  if(!rows.length||!passwordMatches(req.body.password,rows[0].password_hash))return j(res,403,'INVALID_PASSWORD');
+  await q('DELETE FROM accounts WHERE id=$1',[req.user.id]);
+  res.clearCookie('mcpf_session',{path:'/'});
+  res.json({deleted:true});
+});
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.status='published' AND s.visibility='public' AND (s.name ILIKE $1 OR s.description ILIKE $1) GROUP BY s.id ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
