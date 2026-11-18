@@ -78,7 +78,16 @@ try{
    assert.equal(values.headerHeight,72,'same mobile header height on '+route);
    assert.ok(values.font.includes('DM Sans'),'consistent brand body font '+route);
    assert.ok(values.theme,'shared design tokens loaded on '+route);
-   assert.ok(values.scroll<=values.width+3,'no mobile overflow on '+route+': '+JSON.stringify(values));
+   if(values.scroll>values.width+3){
+     const offenders=await page.evaluate(()=>[...document.querySelectorAll('body *')]
+       .map(el=>({el,r:el.getBoundingClientRect()}))
+       .filter(({el,r})=>r.width>0&&r.right>innerWidth+3&&
+         getComputedStyle(el).position!=='fixed'&&getComputedStyle(el).display!=='none')
+       .sort((a,b)=>b.r.right-a.r.right).slice(0,12)
+       .map(({el,r})=>({tag:el.tagName,selector:el.className?.toString().slice(0,80)||el.id,
+         right:Math.round(r.right),width:Math.round(r.width),text:el.textContent?.trim().slice(0,40)})));
+     throw new Error('mobile overflow on '+route+': '+JSON.stringify({values,offenders}));
+   }
    const button=page.locator('#menu-toggle');
    await button.click();
    assert.equal(await button.getAttribute('aria-expanded'),'true','mobile menu opens on '+route);
@@ -88,6 +97,13 @@ try{
      const label=route.slice(1);
      await page.screenshot({path:'artifacts/foundry-'+label+'-mobile.png',fullPage:true,animations:'disabled'});
    }
+ }
+ await page.setViewportSize({width:768,height:1024});
+ for(const route of publicRoutes){
+   const resp=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
+   assert.equal(resp.status(),200,'tablet route '+route);
+   const metric=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+   assert.ok(metric.scroll<=metric.width+3,'tablet 768px page overflow on '+route+': '+JSON.stringify(metric));
  }
  await page.setViewportSize({width:1440,height:900});
  for(const route of ['/','/solutions','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
@@ -169,7 +185,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
- console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',canonical_12_page_design:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
+ console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',canonical_12_page_design:'PASS',tablet_12_page_design:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
  if(registered){
    try {
