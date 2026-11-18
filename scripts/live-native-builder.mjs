@@ -91,7 +91,9 @@ try{
      url:'https://hacker-news.firebaseio.com/v0/maxitem.json',params:[]
    });
    assert.equal(staged.tool.name,'draft_probe');
-   const dirty=await get('/api/servers/'+server.id);
+   const dirtyResponse=await fetch(base+'/api/servers/'+server.id,{headers:{cookie},signal:AbortSignal.timeout(8000)});
+   assert.equal(dirtyResponse.status,200);
+   const dirty=await dirtyResponse.json();
    assert.equal(dirty.server.status,'published','staged tool does not unpublish');
    assert.equal(dirty.server.has_unpublished_changes,true);
    const liveList=await privateClient.listTools();
