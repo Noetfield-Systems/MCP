@@ -24,7 +24,8 @@ test('release roadmap separates commercial receipt from release and points to in
  const readme=read('README.md');
  assert.match(plan,/issues\/47/);
  assert.match(plan,/Technical GA/);
- assert.match(plan,/payment.*acceptance/i);
+ assert.match(plan,/## 5\. Payment product truth/);
+ assert.match(plan,/customer acceptance/i);
  assert.match(plan,/30 concrete upgrades/);
  assert.match(readme,/GA-100-EXECUTION-LEDGER\.md/);
  assert.match(readme,/GA-RELEASE-EXECUTION-2026-11-18\.md/);
