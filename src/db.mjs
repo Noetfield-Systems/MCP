@@ -176,6 +176,25 @@ export async function initDb(){
     provider text NOT NULL CHECK(provider='github'),
     created_at timestamptz NOT NULL DEFAULT now()
   );
+  -- Draft tool definitions remain editable; active published snapshot is immutable until next publish.
+  ALTER TABLE servers ADD COLUMN IF NOT EXISTS published_snapshot jsonb;
+  ALTER TABLE servers ADD COLUMN IF NOT EXISTS published_revision integer;
+  ALTER TABLE servers ADD COLUMN IF NOT EXISTS has_unpublished_changes boolean NOT NULL DEFAULT false;
+  UPDATE servers s SET published_snapshot=(
+    SELECT jsonb_build_object('tools',coalesce(jsonb_agg(jsonb_build_object(
+     'name',t.name,'description',t.description,'method',t.method,'url',t.url,'params',t.params
+    ) ORDER BY t.name),'[]'::jsonb))
+    FROM tools t WHERE t.server_id=s.id
+  ),published_revision=coalesce((SELECT max(version) FROM server_revisions WHERE server_id=s.id),0)
+  WHERE s.status='published' AND s.published_snapshot IS NULL;
+  -- One private, owner-bound key per server, encrypted before storage. No secret in URLs/tool JSON.
+  CREATE TABLE IF NOT EXISTS server_upstream_keys (
+    server_id uuid PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+    hostname text NOT NULL,
+    token_cipher text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
