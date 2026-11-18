@@ -256,3 +256,32 @@ button:disabled,.btn:disabled{opacity:.56;cursor:not-allowed;transform:none}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition-duration:.01ms!important}
 }
+
+/* Cross-page and long-form polish */
+.command-url code{min-width:0;flex:1}
+.console-top>span:nth-child(2){white-space:nowrap}
+.catalog-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:19px;padding-top:15px;border-top:1px solid #3a4862;flex-wrap:wrap}
+.catalog-actions .btn{font-size:11px;min-height:38px;padding:8px 12px}
+.catalog-guide{color:#d0c2ff;font-size:12px;font-weight:700}
+.catalog-guide:hover,.faq-bottom a:hover,.showcase-card a:hover{text-decoration:underline;text-underline-offset:3px}
+.footer-links{flex-wrap:wrap}
+.footer-brand{flex-wrap:wrap}
+.nav:not(:has(.menu-toggle)) .nav-actions .btn-outline{display:inline-flex}
+@media(max-width:920px){
+ .nav:not(:has(.menu-toggle)) nav{display:none}
+ .nav:not(:has(.menu-toggle)) .nav-actions .btn-outline{display:inline-flex}
+ .nav:not(:has(.menu-toggle)) .nav-actions{margin-left:auto}
+ .nav:not(:has(.menu-toggle)) .nav-actions .workspace-eyebrow{display:none}
+}
+@media(max-width:600px){
+ .nav:not(:has(.menu-toggle)) .nav-actions .btn-outline{padding:8px 10px;white-space:normal;text-align:center}
+ .nav:not(:has(.menu-toggle)) .brand{font-size:16px}
+ .catalog-actions{align-items:stretch}
+ .catalog-actions>.btn{flex:1}
+ .footer-links{gap:14px}
+ .footer-brand small{margin-left:0;width:100%}
+ .detail-tabs{overflow-x:auto;overscroll-behavior-x:contain}
+ .detail-tab{white-space:nowrap;flex-shrink:0}
+ .detail-content{min-width:0}
+ .endpoint-box code{overflow-wrap:anywhere;white-space:normal}
+}
