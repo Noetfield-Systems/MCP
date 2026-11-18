@@ -75,7 +75,7 @@ export function foundryMcp(principal=null){
     mcp.registerTool('get_server_tools',{description:'List tools published by one MCP Foundry server',inputSchema:z.object({slug:z.string().max(80)})},async({slug})=>{
       const {rows}=await q("SELECT name,published_snapshot->'tools' AS tools FROM servers WHERE slug=$1 AND status='published' AND visibility='public' AND published_snapshot IS NOT NULL",[slug]);
       const tools=rows[0]?.tools||[];
-      return {content:[{type:'text',text:JSON.stringify(tools.map(t=>({tool_name:t.name,description:t.description,params:t.params})))}]};
+      return {content:[{type:'text',text:JSON.stringify(tools.map(t=>({name:rows[0].name,tool_name:t.name,description:t.description,params:t.params})))}]};
     });
     // Anonymous clients can discover servers; authenticated API key holders can build and publish.
     // Each tool checks the owner and persists changes in the existing Foundry database.
