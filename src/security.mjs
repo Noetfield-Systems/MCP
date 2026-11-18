@@ -27,7 +27,7 @@ const blockedIp=(v)=>{
 };
 export function validatedTarget(value){
   let u;try {u=new URL(value);}catch{throw new Error('Invalid HTTPS endpoint');}
-  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||!u.hostname||u.hostname.length>253||u.hostname.endsWith('.local')||u.hostname.endsWith('.internal')||net.isIP(u.hostname)||u.hostname.includes('[')||u.hostname.includes(']')) throw new Error('Only public-domain HTTPS endpoints on port 443 are supported');
+  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||!u.hostname||u.hostname.length>253||u.hostname==='localhost'||u.hostname.endsWith('.localhost')||u.hostname.endsWith('.local')||u.hostname.endsWith('.internal')||net.isIP(u.hostname)||u.hostname.includes('[')||u.hostname.includes(']')) throw new Error('Only public-domain HTTPS endpoints on port 443 are supported');
   u.hash='';
   return u;
 }
@@ -55,7 +55,7 @@ export function toolUrl(record,args){
     const value=args?.[p.name];
     if(value===undefined||value===null||value===''){if(p.required) throw new Error('Missing '+p.name);continue;}
     if(p.in==='path'){
-      const escaped=encodeURIComponent(String(value)); const target='{'+p.name+'}';
+      const escaped=encodeURIComponent(String(value)); const target=encodeURIComponent('{'+p.name+'}');
       if(!url.pathname.includes(target)) throw new Error('Invalid path parameter '+p.name);
       url.pathname=url.pathname.replace(target,escaped);
     } else if(p.in==='query'){url.searchParams.set(p.name,String(value));}
