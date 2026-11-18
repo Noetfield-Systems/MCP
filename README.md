@@ -12,7 +12,15 @@
 - With `Authorization: Bearer fdy_...`: **Foundry itself is a builder MCP** with `list_my_servers`, `create_server`, `add_readonly_tool`, `import_openapi`, `test_readonly_tool`, `publish_server`, `get_server_usage`. Every management tool uses the authenticated account's tenant only. No anonymous write permissions.
 - Published managed servers under `/mcp/:slug`; private servers require owner key.
 - Dedicated PostgreSQL and Railway service; independent GitHub Actions live acceptance for health, API catalog, official SDK read-only discovery, plus full native builder and actual managed tool execution.
-- Stripe subscription Checkout and signed webhook integration in code, **disabled** until production Stripe billing credentials, plan Price ID and signed webhook are configured. No payments, customers, or revenues are claimed from deployments or tests.
+- A **live one-time CA$199 public API Quickstart** is available through a dedicated Stripe-hosted Payment Link; Foundry's separate custom-order Checkout and recurring subscriptions require merchant credentials/webhook setup. A live purchase link is not evidence of a successful charge, customer or revenue. See [Commercial Launch](docs/COMMERCIAL-LAUNCH.md).
+
+## Commercial and builder growth surfaces
+
+Foundry now has focused, English-only paths for [business API owners](https://mcp-foundry-web-production.up.railway.app/solutions), [Web3 and onchain data builders](https://mcp-foundry-web-production.up.railway.app/web3), and [developers, agencies and community partners](https://mcp-foundry-web-production.up.railway.app/collaborate). These pages use the same isolated Foundry product and authenticated Studio—no other Noetfield venture is merged.
+
+Two additional source-backed onboarding templates use **DEX Screener's public read-only API** and the **World Bank public country metadata API**. Provider rate limits and terms apply; these are examples, not a claim of API-provider sponsorship or a customer deployment.
+
+A first-party opportunity pipeline stores consented, role-specific enquiries in PostgreSQL; only the private Operator Desk can read or qualify them. Partner interest is separate from pilot implementation enquiries, Stripe-paid orders, and verified active developers. See [Commercial growth playbook](docs/GO-TO-MARKET-MCP-2026.md).
 
 ## Starting locally
 Use Node.js 22 and PostgreSQL.
