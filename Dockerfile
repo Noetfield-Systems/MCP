@@ -11,6 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev --no-audit --no-fund
 COPY src ./src
+COPY data ./data
+RUN node -e "const fs=require('node:fs'); const p=JSON.parse(fs.readFileSync('/app/data/researched-prospects.json','utf8')); if(!Array.isArray(p.prospects)) process.exit(1)"
 COPY public ./public
 COPY server.json ./server.json
 COPY --from=foundry-app-build /app/dist ./dist
