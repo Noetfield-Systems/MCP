@@ -58,7 +58,7 @@ try{
  assert.ok(viewport.content<=viewport.screen+3,'mobile page does not overflow horizontally: '+JSON.stringify(viewport));
  // Canonical design system acceptance: every public page uses the same
  // header, footer, typography, focusable mobile menu and no horizontal overflow.
- const publicRoutes=['/','/solutions','/web3','/collaborate','/marketplace',
+ const publicRoutes=['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/marketplace',
   '/connect','/developers','/team','/oauth','/operator','/order','/privacy'];
  const expectedNav=['Platform','For APIs','Web3','Marketplace','Developers','Work with us'];
  for(const route of publicRoutes){
@@ -96,11 +96,27 @@ try{
    assert.equal(await button.getAttribute('aria-expanded'),'true','mobile menu opens on '+route);
    await page.keyboard.press('Escape');
    assert.equal(await button.getAttribute('aria-expanded'),'false','Escape closes mobile menu on '+route);
-   if(['/solutions','/web3','/collaborate','/marketplace','/developers'].includes(route)){
+   if(['/solutions','/readiness','/blueprints','/web3','/collaborate','/marketplace','/developers'].includes(route)){
      const label=route.slice(1);
      await page.screenshot({path:'artifacts/foundry-'+label+'-mobile.png',fullPage:true,animations:'disabled'});
    }
  }
+ // GA: check both new buyer-facing routes as functioning customer journeys.
+ await page.goto(base+'/readiness',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(await page.locator('#readiness-assessment fieldset').count(),6);
+ await page.locator('input[name="source"][value="public"]').check();
+ await page.locator('input[name="docs"][value="openapi"]').check();
+ await page.locator('input[name="job"][value="clear"]').check();
+ await page.locator('input[name="operations"][value="read"]').check();
+ await page.locator('input[name="access"][value="public"]').check();
+ await page.locator('input[name="client"][value="selected"]').check();
+ await page.locator('#readiness-assessment button[type="submit"]').click();
+ assert.equal(await page.locator('#rdy-result').isVisible(),true,'public readiness returns actionable response with no login');
+ assert.equal(await page.locator('#rdy-accept').isChecked(),false,'no silent contact consent');
+ assert.equal(await page.locator('#rdy-marketing').isChecked(),false,'no silent marketing consent');
+ await page.goto(base+'/blueprints',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(await page.locator('.bp-card').count(),10,'ten truthful buyer solution blueprints');
+ assert.ok((await page.locator('main').innerText()).includes('not completed client projects'),'no fictional client case studies');
  // Strategy V3: customer-owned public API docs may include a safe install link.
  await page.goto(base+'/connect',{waitUntil:'domcontentloaded',timeout:20000});
  await page.locator('#client-slug').fill('public-docs-example');
@@ -130,7 +146,7 @@ try{
    }
  }
  await page.setViewportSize({width:1440,height:900});
- for(const route of ['/','/solutions','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
+ for(const route of ['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
    const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
    assert.equal(response.status(),200,'desktop page '+route);
    const metrics=await page.evaluate(()=>({
