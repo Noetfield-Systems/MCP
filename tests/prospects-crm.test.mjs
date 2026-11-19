@@ -7,7 +7,7 @@ const read=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 
 test('CRM contains exactly twenty distinct real named organizations, with public source and outreach evidence',()=>{
  assert.equal(prospectSeed.length,20);
- assert.equal(new Set(prospectSeed.map(p=>p.slug)).size,10);
+ assert.equal(new Set(prospectSeed.map(p=>p.slug)).size,20);
  for(const p of prospectSeed){
   assert.match(p.company,/.+/);
   assert.match(p.api_docs,/^https:\/\//);
