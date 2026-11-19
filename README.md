@@ -4,6 +4,14 @@
 
 [Production application](https://mcp-foundry-web-production.up.railway.app) · [Public directory MCP](https://mcp-foundry-web-production.up.railway.app/mcp/foundry) · [Product strategy](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Strategy V3: commercial and execution priorities](docs/STRATEGY-PRIORITIES-2026-11-18.md) · [legacy 100-initiative backlog](docs/GROWTH-AND-ROADMAP.md)
 
+## GA acceptance: customer delivery, real restore drill and named hosts (18 Nov 2026)
+
+- [Customer-accepted delivery](src/order-acceptance.mjs) is now separate from verified Stripe payment: an operator must provide a nontrivial real source-backed delivery reference, actual customer sign-off reference and approver before a paid scoped order can be marked fulfilled. The order and acceptance are recorded in PostgreSQL. No new customer or transaction is inferred.
+- [Disposable PostgreSQL restore drill](.github/workflows/disposable-postgres-restore.yml) uses actual `pg_dump` and `pg_restore` between two isolated local PostgreSQL databases, with read-back of published MCP definitions and unpaid fixture order; **not** a substitute for verifying Railway production backup/retention.
+- [Named AI host compatibility](docs/HOST-COMPATIBILITY-ACCEPTANCE.md): Cursor, VS Code and Claude Code configurations plus evidence tiers; config generation and SDK smoke are **not** proof of installed host runtime success.
+- [Recovery and GA operator runbook](docs/RECOVERY-AND-GA-OPERATIONS.md) defines production backup verification, signed payment, buyer acceptance and release gates.
+- Real Chromium production acceptance now additionally exercises `/readiness` and `/blueprints` in responsive route parity and verifies assessment without forced contact/marketing opt-ins.
+
 ## Final v1.0 execution — canonically ranked, not 100 launch blockers
 
 - [GA Release Execution Plan (30 ordered upgrades + 6 delivery phases)](docs/GA-RELEASE-EXECUTION-2026-11-18.md).
