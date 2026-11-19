@@ -37,9 +37,9 @@ For each candidate tool score 0–2 on: user task specificity, semantic selectio
 ## 3. The ten vertical playbooks are not ten claims of client deliveries
 The public site [Ten Integration Blueprints](/blueprints) includes: product reviews, CX surveys, SMB e-commerce, print-on-demand, publishing, analytics, CRM/quotes, retail inventory, subscriptions, field service. Each is an engineerable **hypothesis** with acceptance; first-party GitHub/World Bank starters are the available real-source demos. Nothing identifies the ten researched prospects as buyers or partners.
 
-## 4. Ten actual named organizations in research CRM
+## 4. Twenty actual named organizations in research CRM
 **Source of truth:** [data/researched-prospects.json](../data/researched-prospects.json).
-Research completed with real company sites, API documentation and public outreach avenues. Not a contact list scraped for private emails. Each record records:
+Research completed with real company sites, API documentation and public outreach avenues. The table below shows the original ten; wave two adds Booqable, ShipStation, Invoice Ninja, Bookeo, Checkfront, Formstack, Deputy, Housecall Pro, JobNimbus and Re:amaze. See the JSON research CRM for all twenty. Not a contact list scraped for private emails. Each record records:
 `company, segment, source API docs, current MCP evidence, specific pain hypothesis, two candidate tools, exact buyer role, partner/contact channel, proposed bounded offer, draft subject/message, rank`.
 These are *prospective accounts*, not consented inbound enquiries and never imported into the `pilot_leads` table.
 

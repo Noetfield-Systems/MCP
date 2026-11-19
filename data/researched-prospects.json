@@ -270,6 +270,276 @@
       "contact_role": "Developer ecosystem",
       "subject": "Jobber MCP already exists — proposal to validate a specific customer workflow",
       "pitch": "We see that Jobber already ships an official MCP connector. We are not proposing another general connector. If there is a documented gap in a field-service workflow or in external client acceptance, Foundry can run targeted task tests and supply reusable technical evidence. Would your developer team consider a narrow gap assessment?"
+    },
+    {
+      "rank": 11,
+      "slug": "booqable",
+      "company": "Booqable",
+      "segment": "Rental commerce and inventory",
+      "website": "https://booqable.com",
+      "api_docs": "https://developers.booqable.com/v4",
+      "contact": "https://developers.booqable.com/next.html",
+      "contact_email": "",
+      "mcp_status": "Documented REST API and app distribution; a first-party full merchant MCP was not confirmed. Third-party connector listings exist.",
+      "evidence": [
+        "https://developers.booqable.com/v4",
+        "https://developers.booqable.com/next.html",
+        "https://help.booqable.com/en/articles/3325519-getting-started-with-the-booqable-api-and-zapier"
+      ],
+      "task": "Owner-authorized rental inventory lookup and reservation availability by date.",
+      "tools": [
+        "find_rental_item",
+        "check_available_quantity"
+      ],
+      "offer": "Scoped rental inventory read-only integration",
+      "priority": "P1",
+      "hypothesis": "Rental operators may need availability-aware tools rather than a generic list-all-rentals wrapper.",
+      "contact_role": "Developer / App Store ecosystem",
+      "subject": "Booqable API: dated rental availability from AI assistants",
+      "pitch": "I reviewed Booqable's REST API and developer app model. We are testing one specific AI workflow for rental merchants: look up equipment and verify availability for a requested date range with source-backed results, without writing reservations. Would a narrow, owner-authorized read-only demonstration fit your developer app review process? We would document two acceptance tasks and the supported client."
+    },
+    {
+      "rank": 12,
+      "slug": "shipstation",
+      "company": "ShipStation",
+      "segment": "Shipping and fulfillment SaaS",
+      "website": "https://www.shipstation.com",
+      "api_docs": "https://docs.shipstation.com/api-overview",
+      "contact": "https://info.shipstation.com/become-a-partner-api-and-custom-store-integrations",
+      "contact_email": "",
+      "mcp_status": "Official *documentation* MCP exists; it helps developers read API docs. This is not evidence of a merchant operational order-status MCP.",
+      "evidence": [
+        "https://docs.shipstation.com/api-overview",
+        "https://docs.shipstation.com/connect-mcp",
+        "https://info.shipstation.com/become-a-partner-api-and-custom-store-integrations"
+      ],
+      "task": "Authorized retailer asks an AI assistant for live shipment state and carrier tracking evidence.",
+      "tools": [
+        "find_shipping_order",
+        "get_shipping_status"
+      ],
+      "offer": "Scoped shipping API integration / partner test",
+      "priority": "P1",
+      "hypothesis": "Differentiate actual merchant data operations from ShipStation's already-offered Docs MCP.",
+      "contact_role": "Integration partnership program",
+      "subject": "ShipStation API: source-backed merchant shipment lookup in AI clients",
+      "pitch": "I found your API documentation and the official ShipStation Documentation MCP. We are not proposing another docs helper. Our question is whether merchants need a strictly read-only, authorized assistant workflow to check a shipment's current status and tracking source. We can submit two reproducible tests and host configuration, with no order creation or label purchase. Is the API integration partner program the right evaluation route?"
+    },
+    {
+      "rank": 13,
+      "slug": "invoiceninja",
+      "company": "Invoice Ninja",
+      "segment": "Open-source invoicing and billing",
+      "website": "https://invoiceninja.com",
+      "api_docs": "https://invoiceninja.github.io/docs/developer-guide",
+      "contact": "https://invoiceninja.com/contact-support/",
+      "contact_email": "contact@invoiceninja.com",
+      "mcp_status": "V5 REST API documented. Independent community MCP implementations/proposals exist; official full-production MCP scope requires rechecking.",
+      "evidence": [
+        "https://invoiceninja.github.io/docs/developer-guide",
+        "https://invoiceninja.com/contact-support/",
+        "https://invoiceninja.com/automations/"
+      ],
+      "task": "A business owner reads overdue invoice status and amounts without initiating payment or changing records.",
+      "tools": [
+        "list_overdue_invoices",
+        "get_invoice_status"
+      ],
+      "offer": "Private read-only billing assistant scope",
+      "priority": "P1",
+      "hypothesis": "Specific accounts-receivable workflows and client acceptance may still need tested, private integration.",
+      "contact_role": "Product / integrations team",
+      "subject": "Invoice Ninja v5 API: read-only invoice status for an AI assistant",
+      "pitch": "Invoice Ninja already supports API-based automation and community integrations. We would like to validate a narrow customer-owned AI use case: read overdue invoices and status through the v5 API, with per-user authorization, defined accounting fields and no write or payment side effects. Do you have an official MCP roadmap or an integration review contact we should coordinate with before building a reproducible pilot?"
+    },
+    {
+      "rank": 14,
+      "slug": "bookeo",
+      "company": "Bookeo",
+      "segment": "Bookings and appointment scheduling",
+      "website": "https://www.bookeo.com",
+      "api_docs": "https://www.bookeo.com/apiref/",
+      "contact": "https://www.bookeo.com/api/",
+      "contact_email": "api@bookeo.com",
+      "mcp_status": "Public developer API and third-party authorization flow documented; an official customer-data MCP was not confirmed by this review.",
+      "evidence": [
+        "https://www.bookeo.com/api/",
+        "https://www.bookeo.com/api/setup/",
+        "https://www.bookeo.com/apiref/"
+      ],
+      "task": "Authorized booking staff retrieve upcoming sessions and available slots for one specific service.",
+      "tools": [
+        "get_upcoming_bookings",
+        "check_service_slots"
+      ],
+      "offer": "Appointment-read integration (private API scope)",
+      "priority": "P1",
+      "hypothesis": "Agent answers about availability are concrete user outcomes; third-party permission mechanism must be tested.",
+      "contact_role": "Bookeo API team",
+      "subject": "Bookeo API: permissioned booking lookups from AI clients",
+      "pitch": "Your API documentation describes an integration and customer authorization path. We are exploring a focused read-only workflow where an authorized booking operator can ask an AI assistant for upcoming reservations and availability without creating or cancelling bookings. Would the API team review a two-task prototype with explicit account scope and installation steps? We would not request access outside Bookeo's approved API process."
+    },
+    {
+      "rank": 15,
+      "slug": "checkfront",
+      "company": "Checkfront",
+      "segment": "Tours and reservation management",
+      "website": "https://www.checkfront.com",
+      "api_docs": "https://developers.checkfront.com/4.0/",
+      "contact": "https://www.checkfront.com/company/contact/",
+      "contact_email": "",
+      "mcp_status": "Official v4 developer API documented; native first-party booking operations MCP was not established in research.",
+      "evidence": [
+        "https://developers.checkfront.com/4.0/",
+        "https://support.checkfront.com/hc/en-us/articles/19868103580188-Working-with-Checkfront-Developer-tools-API",
+        "https://www.checkfront.com/company/contact/"
+      ],
+      "task": "Agent reads available tours and reservation status for an authorized account without making a booking.",
+      "tools": [
+        "find_available_tour",
+        "read_reservation_status"
+      ],
+      "offer": "Scoped reservation API agent pilot",
+      "priority": "P1",
+      "hypothesis": "High-intent availability/status questions provide narrow acceptance criteria before any write operation.",
+      "contact_role": "Developer / integration partnerships",
+      "subject": "Checkfront API: verified booking-status queries in customer AI assistants",
+      "pitch": "We reviewed the Checkfront developer API, including its customer authorization model. We propose validating just two read-only tasks in an external AI client: availability for a requested tour/date and status of an authorized booking. The result would include bounded tools, clear credentials handling and source-backed tests. Is there an integration-review contact who could assess this workflow without a broad marketplace commitment?"
+    },
+    {
+      "rank": 16,
+      "slug": "formstack",
+      "company": "Formstack",
+      "segment": "Forms and document workflows",
+      "website": "https://www.formstack.com",
+      "api_docs": "https://developers.formstack.com/reference/api-overview",
+      "contact": "https://help.formstack.com/hc/en-us/requests/new",
+      "contact_email": "",
+      "mcp_status": "REST API and partner ecosystem verified; official general-purpose form-submission MCP status needs verification before outreach.",
+      "evidence": [
+        "https://developers.formstack.com/reference/api-overview",
+        "https://help.formstack.com/hc/en-us/articles/44593129470867-Developer-Resources",
+        "https://help.formstack.com/hc/en-us/requests/new"
+      ],
+      "task": "Authorized operator checks form completion counts and defined workflow status without exposing respondent personal data.",
+      "tools": [
+        "list_active_forms",
+        "get_submission_counts"
+      ],
+      "offer": "Read-only forms workflow integration",
+      "priority": "P2",
+      "hypothesis": "A minimal sensitive-data approach may improve host compatibility and buyer trust.",
+      "contact_role": "Developer support / technical integrations",
+      "subject": "Formstack API: permissioned workflow-status tools for AI assistants",
+      "pitch": "Formstack documents a REST API for customer-owned integrations. We are assessing a limited agent workflow for business teams: see active form status and submission counts without exposing raw respondent fields or taking write actions. We would define tenant scope, a compatible host and two source-backed tests before proposing an implementation. Is this best evaluated through developer support or an integration partner channel?"
+    },
+    {
+      "rank": 17,
+      "slug": "deputy",
+      "company": "Deputy",
+      "segment": "Workforce scheduling and time attendance",
+      "website": "https://www.deputy.com",
+      "api_docs": "https://developer.deputy.com/docs/getting-started-with-the-deputy-api",
+      "contact": "https://www.deputy.com/partners/integration",
+      "contact_email": "partners@deputy.com",
+      "mcp_status": "Developer API and technology integration partner program confirmed; any official MCP and native AI scope should be reconfirmed before approach.",
+      "evidence": [
+        "https://developer.deputy.com/docs/getting-started-with-the-deputy-api",
+        "https://www.deputy.com/partners/integration",
+        "https://developer.deputy.com/docs/integration-and-data-availability-options"
+      ],
+      "task": "Approved manager retrieves upcoming roster gaps by site and date, without editing employee shifts.",
+      "tools": [
+        "get_roster_summary",
+        "check_unfilled_shifts"
+      ],
+      "offer": "Partner-specific workforce read tool pilot",
+      "priority": "P2",
+      "hypothesis": "Manager-only roster questions have concrete benefit but require workforce privacy and partner access scoping.",
+      "contact_role": "Deputy integration partnerships",
+      "subject": "Deputy API: manager-authorized roster gap lookup for AI assistants",
+      "pitch": "I reviewed your developer API and integration partner program. We are not proposing another general payroll connector. A small pilot could let an authorized manager ask an AI client for unfilled shifts at one location, using the proper Deputy tenant permissions and no shift mutations. Could the partnerships team assess whether this narrow read-only use case is useful and which approved API scopes apply?"
+    },
+    {
+      "rank": 18,
+      "slug": "housecallpro",
+      "company": "Housecall Pro",
+      "segment": "Field-service business software",
+      "website": "https://www.housecallpro.com",
+      "api_docs": "https://help.housecallpro.com/en/articles/8505035-api-overview",
+      "contact": "https://help.housecallpro.com/en/articles/8505035-api-overview",
+      "contact_email": "",
+      "mcp_status": "Customer/API-key workflows exist for eligible plans; approved partner and account conditions apply. Native official MCP for customer job lookups was not confirmed.",
+      "evidence": [
+        "https://help.housecallpro.com/en/articles/8505035-api-overview",
+        "https://help.housecallpro.com/en/articles/12062219-api-leads-in-job-inbox",
+        "https://www.housecallpro.com/integrations"
+      ],
+      "task": "Eligible customer asks job status and appointment schedule with read-only authorized access.",
+      "tools": [
+        "get_service_job",
+        "read_service_calendar"
+      ],
+      "offer": "Customer-sponsored private API feasibility pilot",
+      "priority": "P2",
+      "hypothesis": "Strong field-services task fit, but availability of API access to buyer and partner qualification must be checked first.",
+      "contact_role": "API support / partner integrations",
+      "subject": "Housecall Pro API: customer-sponsored read-only job lookup",
+      "pitch": "Your API guidance describes how eligible customers and developers can build scoped integrations. We would first validate one customer's API access and a read-only job-status task before offering an external AI assistant connector. The pilot would not issue estimates, invoices or job mutations. Is there an integrations contact who could review a customer-sponsored, tightly scoped test?"
+    },
+    {
+      "rank": 19,
+      "slug": "jobnimbus",
+      "company": "JobNimbus",
+      "segment": "Contractor CRM and operations",
+      "website": "https://www.jobnimbus.com",
+      "api_docs": "https://developer.jobnimbus.com/docs/authorization",
+      "contact": "https://support.jobnimbus.com/how-do-i-create-an-integration-using-jobnimbuss-open-api",
+      "contact_email": "",
+      "mcp_status": "JobNimbus Open API documented; first-party official MCP status was not established in this research.",
+      "evidence": [
+        "https://developer.jobnimbus.com/docs/authorization",
+        "https://support.jobnimbus.com/how-do-i-create-an-integration-using-jobnimbuss-open-api",
+        "https://www.jobnimbus.com"
+      ],
+      "task": "Authorized contractor retrieves project stage and next scheduled service date from CRM.",
+      "tools": [
+        "get_project_stage",
+        "read_job_schedule"
+      ],
+      "offer": "Scoped contractor CRM workflow",
+      "priority": "P2",
+      "hypothesis": "A small read-only CRM task offers measurable field acceptance without assuming write privileges.",
+      "contact_role": "Developer support / integration ecosystem",
+      "subject": "JobNimbus API: verified contractor project lookup through AI",
+      "pitch": "I reviewed your API authorization and custom integration documentation. We are assessing a bounded, tenant-authorized workflow in which a contractor asks an AI client for one project's stage and upcoming scheduled visit. We would start with read-only permissions, two source-backed task tests and no customer record updates. Is this a suitable use case for an integration review or developer discussion?"
+    },
+    {
+      "rank": 20,
+      "slug": "reamaze",
+      "company": "Re:amaze",
+      "segment": "E-commerce customer support platform",
+      "website": "https://www.reamaze.com",
+      "api_docs": "https://www.reamaze.com/api",
+      "contact": "https://reamaze.reamaze.io/kb/advanced-settings/does-re-amaze-have-an-api",
+      "contact_email": "",
+      "mcp_status": "REST-like API documented; official customer-support MCP status and restrictions require updated review.",
+      "evidence": [
+        "https://www.reamaze.com/api",
+        "https://reamaze.reamaze.io/kb/advanced-settings/does-re-amaze-have-an-api",
+        "https://www.reamaze.com"
+      ],
+      "task": "Customer-support lead reads ticket counts and open conversation metadata without exporting private message bodies.",
+      "tools": [
+        "list_open_conversations",
+        "get_support_queue_summary"
+      ],
+      "offer": "Scoped customer-support read-only workflow",
+      "priority": "P2",
+      "hypothesis": "Usefulness may come from a bounded support queue summary instead of raw conversation exposure.",
+      "contact_role": "Developer support / integrations",
+      "subject": "Re:amaze API: support queue summaries in authorized AI clients",
+      "pitch": "Your documented REST API provides a path to authorized support workflows. We would like to test a narrow read-only MCP integration for support managers: summarize the open conversation queue and retrieve permitted ticket metadata without leaking customer message content. We would scope one tenant, named AI client and two accepted tasks before commercializing it. Is there a suitable integrations contact to evaluate this proposal?"
     }
   ]
 }

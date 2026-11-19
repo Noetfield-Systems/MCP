@@ -11,7 +11,7 @@
 | # | V3 action | Customer/technical acceptance | Status | Lane | Code/doc evidence or V2 mapping |
 |---:|---|---|---|---|---|
 | 1 | تعریف و عرضهٔ API Agent Launch | دامنه، قیمت آزمایشی، نمونه و CTA درخواست/خرید روشن؛ ادامهٔ فروش Quickstart | `PARTIAL_BASELINE` | Product / Engineering | public/solutions.html; V2: 11,14,15 |
-| 2 | انتخاب خریدار و فرصت‌های نزدیک | ۲۰ نامزد مرتبط با API و مسئلهٔ مشخص؛ اولویت بر اساس امکان سفارش، نه شهرت | `PARTIAL_BASELINE` | Sales / Growth | data/researched-prospects.json (10 of 20); V2: 23,30,89 |
+| 2 | انتخاب خریدار و فرصت‌های نزدیک | ۲۰ نامزد مرتبط با API و مسئلهٔ مشخص؛ اولویت بر اساس امکان سفارش، نه شهرت | `PARTIAL_BASELINE` | Sales / Growth | data/researched-prospects.json (20 researched, not customers); V2: 23,30,89 |
 | 3 | روشن‌کردن Quickstart موجود | یک API عمومی، سه GET، exclusions و مسیر پرداخت کوتاه؛ بدون فرم اضافی اجباری | `CODE_PRESENT_REVERIFY_LIVE` | Revenue Ops | public/index.html / docs/COMMERCIAL-LAUNCH.md; V2: 11,13 |
 | 4 | اتصال پول به سفارش | ثبت مرجع پرداخت معتبر و سفارش؛ شروع دستی ممکن، سپس webhook؛ click معادل paid نباشد | `PARTIAL_BASELINE` | Revenue Ops | src/expansion.mjs; V2: 12,16 |
 | 5 | brief و تحویل استاندارد | URL مجاز، کلاینت هدف، ابزارها، نتیجهٔ پذیرش؛ یک صفحه در workspace موجود | `PARTIAL_BASELINE` | Product / Engineering | docs/SALES-CLINIC-PLAYBOOK.md; V2: 17,18 |
