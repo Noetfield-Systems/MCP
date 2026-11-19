@@ -46,7 +46,7 @@ Rows are **pending verification or missing work**, not 30 unstarted greenfield p
 | 4 | Commercial | Verify CA$199 hosted Stripe link and scope; no false purchase count | 3,4 | Actual hosted checkout link, scope and processor truth |
 | 5 | Commercial | Verify custom quotation link, signed payment event and refund state | 4,6,36 | One authorized synthetic webhook test, distinct from real sales |
 | 6 | Product | Verify optional lead forms, CRM persistence, operator-only access and CSV | 2,5,14 | Exact Postgres readback and consent boundary |
-| 7 | Sales | Expand 10 researched businesses to 20 with current API/MCP status | 2,21 | 20 source-grounded target records; no fake contacted status |
+| 7 | Sales | Keep 20 researched businesses current with verifiable API/MCP status | 2,21 | 20 source-grounded target records; no fake contacted status |
 | 8 | Sales | Review and send individually suitable 3 drafted partner enquiries; prepare 2 more | 2,6,49 | Real message IDs/partner submissions after legitimate send |
 | 9 | Product | Test anonymous readiness and printable customer checklist | 8,18,43 | No email gate for assessment, correct paid path and no fake lead |
 | 10 | QA | Test public GitHub and World Bank examples and one Web3 source against real API | 11,27,84 | Exact source response and documented limitations |
@@ -109,7 +109,7 @@ Existing authenticated MCP-native Builder, public OpenAPI import, real source te
 
 ## 7. Weekly operator scorecard and explicit decisions
 **Technical:** latest main SHA, settled production SHA, /healthz result, 5 external workflow results, zero/known customer-impact incidents, named-client successful tests, restore drill timestamp.
-**Sales:** 10 current researched accounts vs 20 target; 3 Gmail drafts created vs 0 verified sends; actual contacted/replies/qualified/proposal/paid/accepted, current processing fees, refunds, labor and margin.
+**Sales:** 20 researched accounts; no outreach automatically implied; 3 Gmail drafts created vs 0 verified sends; actual contacted/replies/qualified/proposal/paid/accepted, current processing fees, refunds, labor and margin.
 **Product:** source-import → tool real test → publish → first named-client call, test/live origin, distinct independent organization and repeat usage.
 **Priority heuristic:** customer-funded job + short evidence path + existing code reuse > generic feature count. Product may commercially launch before the first buyer; first sale is a validation metric, not a launch gate.
 
