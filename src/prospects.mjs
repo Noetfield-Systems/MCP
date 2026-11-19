@@ -53,7 +53,6 @@ export function prospectRouter({operator}){
       public_tools:details.get(r.id)?.tools||[]})),note:'Research targets only. No verified prospects contacted, no client work or revenue implied.'});
   });
   router.patch('/api/admin/prospects/:id',operator,async(req,res)=>{
-    if(!knownIds.has(req.params.id))return res.status(404).json({error:'UNKNOWN_RESEARCHED_PROSPECT'});
     const current=await q('SELECT * FROM prospect_accounts WHERE id=$1',[req.params.id]);
     if(!current.rows.length)return res.status(404).json({error:'PROSPECT_NOT_FOUND'});
     let next;
