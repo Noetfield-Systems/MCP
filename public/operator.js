@@ -71,7 +71,16 @@ function displayOrders(orders){
  table.innerHTML=orders.length?orders.map(o=>{
   const paid=['paid','fulfilled'].includes(o.status);
   const amount=new Intl.NumberFormat('en-CA',{style:'currency',currency:o.currency.toUpperCase()}).format(o.amount_cents/100);
-  return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.offer_type||'custom')+' · '+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+(o.status==='paid'?'<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'">Mark fulfilled</button>':paid?'Verified by webhook':'Not paid')+'</td></tr>';
+  const acceptance=o.status==='paid'?
+   '<details class="order-acceptance-form"><summary>Record customer-accepted delivery</summary>'+
+    '<label>Delivery test / release reference<input class="input" data-acceptance="delivery_reference" maxlength="500" placeholder="Source-backed delivery evidence"></label>'+
+    '<label>Customer sign-off reference<input class="input" data-acceptance="customer_acceptance_reference" maxlength="500" placeholder="Actual customer acceptance email/ticket"></label>'+
+    '<label>Customer approver<input class="input" data-acceptance="accepted_by" maxlength="120" placeholder="Customer name or authorized role"></label>'+
+    '<button class="btn btn-outline btn-small" data-fulfill="'+escapeHtml(o.id)+'" type="button">Confirm accepted delivery</button></details>':
+     o.status==='fulfilled'?'Accepted by '+escapeHtml(o.accepted_by||'customer')+
+      '<small>'+escapeHtml(o.customer_acceptance_reference||'Recorded sign-off')+'</small>':
+     paid?'Payment verified; no customer sign-off recorded':'Not paid';
+  return '<tr><td><strong>'+escapeHtml(o.id.slice(0,8))+'…</strong><small>'+escapeHtml(o.offer_type||'custom')+' · '+escapeHtml(o.description)+'</small></td><td>'+escapeHtml(o.contact_name)+'<small>'+escapeHtml(o.email)+'</small></td><td>'+escapeHtml(amount)+'</td><td>'+escapeHtml(o.status)+'</td><td>'+acceptance+'</td></tr>';
  }).join(''):'<tr><td colspan="5">No scoped orders created. Enquiries are not sales.</td></tr>';
 }
 const PROSPECT_STAGES=['researched','qualified','contacted','replied','discovery','proposal','won','lost','not_fit'];
@@ -194,8 +203,14 @@ $('#operator-order-form').addEventListener('submit',async event=>{
 document.addEventListener('click',async event=>{
  const target=event.target.closest('[data-fulfill]');if(!target)return;
  target.disabled=true;
- try{await operatorRequest('POST','/api/admin/pilot-orders/'+encodeURIComponent(target.dataset.fulfill)+'/fulfill',{});
-  $('#operator-order-feedback').textContent='Signed-payment order marked fulfilled. This is an operator status, not a refund or new transaction.';
+ try{
+  const form=target.closest('.order-acceptance-form');
+  const value=name=>form?.querySelector('[data-acceptance="'+name+'"]')?.value.trim()||'';
+  const proof={delivery_reference:value('delivery_reference'),customer_acceptance_reference:value('customer_acceptance_reference'),accepted_by:value('accepted_by')};
+  if(proof.delivery_reference.length<12||proof.customer_acceptance_reference.length<12||proof.accepted_by.length<3)
+   throw Error('Document actual delivery evidence, customer approval reference, and approver.');
+  await operatorRequest('POST','/api/admin/pilot-orders/'+encodeURIComponent(target.dataset.fulfill)+'/fulfill',proof);
+  $('#operator-order-feedback').textContent='Customer-accepted delivery recorded separately from the signed Stripe payment.';
   await load();
  }catch(error){$('#operator-order-feedback').textContent='Fulfillment failed: '+error.message;}finally{target.disabled=false;}
 });

@@ -1,3 +1,4 @@
+import {validateOrderAcceptance} from './order-acceptance.mjs';
 import express from 'express';
 import {randomUUID,randomBytes,createHash} from 'node:crypto';
 import {q,pool,ownedServer} from './db.mjs';
@@ -193,6 +194,7 @@ export function expansionRouter({auth,operator,stripe}){
  });
  router.get('/api/admin/pilot-orders',operator,async(_req,res)=>{
   const {rows}=await q(`SELECT o.id,o.lead_id,o.offer_type,o.amount_cents,o.currency,o.description,o.status,o.created_at,o.completed_at,
+  o.delivery_reference,o.customer_acceptance_reference,o.accepted_by,o.accepted_at,
   l.contact_name,l.company,l.email FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id ORDER BY o.created_at DESC LIMIT 100`);
   res.json({orders:rows,revenue_claims:'Only Stripe signed webhook-confirmed paid orders count'});
  });
@@ -239,9 +241,16 @@ export function expansionRouter({auth,operator,stripe}){
   }catch(e){console.error('foundry_pilot_checkout_failed',e?.code||e?.type||'UNKNOWN');return fail(res,502,'CHECKOUT_UNAVAILABLE');}
  });
  router.post('/api/admin/pilot-orders/:id/fulfill',operator,async(req,res)=>{
-  const {rows}=await q("UPDATE pilot_orders SET status='fulfilled',updated_at=now() WHERE id=$1 AND status='paid' RETURNING id,status,completed_at",[req.params.id]);
+  let acceptance;
+  try { acceptance=validateOrderAcceptance(req.body); }
+  catch(error){return fail(res,400,error.message);}
+  const {rows}=await q(`UPDATE pilot_orders SET status='fulfilled',delivery_reference=$2,
+    customer_acceptance_reference=$3,accepted_by=$4,accepted_at=now(),updated_at=now()
+    WHERE id=$1 AND status='paid' AND stripe_checkout_session_id IS NOT NULL
+    RETURNING id,status,completed_at,accepted_at,delivery_reference,customer_acceptance_reference,accepted_by`,
+    [req.params.id,acceptance.delivery_reference,acceptance.customer_acceptance_reference,acceptance.accepted_by]);
   if(!rows.length)return fail(res,409,'SIGNED_PAYMENT_REQUIRED_BEFORE_FULFILLMENT');
-  res.json({order:rows[0]});
+  res.json({order:rows[0],accepted_delivery_documented:true,not_a_new_payment:true});
  });
  return router;
 }
