@@ -37,6 +37,6 @@ test('actual backup restore script cannot connect to production and CI uses isol
  assert.match(script,/REFUSING_NONLOCAL_OR_NON_DISPOSABLE_POSTGRES/);
  assert.match(script,/pg_dump/);assert.match(script,/pg_restore/);
  assert.match(script,/production_restore_performed:false/);
- assert.match(workflow,/postgres:16/);
+ assert.match(workflow,/postgres:18/);
  assert.match(workflow,/isolated-postgres-restore-drill\.mjs/);
 });
