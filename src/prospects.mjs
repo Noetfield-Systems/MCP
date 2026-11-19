@@ -4,7 +4,18 @@ import {q} from './db.mjs';
 
 // Source-controlled only publicly documented business contacts. This data is research,
 // not customer consent, and never populates the consented pilot_leads table.
-export const research=JSON.parse(readFileSync(new URL('../data/researched-prospects.json',import.meta.url),'utf8'));
+// Optional commercial research must never prevent the core customer app from starting.
+export function loadProspectResearch(source=new URL('../data/researched-prospects.json',import.meta.url),reader=readFileSync){
+  try{
+    const parsed=JSON.parse(reader(source,'utf8'));
+    if(!parsed||!Array.isArray(parsed.prospects))throw Error('INVALID_PROSPECT_RESEARCH');
+    return parsed;
+  }catch(error){
+    console.error('prospect_research_unavailable',String(error?.code||error?.message||'UNKNOWN'));
+    return {as_of:null,prospects:[]};
+  }
+}
+export const research=loadProspectResearch();
 export const prospectStages=Object.freeze(['researched','qualified','contacted','replied','discovery','proposal','won','lost','not_fit']);
 export const prospectSeed=Object.freeze(research.prospects);
 const knownIds=new Set(prospectSeed.map(p=>p.slug));
