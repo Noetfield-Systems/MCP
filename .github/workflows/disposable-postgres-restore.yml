@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:16
+        image: postgres:18
         env:
           POSTGRES_USER: foundry_ci
           POSTGRES_PASSWORD: ci-disposable-only
