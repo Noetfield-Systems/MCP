@@ -8,7 +8,7 @@
 
 ## Backup / restore truth
 **Real automated isolated drill:** `scripts/isolated-postgres-restore-drill.mjs` and [Disposable PostgreSQL Backup and Restore Acceptance](../.github/workflows/disposable-postgres-restore.yml).
-1. GitHub Actions launches its own PostgreSQL 16 service, not Railway customer data.
+1. GitHub Actions launches its own PostgreSQL 18 service, not Railway customer data.
 2. The script accepts only a local admin database `postgres` using `DRILL_ADMIN_URL`.
 3. It creates two randomly named throwaway databases, initializes **actual Foundry schema**, saves a source-backed fake CI server and a **not-paid** order fixture, runs actual `pg_dump` archive creation and actual `pg_restore` into the separate target.
 4. It compares real tables, customer account/managed server published snapshot and order state using SQL; reports dump SHA-256 and size, **no secrets**.
