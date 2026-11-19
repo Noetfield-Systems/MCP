@@ -18,7 +18,6 @@ export function loadProspectResearch(source=new URL('../data/researched-prospect
 export const research=loadProspectResearch();
 export const prospectStages=Object.freeze(['researched','qualified','contacted','replied','discovery','proposal','won','lost','not_fit']);
 export const prospectSeed=Object.freeze(research.prospects);
-const knownIds=new Set(prospectSeed.map(p=>p.slug));
 const bounded=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
 
 export async function seedProspectAccounts(){
