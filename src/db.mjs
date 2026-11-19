@@ -158,6 +158,12 @@ export async function initDb(){
   ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS offer_type text NOT NULL DEFAULT 'custom'
     CHECK(offer_type IN ('quickstart','launch','private','care','agency','custom'));
   CREATE INDEX IF NOT EXISTS pilot_orders_offer_idx ON pilot_orders(offer_type,created_at DESC);
+  -- Payment and customer-accepted delivery are distinct, independently evidenced milestones.
+  ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS delivery_reference text;
+  ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS customer_acceptance_reference text;
+  ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS accepted_by text;
+  ALTER TABLE pilot_orders ADD COLUMN IF NOT EXISTS accepted_at timestamptz;
+  CREATE INDEX IF NOT EXISTS pilot_orders_acceptance_idx ON pilot_orders(accepted_at DESC) WHERE accepted_at IS NOT NULL;
   CREATE TABLE IF NOT EXISTS oauth_flows (
     state_hash text PRIMARY KEY,
     account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
