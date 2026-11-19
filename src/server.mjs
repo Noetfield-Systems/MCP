@@ -31,7 +31,7 @@ const auth=(...args)=>requireAuth(...args);
 const readKey=async(raw)=>{if(!raw?.startsWith('fdy_'))return null;const {rows}=await q('SELECT a.id,a.email,a.plan FROM api_keys k JOIN accounts a ON a.id=k.owner_id WHERE k.token_hash=$1 AND k.revoked_at IS NULL',[sha(raw)]);return rows[0]||null;};
 
 app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,product:'MCP Foundry',store:'postgres',protocol:'2026-07-28'});}catch{res.status(503).json({ok:false,error:'DATABASE_UNAVAILABLE'});}});
-app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),custom_checkout_available:!!(stripe&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()}}));
+app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),custom_checkout_available:!!(stripe&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()},deployment:{git_sha:process.env.RAILWAY_GIT_COMMIT_SHA||process.env.GIT_COMMIT_SHA||null}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
 app.all('/mcp/foundry',async(req,res,next)=>{
