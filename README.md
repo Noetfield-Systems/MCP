@@ -1,3 +1,7 @@
+## Judge.me read-only Shopify pilot (in development)
+
+Dedicated merchant OAuth with `read_products read_reviews`, two read-only MCP tools and an account-bound private `/mcp/judgeme` endpoint are implemented on the feature branch. Until the provider credentials and a real development-store consent flow are tested, this is **not** a live integration or partner approval. [Merchant setup](docs/JUDGEME-INSTALL.md) · [QA matrix and submission artifacts](docs/JUDGEME-QA.md).
+
 # MCP FOUNDRY
 
 **Your API. Everywhere AI Works.** An independent commercial developer platform for building, hosting, testing, publishing, operating, and ultimately selling real Model Context Protocol integrations.

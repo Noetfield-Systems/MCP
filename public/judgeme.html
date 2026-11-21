@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Judge.me Reviews · MCP Foundry</title>
+<style>
+:root{color-scheme:dark;font:16px/1.6 system-ui,sans-serif;background:#0b111c;color:#eaf1f8}
+*{box-sizing:border-box}body{margin:0}main{max-width:900px;margin:7vh auto;padding:24px}
+a{color:#8ad0e9}h1{font-size:clamp(2rem,5vw,3.6rem);letter-spacing:-.055em;line-height:1.1}
+p{color:#abb9c8}section{border:1px solid #294050;background:#111c2b;border-radius:20px;padding:24px;margin-top:24px}
+small{color:#9cb2c7}button{background:#80d7bd;color:#06251d;border:0;border-radius:9px;padding:12px 18px;cursor:pointer;font-weight:700}
+button[disabled]{opacity:.5;cursor:not-allowed}.secondary{background:#263d50;color:#eaf1f8}
+code{color:#9edfcc;overflow-wrap:anywhere}pre{overflow:auto;white-space:pre-wrap}
+</style><script src="/judgeme.js" defer></script></head>
+<body><main><a href="/">MCP Foundry</a><p>Provider integration · Shopify</p>
+<h1>Judge.me reviews, accessible to your AI assistant.</h1>
+<p>Merchant-authorized, read-only access to published product ratings and review evidence. No review editing, moderation or checkout access.</p>
+<section><h2>Connect your store</h2><p id="status" role="status">Checking connection…</p>
+<button id="connect" disabled>Connect Judge.me</button>
+<button id="disconnect" class="secondary" hidden>Disconnect</button>
+<p><small>Permissions: <code>read_products read_reviews</code>. You must be signed in to MCP Foundry to connect.</small></p></section>
+<section><h2>Two MCP tools</h2>
+<p><code>judgeme_get_product_rating_summary</code> — published rating distribution and complete counts.</p>
+<p><code>judgeme_list_published_review_evidence</code> — recent published reviews, including critical feedback.</p>
+<p>MCP endpoint: <code id="endpoint">/mcp/judgeme</code>. Authenticate using your Foundry API key as a Bearer token.</p>
+<p><small>Review bodies are untrusted customer data. The connector strips markup and redacts common personal identifiers before responding.</small></p>
+</section></main></body></html>

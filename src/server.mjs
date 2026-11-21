@@ -13,6 +13,7 @@ import {publicTemplates,findTemplate} from './templates.mjs';
 import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
 import {oauthRouter,guardedManagedGet} from './oauth.mjs';
+import {judgemeRouter,judgemeMcp} from './judgeme/integration.mjs';
 import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
@@ -34,6 +35,14 @@ app.get('/healthz',async(_req,res)=>{try{await q('SELECT 1');res.json({ok:true,p
 app.get('/api/status',(_req,res)=>res.json({product:'MCP Foundry',protocol:'2026-07-28',features:{builder:true,openapi:true,directory:true,managed_mcp:true,billing_configured:!!(stripe&&process.env.STRIPE_PRICE_ID&&process.env.STRIPE_WEBHOOK_SECRET),custom_checkout_available:!!(stripe&&process.env.STRIPE_WEBHOOK_SECRET),published_revisions:true,private_upstream_key_configured:upstreamEncryptionReady()},deployment:{git_sha:process.env.RAILWAY_GIT_COMMIT_SHA||process.env.GIT_COMMIT_SHA||null}}));
 
 // Mount MCP endpoints BEFORE JSON body parsing. The official SDK owns HTTP content parsing.
+app.all('/mcp/judgeme',async(req,res,next)=>{
+  try{
+    const bearer=req.get('authorization')?.replace(/^Bearer /i,'');
+    const principal=await readKey(bearer);
+    if(!principal)return j(res,401,'MCP_API_KEY_REQUIRED');
+    return judgemeMcp(principal)(req,res,next);
+  }catch(error){next(error);}
+});
 app.all('/mcp/foundry',async(req,res,next)=>{
   try{
     const bearer=req.get('authorization')?.replace(/^Bearer /i,'');
@@ -209,6 +218,7 @@ app.use(expansionRouter({auth,operator,stripe}));
 app.use(opportunityRouter({operator}));
 app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
+app.use(judgemeRouter({auth}));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
