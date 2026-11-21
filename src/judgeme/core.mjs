@@ -35,8 +35,9 @@ export function sanitizeReview(review,product){
 }
 export function isPublished(review){
   // An archived review may retain curated=ok; hidden must explicitly be false.
+  const status=String(review?.status||'').toLowerCase();
   return review?.curated==='ok'&&review?.hidden===false&&
-    !review?.archived&&String(review?.status||'').toLowerCase()!=='archived';
+    review?.published!==false&&!review?.archived&&(!status||status==='published');
 }
 export function assertProductMatch(review,product){
   let checked=false;
