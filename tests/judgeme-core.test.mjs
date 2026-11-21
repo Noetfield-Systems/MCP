@@ -30,6 +30,8 @@ test('archived review with curated ok is not published',()=>{
   assert.equal(isPublished(review(1,5,{hidden:true})),false);
   assert.equal(isPublished(review(1,5,{archived:true})),false);
   assert.equal(isPublished(review(1,5,{status:'Archived'})),false);
+  assert.equal(isPublished(review(1,5,{status:'Hidden'})),false);
+  assert.equal(isPublished(review(1,5,{published:false})),false);
   assert.equal(isPublished(review(1,5,{hidden:undefined})),false);
 });
 test('rejects fallback/store-wide/mismatching or identity-less reviews',async()=>{
