@@ -221,6 +221,20 @@ export async function initDb(){
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS prospect_accounts_stage_rank_idx ON prospect_accounts(stage,rank);
+  CREATE TABLE IF NOT EXISTS judgeme_oauth_flows (
+    state_hash text PRIMARY KEY,
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    expires_at timestamptz NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS judgeme_oauth_flows_expiry_idx ON judgeme_oauth_flows(expires_at);
+  CREATE TABLE IF NOT EXISTS judgeme_connections (
+    account_id uuid PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+    access_cipher text NOT NULL,
+    scopes text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
