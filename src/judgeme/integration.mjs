@@ -131,6 +131,18 @@ export function judgemeRouter({auth}){
   });
   return router;
 }
+export function mapJudgemeError(error){
+  const message=String(error?.message||'');
+  const upstream=/^Upstream returned HTTP (\d{3})$/.exec(message);
+  if(upstream){
+    if(['401','403'].includes(upstream[1]))return 'JUDGEME_AUTHORIZATION_FAILED';
+    if(upstream[1]==='404')return 'JUDGEME_RESOURCE_NOT_FOUND';
+    if(upstream[1]==='429')return 'JUDGEME_RATE_LIMITED';
+    return 'JUDGEME_UPSTREAM_UNAVAILABLE';
+  }
+  if(/^(JUDGEME_|INVALID_|PRODUCT_|PAGINATION_|DUPLICATE_)/.test(message))return message;
+  return 'JUDGEME_UPSTREAM_UNAVAILABLE';
+}
 export function judgemeMcp(principal){
   const handler=createMcpHandler(()=>{
     const mcp=new McpServer({name:'MCP Foundry - Judge.me Reviews',version:'0.1.0'});
@@ -140,8 +152,7 @@ export function judgemeMcp(principal){
         const result=await fn(args,judgeGet,access);
         return {content:[{type:'text',text:JSON.stringify(result)}],structuredContent:result};
       }catch(error){
-        const known=/^(JUDGEME_|INVALID_|PRODUCT_|PAGINATION_|DUPLICATE_)/.test(error?.message||'');
-        const code=known?error.message:'JUDGEME_UPSTREAM_UNAVAILABLE';
+        const code=mapJudgemeError(error);
         return {isError:true,content:[{type:'text',text:code}]};
       }
     };
