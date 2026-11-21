@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {randomBytes} from 'node:crypto';
-import {encryptJudgeToken,decryptJudgeToken,assertReadOnlyScopes,judgeGet} from '../src/judgeme/integration.mjs';
+import {encryptJudgeToken,decryptJudgeToken,assertReadOnlyScopes,judgeGet,mapJudgemeError} from '../src/judgeme/integration.mjs';
 
 test('Judge.me credentials are encrypted at rest, bound to account, and reject tampering',()=>{
   const old=process.env.FOUNDRY_OAUTH_ENCRYPTION_KEY;
@@ -28,4 +28,12 @@ test('Judge.me OAuth must have exactly needed read permissions, no write scopes'
 test('Judge.me request allowlist denies arbitrary endpoints before networking',async()=>{
   await assert.rejects(judgeGet('/reviews/1',{},'some-secret'),/JUDGEME_ENDPOINT_NOT_ALLOWED/);
   await assert.rejects(judgeGet('/products',{},'some-secret'),/JUDGEME_ENDPOINT_NOT_ALLOWED/);
+});
+
+test('provider authorization, not found, rate-limit and unknown errors are fail-closed',()=>{
+  assert.equal(mapJudgemeError(Error('Upstream returned HTTP 401')),'JUDGEME_AUTHORIZATION_FAILED');
+  assert.equal(mapJudgemeError(Error('Upstream returned HTTP 403')),'JUDGEME_AUTHORIZATION_FAILED');
+  assert.equal(mapJudgemeError(Error('Upstream returned HTTP 404')),'JUDGEME_RESOURCE_NOT_FOUND');
+  assert.equal(mapJudgemeError(Error('Upstream returned HTTP 429')),'JUDGEME_RATE_LIMITED');
+  assert.equal(mapJudgemeError(Error('unexpected token in URL: secret')),'JUDGEME_UPSTREAM_UNAVAILABLE');
 });
