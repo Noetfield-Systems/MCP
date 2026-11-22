@@ -29,7 +29,24 @@
 <div id="drift-output" class="launch-result">Select a server to inspect recent changes.</div></section>
 <section class="launch-panel"><div class="launch-kicker">Distribution / customer trust</div><h2>Share what is actually published.</h2><p>The published Passport and client setup page show real versioned definitions without exposing upstream URLs or bearer tokens. Copying a link is never counted as a real installation.</p><div id="distribution-output" class="launch-result">Select a public, published server for installation links.</div></section>
 </div><p class="launch-footnote">This is an owner-initiated source test, not a scheduled uptime monitor, external MCP host certification, partner approval or real-customer usage receipt. See <a class="launch-link" href="/developers">developer documentation</a>.</p>
-</main><footer class="foundry-footer">
+<section class="launch-panel" aria-labelledby="source-spec-title" style="max-width:1120px;margin:30px auto">
+  <div class="launch-kicker">PUBLIC OPENAPI SOURCE WATCH · OWNER-INITIATED</div>
+  <h2 id="source-spec-title">Compare a public API contract before your MCP breaks.</h2>
+  <p>Pin an unauthenticated public OpenAPI document and compare later GET-operation signatures against that pinned baseline. This complements the response-structure checks above. It does not run on a schedule, repair tools automatically or access credentialed specs.</p>
+  <div class="launch-fields">
+    <label class="launch-field">Public OpenAPI JSON/YAML HTTPS URL<input id="spec-watch-url" type="url" placeholder="https://example.com/openapi.json" autocomplete="off"></label>
+    <label class="launch-field">Public API HTTPS base URL<input id="spec-watch-base" type="url" placeholder="https://api.example.com" autocomplete="off"></label>
+  </div>
+  <div class="launch-actions">
+    <button id="spec-watch-pin" type="button" class="launch-button">Pin OpenAPI baseline</button>
+    <button id="spec-watch-check" type="button" class="launch-button alt">Check for contract changes</button>
+    <button id="spec-watch-curate" type="button" class="launch-button alt">Curate GET tools</button>
+  </div>
+  <div id="spec-watch-output" class="launch-result" role="status" aria-live="polite">Select an owned server to start.</div>
+  <div id="spec-curated-list" class="launch-tools"></div>
+  <button id="spec-watch-import" type="button" class="launch-button alt" disabled>Import selected into editable draft</button>
+  <p class="launch-small">Public HTTPS only; URLs with embedded credentials, query strings or fragments are rejected. Suggested rankings are deterministic heuristics, not evidence of customer demand or provider approval.</p>
+</section></main><footer class="foundry-footer">
  <div class="foundry-footer-inner">
  <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
  <p>Turn working APIs into tools AI clients can actually use. Build, test, publish and deliver.</p></div>

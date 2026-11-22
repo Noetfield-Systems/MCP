@@ -150,3 +150,73 @@ $('owner-server').addEventListener('change',loadDetails);
 $('reload-owner').addEventListener('click',loadDetails);
 $('run-tests').addEventListener('click',runTests);
 $('rank-tools').addEventListener('click',curate);
+
+
+/* Public OpenAPI contract/watch and selected GET import. Does not replace the
+ existing real source-response Test Lab or automatically publish anything. */
+const specOut=value=>{$('spec-watch-output').textContent=typeof value==='string'?value:JSON.stringify(value,null,2);};
+function specServer(){
+ const id=$('owner-server').value;
+ if(!state.server||!id||state.server.id!==id)throw Error('SELECT_AN_OWNED_SERVER_FIRST');
+ return encodeURIComponent(id);
+}
+const specInput=()=>({spec_url:$('spec-watch-url').value.trim(),base_url:$('spec-watch-base').value.trim()});
+async function refreshPublicSpec(){
+ if(!state.server)return;
+ try{
+  const result=await api('/api/lab/servers/'+specServer()+'/openapi-watch');
+  if(result.watch){
+   $('spec-watch-url').value=result.watch.spec_url;
+   $('spec-watch-base').value=result.watch.base_url;
+   specOut(result.watch);
+  }else specOut('No pinned public OpenAPI baseline for this server.');
+ }catch(e){specOut('OpenAPI baseline unavailable: '+e.message);}
+}
+let openapiRecommendations=[];
+$('spec-watch-pin').addEventListener('click',async()=>{
+ const button=$('spec-watch-pin');button.disabled=true;specOut('Fetching public OpenAPI and pinning a versioned baseline…');
+ try{const result=await api('/api/lab/servers/'+specServer()+'/openapi-watch',{
+  method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(specInput())
+ });specOut(result);}
+ catch(e){specOut('Baseline not recorded: '+e.message);}
+ finally{button.disabled=false;}
+});
+$('spec-watch-check').addEventListener('click',async()=>{
+ const button=$('spec-watch-check');button.disabled=true;specOut('Re-fetching published OpenAPI source…');
+ try{specOut(await api('/api/lab/servers/'+specServer()+'/openapi-watch/check',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}));}
+ catch(e){specOut('Contract check not confirmed: '+e.message);}
+ finally{button.disabled=false;}
+});
+$('spec-watch-curate').addEventListener('click',async()=>{
+ const button=$('spec-watch-curate');button.disabled=true;openapiRecommendations=[];
+ $('spec-curated-list').replaceChildren();$('spec-watch-import').disabled=true;specOut('Inspecting publicly documented GET operations…');
+ try{
+  const result=await api('/api/lab/servers/'+specServer()+'/curate-openapi',{
+   method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(specInput())});
+  openapiRecommendations=result.suggestions||[];
+  for(const tool of openapiRecommendations){
+   const row=document.createElement('label'),checkbox=document.createElement('input'),name=document.createElement('span');
+   row.className='launch-tool';
+   checkbox.type='checkbox';checkbox.checked=!tool.manual_review;checkbox.value=tool.name;checkbox.className='spec-tool-choice';
+   name.textContent=tool.name+' · score '+tool.score+' · '+(tool.reasons||[]).join(', ');
+   row.append(checkbox,name);$('spec-curated-list').append(row);
+  }
+  $('spec-watch-import').disabled=!openapiRecommendations.length;
+  specOut({supported_get_operations:result.supported_get_operations,considered:result.considered,
+    suggestions:openapiRecommendations.length,method:result.method,note:result.note});
+ }catch(e){specOut('Curation failed: '+e.message);}finally{button.disabled=false;}
+});
+$('spec-watch-import').addEventListener('click',async()=>{
+ const selected=[...document.querySelectorAll('.spec-tool-choice:checked')].map(x=>x.value);
+ if(!selected.length){specOut('Select at least one supported GET operation.');return;}
+ const button=$('spec-watch-import');button.disabled=true;
+ try{
+  const input={spec_url:specInput().spec_url,baseUrl:specInput().base_url,selected_tool_names:selected};
+  const result=await api('/api/servers/'+specServer()+'/import-openapi',{
+   method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)});
+  specOut({import_result:result,note:'Tools added only to the editable draft; explicit tests and publish remain separate.'});
+  await loadDetails();
+ }catch(e){specOut('Selected import not confirmed: '+e.message);}
+ finally{button.disabled=false;}
+});
+$('owner-server').addEventListener('change',()=>{openapiRecommendations=[];$('spec-curated-list').replaceChildren();$('spec-watch-import').disabled=true;setTimeout(()=>refreshPublicSpec().catch(()=>{}),300);});

@@ -19,6 +19,7 @@ import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-intelligence.mjs';
 import {verificationLabRouter} from './verification-lab.mjs';
+import {openapiWatchRouter} from './openapi-watch.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -222,6 +223,7 @@ app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(judgemeRouter({auth}));
 app.use(verificationLabRouter({auth}));
+app.use(openapiWatchRouter(auth));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
@@ -341,6 +343,15 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    ({origin}=resolved);
    entries=openapiPreview(resolved.document,req.body?.baseUrl).tools;
  }catch(e){return j(res,400,String(e?.message||'IMPORT_FAILED').slice(0,120));}
+ const all_supported=entries.length;
+ const selectedNames=req.body?.selected_tool_names;
+ if(selectedNames!==undefined){
+   if(!Array.isArray(selectedNames)||selectedNames.length<1||selectedNames.length>10||
+      selectedNames.some(n=>typeof n!=='string'||n.length>60)||new Set(selectedNames).size!==selectedNames.length)
+      return j(res,400,'INVALID_TOOL_NAME_SELECTION');
+   entries=entries.filter(t=>selectedNames.includes(t.name));
+   if(entries.length!==selectedNames.length)return j(res,400,'SELECTED_TOOL_NOT_IN_SOURCE');
+ }
  if(!entries.length)return j(res,400,'NO_GET_OPERATIONS_FOUND');
  let added=0;
  const existing=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
@@ -352,7 +363,7 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    if(added>= (req.user.plan==='pro'?50:10))break;
  }
  if(added){await markDraftChanged(server.id);await recordActivation('tool_added',req.user.id,server.id);}
- res.json({found:entries.length,added,origin,skipped:entries.length-added});
+ res.json({found:all_supported,selected:entries.length,added,origin,skipped:entries.length-added});
 });
 app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
