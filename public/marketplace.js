@@ -25,7 +25,7 @@ async function load(){
 async function showDetails(slug){
  const x=await api('/api/marketplace/'+encodeURIComponent(slug));const l=x.listing;
  const detail=$('#market-details');detail.classList.remove('hidden');
- detail.innerHTML='<span class="workspace-eyebrow">'+esc(l.category.replaceAll('-',' '))+'</span><h3>'+esc(l.name)+'</h3><p>'+esc(l.readme)+'</p><p style="margin-top:13px;color:#aab9ca">Tools: '+x.tools.map(t=>esc(t.name)).join(' · ')+'</p><code>'+esc(location.origin+'/mcp/'+l.slug)+'</code><div><a class="btn btn-primary btn-small" href="/connect?server='+encodeURIComponent(l.slug)+'">Get connection settings ↗</a></div>';
+ detail.innerHTML='<span class="workspace-eyebrow">'+esc(l.category.replaceAll('-',' '))+'</span><h3>'+esc(l.name)+'</h3><p>'+esc(l.readme)+'</p><p style="margin-top:13px;color:#aab9ca">Tools: '+x.tools.map(t=>esc(t.name)).join(' · ')+'</p><code>'+esc(location.origin+'/mcp/'+l.slug)+'</code><div><a class="btn btn-primary btn-small" href="/connect?server='+encodeURIComponent(l.slug)+'">Get connection settings ↗</a> <a class="btn btn-outline btn-small" href="/passport?server='+encodeURIComponent(l.slug)+'">Evidence Passport ↗</a> <a class="btn btn-outline btn-small" href="/doctor?server='+encodeURIComponent(l.slug)+'">MCP Doctor ↗</a></div>';
  detail.scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-listing]');if(b)showDetails(b.dataset.listing).catch(x=>$('#market-count').textContent=x.message);});

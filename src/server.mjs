@@ -17,6 +17,7 @@ import {judgemeRouter,judgemeMcp} from './judgeme/integration.mjs';
 import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
+import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-intelligence.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -224,6 +225,31 @@ app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
  res.json({servers:rows});
 });
+// Public evidence endpoints deliberately exclude private servers and upstream credentials.
+async function publicLaunchEvidence(slug){
+ if(!validPublicSlug(slug))return null;
+ const {rows}=await q("SELECT id,slug,name,description,status,visibility,published_revision,published_snapshot,updated_at FROM servers WHERE slug=$1 AND status='published' AND visibility='public' AND published_snapshot IS NOT NULL LIMIT 1",[slug]);
+ const server=rows[0];if(!server)return null;
+ const [metrics,errors]=await Promise.all([
+   q("SELECT count(*)::int AS calls,count(*) FILTER (WHERE success)::int AS successes,coalesce(round(percentile_cont(0.95) WITHIN GROUP (ORDER BY duration_ms)),0)::int AS p95_ms,max(created_at) FILTER (WHERE success) AS last_success_at FROM tool_events WHERE server_id=$1 AND created_at>now()-interval '30 days'",[server.id]),
+   q("SELECT coalesce(error_code,'TOOL_EXECUTION_ERROR') AS error_code,count(*)::int AS calls FROM tool_events WHERE server_id=$1 AND success=false AND created_at>now()-interval '30 days' GROUP BY error_code ORDER BY calls DESC LIMIT 8",[server.id])
+ ]);
+ return {server,metrics:metrics.rows[0],errors:errors.rows};
+}
+app.get('/api/passport/:slug',async(req,res)=>{
+ const value=await publicLaunchEvidence(req.params.slug);
+ if(!value)return j(res,404,'PUBLIC_SERVER_NOT_FOUND');
+ res.setHeader('Cache-Control','public,max-age=30');
+ const root=(process.env.PUBLIC_URL||'https://mcp-foundry-web-production.up.railway.app').replace(/\/$/,'');
+ res.json(integrationPassport(value.server,value.metrics,root));
+});
+app.get('/api/doctor/:slug',async(req,res)=>{
+ const value=await publicLaunchEvidence(req.params.slug);
+ if(!value)return j(res,404,'PUBLIC_SERVER_NOT_FOUND');
+ res.setHeader('Cache-Control','public,max-age=20');
+ res.json(integrationDoctor(value.server,value.metrics,value.errors));
+});
+
 app.get('/api/servers',auth,async(req,res)=>{
  const {rows}=await q('SELECT s.*,count(t.id)::int AS tool_count FROM servers s LEFT JOIN tools t ON t.server_id=s.id WHERE s.owner_id=$1 GROUP BY s.id ORDER BY s.created_at DESC',[req.user.id]);res.json({servers:rows});
 });

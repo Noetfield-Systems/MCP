@@ -2,6 +2,10 @@
 
 Dedicated merchant OAuth with `read_products read_reviews`, two read-only MCP tools and an account-bound private `/mcp/judgeme` endpoint are implemented on the feature branch. Until the provider credentials and a real development-store consent flow are tested, this is **not** a live integration or partner approval. [Merchant setup](docs/JUDGEME-INSTALL.md) · [QA matrix and submission artifacts](docs/JUDGEME-QA.md).
 
+## Verified Launch — Agent Launch Kit, Integration Passport and MCP Doctor
+
+The guided [Agent Launch Kit](/launch) reuses existing authenticated APIs for real draft creation, upstream tests and explicit atomic Publish. [Integration Passport](/passport) and [MCP Doctor](/doctor) use public published definitions and clearly labeled observed execution records, not client endorsements, paying customer counts or security certifications. Before public claims, verify CI, live deployment and independently observed host execution.
+
 # MCP FOUNDRY
 
 **Your API. Everywhere AI Works.** An independent commercial developer platform for building, hosting, testing, publishing, operating, and ultimately selling real Model Context Protocol integrations.

@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1121"><meta name="description" content="Launch a source-backed MCP server: select, test, publish, connect and inspect evidence."><title>Agent Launch Kit — MCP Foundry</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-graphite"><style>
+.launch-wrap{max-width:1000px;margin:64px auto 100px;padding:0 24px}.launch-kicker{letter-spacing:.18em;text-transform:uppercase;color:#84cfc8;font-size:12px;font-weight:700}.launch-wrap h1{font-size:clamp(36px,6vw,70px);letter-spacing:-.055em;line-height:1.06;margin:18px 0}.launch-wrap .intro{max-width:710px;color:#a6b7c5;font-size:18px}.launch-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.8fr);gap:22px;margin-top:34px}.launch-panel{border:1px solid #2b3b4a;border-radius:20px;background:#131e2c;padding:28px;min-width:0}.launch-panel h2{font-size:24px;margin:0 0 16px}.launch-panel p{color:#a7b9c9}.launch-field{display:block;color:#d9e5ef;margin:20px 0}.launch-field select{display:block;width:100%;padding:14px;background:#0d1724;color:white;border:1px solid #526176;border-radius:9px;margin-top:9px}.launch-actions{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0}.launch-button{background:#91d9c7;border:0;border-radius:10px;padding:12px 19px;color:#09261f;font:700 15px system-ui;cursor:pointer}.launch-button:disabled{opacity:.42;cursor:not-allowed}.launch-button.secondary{background:#25394b;color:#f2f6f7}.launch-message{border-left:3px solid #75c7b3;background:#0c1826;padding:14px 16px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:42px}.launch-proof{padding-left:24px;color:#c4cfdb;line-height:2}.launch-proof li{padding-left:4px}.launch-output{display:none;border-top:1px solid #2e4152;margin-top:22px;padding-top:18px}.launch-output a{color:#8ed8ca;display:block;margin:10px 0}.launch-output code{overflow-wrap:anywhere}.launch-disclaimer{font-size:13px;color:#8b9eb1;margin-top:30px}.launch-links a{display:inline-block;color:#91ddcd;margin:16px 18px 0 0}@media(max-width:740px){.launch-grid{grid-template-columns:1fr}.launch-wrap{margin-top:36px;padding:0 16px}.launch-panel{padding:22px}.launch-actions>*{width:100%}}
+</style></head><body><main class="launch-wrap">
+ <a href="/" style="color:#95d7cd;text-decoration:none">MCP Foundry / Platform</a>
+ <p class="launch-kicker">Verified workflow · Live APIs · No placeholder success</p>
+ <h1>From public API<br>to an agent-ready tool.</h1>
+ <p class="intro">A guided, source-backed launch. Create an isolated draft from a real starter, test actual upstream responses, publish only after successful tests, then share your installation guide and evidence passport.</p>
+ <div class="launch-grid"><section class="launch-panel" aria-labelledby="launch-title">
+ <h2 id="launch-title">Start a working integration</h2>
+ <label class="launch-field">Choose a documented public API starter<select id="launch-template"><option value="">Loading actual sources…</option></select></label>
+ <p id="launch-description">Connect your existing Foundry account to create an owned draft.</p>
+ <div class="launch-actions">
+ <button type="button" class="launch-button" id="launch-create" disabled>1. Create draft</button>
+ <button type="button" class="launch-button secondary" id="launch-test" disabled>2. Test real upstream tools</button>
+ <button type="button" class="launch-button secondary" id="launch-publish" disabled>3. Publish tested version</button>
+ </div>
+ <p class="launch-message" id="launch-feedback" role="status">Checking live workspace…</p>
+ <div class="launch-output" id="launch-output"><h3>Published endpoint</h3><code id="launch-endpoint"></code><div id="launch-links"></div></div>
+ </section><aside class="launch-panel"><h2>Actual delivery checkpoints</h2>
+ <ol class="launch-proof"><li>Authenticated Foundry account</li><li>Source-backed server draft</li><li>Live upstream test, with observed response</li><li>Atomic published snapshot</li><li>Copyable MCP host configuration</li><li>Public evidence-tiered passport</li><li>Independent MCP host execution</li></ol>
+ <p>The final step needs an external MCP host; publishing alone is not evidence that a user installed the server.</p>
+ <div class="launch-links"><a href="/#studio">Full Studio</a><a href="/doctor">MCP Doctor</a><a href="/readiness">API readiness</a><a href="/#quickstart">CA$199 Quickstart</a></div>
+ </aside></div><p class="launch-disclaimer">This wizard calls existing tenant-isolated Foundry APIs. It uses public GET sources, runs actual tool tests, never publishes on a failed test and never records a purchase from a page visit. For private API or OAuth requirements, request a scoped integration.</p>
+ </main><script type="module" src="/launch.js"></script></body></html>
