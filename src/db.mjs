@@ -266,6 +266,8 @@ export async function initDb(){
     checked_at timestamptz NOT NULL DEFAULT now(),drift_observations integer NOT NULL DEFAULT 0
   );
   CREATE INDEX IF NOT EXISTS openapi_spec_baselines_owner ON openapi_spec_baselines(owner_id,checked_at DESC);
+  ALTER TABLE servers ADD COLUMN IF NOT EXISTS agency_client_label text NOT NULL DEFAULT '';
+  CREATE INDEX IF NOT EXISTS servers_owner_agency_client_idx ON servers(owner_id,agency_client_label);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
