@@ -166,7 +166,7 @@ export function launchSuiteRouter({auth}){
         baseline_hash:baselineHash,current_schema_hash:fingerprint,source:'owner_initiated_upstream_GET'});
     }
     res.setHeader('Cache-Control','no-store');
-    return res.json({results,all_passed:results.every(r=>r.outcome==='passed'&&!r.current_schema_hash?.includes('!')),
+    return res.json({results,all_passed:results.every(r=>r.outcome==='passed'&&r.contract_status==='matches_baseline'),
       independent_host_compatibility:'not_tested',note:'No upstream URLs, arguments, response bodies or access tokens were stored.'});
   });
   router.post('/api/launch/servers/:id/baselines/:toolId/accept',auth,async(req,res)=>{
