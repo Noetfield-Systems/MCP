@@ -25,7 +25,7 @@ try{
   await page.locator('[data-wb-tab="result"]').click();
   assert.equal(await page.locator('#wb-code-kind').innerText(),'ILLUSTRATIVE JSON','Builder preview tabs work without claiming live requests');
   await page.locator('[data-wb-tab="definition"]').click();
- assert.equal(await page.locator('.showcase-card').count(),3);
+ assert.equal(await page.locator('.showcase-card').count(),6,'three builder workflows plus three real launch/verification journeys');
  assert.equal(await page.locator('.faq-item').count(),10);
  await page.locator('.faq-item').first().locator('summary').click();
  assert.equal(await page.locator('.faq-item').first().evaluate(el=>el.open),true,'FAQ opens using native details');
