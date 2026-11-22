@@ -14,6 +14,7 @@ import {recordActivation} from './activation.mjs';
 import {expansionRouter,attachReferral,snapshotServer,applyPilotWebhook} from './expansion.mjs';
 import {oauthRouter,guardedManagedGet} from './oauth.mjs';
 import {judgemeRouter,judgemeMcp} from './judgeme/integration.mjs';
+import {launchSuiteRouter} from './launch-suite.mjs';
 import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
@@ -219,6 +220,7 @@ app.use(opportunityRouter({operator}));
 app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(judgemeRouter({auth}));
+app.use(launchSuiteRouter({auth}));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
