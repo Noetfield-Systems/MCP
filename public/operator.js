@@ -122,16 +122,43 @@ $('#prospect-export')?.addEventListener('click',async()=>{
  }catch(e){$('#operator-prospect-feedback').textContent=e.message;}
  finally{btn.disabled=false;}
 });
+function displayInvestorEvidence(e){
+ const cards=[
+  ['Registered accounts (not independently verified organizations)',e.acquisition.registered_accounts_all_time],
+  ['Accounts owning published servers',e.activation.distinct_owner_accounts_with_published_servers],
+  ['Published server definitions',e.activation.published_servers_all_time],
+  ['Observed tool executions (30d)',e.usage.observed_tool_calls_30d],
+  ['Successful tool executions (30d)',e.usage.observed_successes_30d],
+  ['Servers with successful use on 2+ days (30d)',e.usage.successful_servers_on_two_or_more_days_30d],
+  ['Owner test receipts (30d)',e.quality.owner_initiated_test_receipts_30d],
+  ['Stored implementation enquiries',e.acquisition.stored_consent_based_enquiries_all_time]
+ ];
+ const html='<div class="funnel-grid">'+cards.map(([label,value])=>
+  '<div class="funnel-item"><div class="funnel-heading"><strong>'+escapeHtml(label)+'</strong><b>'+escapeHtml(value)+'</b></div></div>'
+ ).join('')+'</div>';
+ const orderGroups=e.finance.recorded_order_status_groups;
+ const orders=orderGroups.length?'<ul>'+orderGroups.map(o=>'<li>'+escapeHtml(o.currency)+' / '+escapeHtml(o.status)+
+  ': '+escapeHtml(o.order_count)+' recorded order(s), '+escapeHtml(o.recorded_amount_minor_units)+' minor units</li>').join('')+'</ul>':
+  '<p>No order status records exist.</p>';
+ $('#operator-evidence').innerHTML=html+
+  '<div style="margin:16px 0"><strong>Order status (not processor reconciliation)</strong>'+orders+'</div>'+
+  '<p class="hint">Evidence tier: '+escapeHtml(e.evidence_tier)+' · '+escapeHtml(e.period)+
+  '. Processor-reconciled revenue: unavailable. Gross margin: unavailable.</p>'+
+  '<p class="hint">'+e.important_boundaries.map(escapeHtml).join(' ')+'</p>';
+}
+
 async function load(){
- const [stats,leads,funnel,orders,opportunities,prospects]=await Promise.all([
+ const [stats,leads,funnel,orders,opportunities,prospects,evidence]=await Promise.all([
   operatorRequest('GET','/api/admin/overview'),
   operatorRequest('GET','/api/admin/pilot-interest'),
   operatorRequest('GET','/api/admin/funnel'),
   operatorRequest('GET','/api/admin/pilot-orders'),
   operatorRequest('GET','/api/admin/opportunities'),
-  operatorRequest('GET','/api/admin/prospects')
+  operatorRequest('GET','/api/admin/prospects'),
+  operatorRequest('GET','/api/admin/investor-evidence')
  ]);
  displayStats(stats);displayLeads(leads.leads);displayFunnel(funnel);displayOrders(orders.orders);displayOpportunities(opportunities.applications,opportunities.counts);
+ displayInvestorEvidence(evidence);
  displayProspects(prospects.prospects||[]);
  $('#order-lead-id').innerHTML=leads.leads.map(l=>'<option value="'+escapeHtml(l.id)+'">'+escapeHtml(l.contact_name)+' — '+escapeHtml(l.company||l.email)+'</option>').join('');
  $('#operator-order-form button[type=submit]').disabled=!leads.leads.length;

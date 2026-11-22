@@ -18,6 +18,7 @@ import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-intelligence.mjs';
+import {outcomeEvidenceRouter} from './outcome-evidence.mjs';
 import {verificationLabRouter} from './verification-lab.mjs';
 import {openapiWatchRouter} from './openapi-watch.mjs';
 
@@ -222,6 +223,7 @@ app.use(opportunityRouter({operator}));
 app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(judgemeRouter({auth}));
+app.use(outcomeEvidenceRouter({operator}));
 app.use(verificationLabRouter({auth}));
 app.use(openapiWatchRouter(auth));
 app.use(upstreamKeyRouter({auth}));
