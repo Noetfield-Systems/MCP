@@ -19,7 +19,7 @@ export function channelFunnel(raw={}){
 export function channelRouter(auth){
  const router=express.Router();
  router.get('/api/growth/channel',auth,async(req,res)=>{
-  const result=await q(\`WITH referred AS (
+  const result=await q(`WITH referred AS (
    SELECT gr.invitee_id,gr.created_at,
      EXISTS(SELECT 1 FROM servers s WHERE s.owner_id=gr.invitee_id AND s.status='published') AS has_publication,
      EXISTS(SELECT 1 FROM servers s JOIN tool_events te ON te.server_id=s.id
@@ -35,7 +35,7 @@ export function channelRouter(auth){
    count(*) FILTER (WHERE has_success)::int AS used,
    count(*) FILTER (WHERE active_days>=2)::int AS returning,
    count(*) FILTER (WHERE created_at>now()-interval '30 days')::int AS recent
-   FROM referred\`,[req.user.id]);
+   FROM referred`,[req.user.id]);
   res.setHeader('Cache-Control','no-store');
   return res.json({...channelFunnel(result.rows[0]),
     measured_at:new Date().toISOString(),source:'account-scoped PostgreSQL referral, published-server and tool-events records'});
