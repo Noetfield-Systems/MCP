@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Published MCP tool definitions, version and installation instructions, with explicit limits on what has been verified.">
+<meta name="theme-color" content="#0b1121"><title>Integration Passport — MCP Foundry</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/ui-system.css">
+<link rel="stylesheet" href="/launch.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/passport.js" defer></script><script src="/site-shell.js" defer></script></head><body class="launch-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="nav foundry-nav"><a class="foundry-brand" href="/"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
+<nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions">For APIs</a><a href="/launch">Agent Launch</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a></nav>
+<div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio</a></div><button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button></header>
+<main class="launch-main" id="main">
+<div class="launch-kicker">Integration passport / Publication provenance</div>
+<h1>Know what<br>is actually live.</h1>
+<p class="launch-lead">This passport reads the stored published revision for a public MCP Foundry server. No secret URLs or authentication credentials are exposed. Tool listings and published status are not independent third-party approvals.</p>
+<section class="launch-panel">
+<form id="lookup" class="launch-fields"><label class="launch-field">Server slug<input id="slug" pattern="[a-z][a-z0-9-]{2,48}" required maxlength="49" spellcheck="false" placeholder="your-published-server"></label><button class="launch-button" type="submit">Show passport</button></form>
+<div id="result" class="launch-result" role="status" aria-live="polite">Enter a public server slug.</div></section>
+<div class="launch-actions"><a class="launch-button alt" href="/launch">Open Agent Launch Workbench</a><a class="launch-link" href="/developers">Technical documentation</a></div>
+</main></body></html>
