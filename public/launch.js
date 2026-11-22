@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;':'&quot;',"'":'&#39;'}[c]));
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slugOk=s=>/^[a-z][a-z0-9-]{2,48}$/.test(s);
 const prettyTime=value=>value?new Date(value).toLocaleString('en-CA',{dateStyle:'medium',timeStyle:'short'}):'Not recorded';
 const state={server:null,report:null};
