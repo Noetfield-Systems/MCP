@@ -91,7 +91,7 @@ export function verificationLabRouter({auth}){
     const server=await owned(req,res);if(!server)return;
     const [tools,checks,errors,external]=await Promise.all([
       q('SELECT id,name,description,params FROM tools WHERE server_id=$1 ORDER BY name',[server.id]),
-      q('SELECT id,tool_id,tool_name,outcome,error_code,duration_ms,schema_hash,baseline_hash,drift,created_at FROM integration_test_receipts WHERE server_id=$1 ORDER BY created_at DESC LIMIT 30',[server.id]),
+      q('SELECT r.id,r.tool_id,r.tool_name,r.outcome,r.error_code,r.duration_ms,r.shape,r.schema_hash,r.baseline_hash,r.drift,r.created_at,b.shape AS accepted_shape FROM integration_test_receipts r LEFT JOIN integration_contract_baselines b ON b.tool_id=r.tool_id WHERE r.server_id=$1 ORDER BY r.created_at DESC LIMIT 30',[server.id]),
       q("SELECT error_code,count(*)::int AS calls FROM tool_events WHERE server_id=$1 AND success=false AND created_at>now()-interval '30 days' GROUP BY error_code ORDER BY calls DESC LIMIT 5",[server.id]),
       q("SELECT count(*)::int AS calls,count(*) FILTER (WHERE success)::int AS succeeded,count(DISTINCT date_trunc('day',created_at))::int AS active_days FROM tool_events WHERE server_id=$1 AND created_at>now()-interval '30 days'",[server.id])
     ]);
