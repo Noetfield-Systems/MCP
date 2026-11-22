@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1121"><meta name="description" content="Run bounded real API tests, detect schema contract drift and inspect saved receipts on your owned MCP servers.">
+<title>Test Lab &amp; Contract Watch — MCP Foundry</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/ui-system.css"><link rel="stylesheet" href="/lab.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/lab.js" defer></script><script src="/site-shell.js" defer></script></head>
+<body class="launch-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="nav foundry-nav"><a class="foundry-brand" href="/" aria-label="MCP Foundry"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a><nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/launch">Agent Launch</a><a href="/lab" aria-current="page">Test Lab</a><a href="/doctor">MCP Doctor</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a></nav><div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio</a></div><button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button></header>
+<main class="launch-main" id="main">
+<div class="launch-hero"><div><p class="launch-kicker">P1 / Owner verified outcomes</p><h1>Know when<br>your API changes.</h1><p class="launch-lead">Run up to five read-only GET checks, record proof of real upstream responses, compare safe schema fingerprints and choose valuable agent tools. No copied secrets, fabricated users or unverified host badges.</p><div class="launch-actions"><a class="launch-button alt" href="/launch">Create a server in Agent Launch</a><a class="launch-link" href="/doctor">Public MCP Doctor</a></div></div><aside class="launch-hero-aside"><p class="launch-kicker">Evidence contract</p><h2>One owner. One source.</h2><p>Only a signed-in owner can test an existing server. The test receipts contain outcome, category, response structure, latency and timestamp—not upstream URLs, request arguments, response values or API keys.</p><div class="launch-chips"><span>Live GET</span><span>40 checks / day</span><span>Explicit rebaseline</span></div></aside></div>
+<div class="launch-grid">
+<section class="launch-panel wide" aria-labelledby="lab-title"><div class="launch-kicker">Owner / API Test Lab</div><h2 id="lab-title">Your existing servers</h2><p>Sign in to Foundry Studio, then load a server. A live GET uses the existing host and credential protections. Checks cannot modify upstream data.</p>
+<div class="launch-actions"><button class="launch-button" type="button" id="load-servers">Load my servers</button><a class="launch-link" href="/#studio">Studio account &amp; builder</a></div>
+<div class="launch-fields" style="margin-top:18px"><label class="launch-field">Your server<select id="owner-server"><option value="">Load your servers first</option></select></label><button class="launch-button alt" type="button" id="reload-owner" disabled>Refresh evidence</button></div>
+<p class="launch-feedback" id="owner-feedback" role="status" aria-live="polite"></p>
+<div class="launch-result" id="owner-report">No owned server selected.</div>
+<div id="tool-lab" class="launch-tools"></div>
+<div class="launch-actions"><button class="launch-button" type="button" id="run-tests" disabled>Run selected GET tests</button><button class="launch-button alt" type="button" id="rank-tools" disabled>Curate useful tools</button></div>
+<div class="launch-result" id="test-results" role="status" aria-live="polite"></div>
+</section>
+<section class="launch-panel"><div class="launch-kicker">API Contract Watch</div><h2>Review changes before accepting.</h2><p>The first passing test records a baseline. Later tests compare structural keys and primitive types. A changed contract generates a warning. Only the signed-in owner can accept a new baseline; it never automatically publishes a revised tool.</p>
+<div id="drift-output" class="launch-result">Select a server to inspect recent changes.</div></section>
+<section class="launch-panel"><div class="launch-kicker">Distribution / customer trust</div><h2>Share what is actually published.</h2><p>The published Passport and client setup page show real versioned definitions without exposing upstream URLs or bearer tokens. Copying a link is never counted as a real installation.</p><div id="distribution-output" class="launch-result">Select a public, published server for installation links.</div></section>
+</div><p class="launch-footnote">This is an owner-initiated source test, not a scheduled uptime monitor, external MCP host certification, partner approval or real-customer usage receipt. See <a class="launch-link" href="/developers">developer documentation</a>.</p>
+</main></body></html>

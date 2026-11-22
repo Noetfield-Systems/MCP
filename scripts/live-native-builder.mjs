@@ -83,6 +83,33 @@ try{
    assert.ok(evidence.summary.p95_ms>=0,'observed p95 from PostgreSQL');
    assert.ok(evidence.recent.some(t=>t.tool_name==='max_hn_item'&&t.success),'real tool call stored');
    assert.ok(evidence.redacted,'no raw arguments or credential logging');
+   // New owner-scoped Test Lab: actual GET, durable receipt, authorization and
+   // explicit baseline acceptance. Test traffic is never counted as customers.
+   const unauthLab=await fetch(base+'/api/lab/servers/'+server.id,{signal:AbortSignal.timeout(9000)});
+   assert.equal(unauthLab.status,401,'anonymous Lab evidence is forbidden');
+   const preLab=await fetch(base+'/api/lab/servers/'+server.id,{headers:{cookie},signal:AbortSignal.timeout(9000)});
+   assert.equal(preLab.status,200,'owner may read Lab evidence');
+   const before=await preLab.json();
+   assert.ok(before.tools.some(t=>t.name==='max_hn_item'),'owned tool selection is real');
+   const ownerCheck=await post('/api/lab/servers/'+server.id+'/checks',{checks:[{tool_id:add.tool.id,args:{}}]});
+   assert.equal(ownerCheck.results.length,1,'one bounded owner test receipt');
+   assert.equal(ownerCheck.results[0].outcome,'passed','live public GET check completed');
+   assert.equal(ownerCheck.results[0].contract_status,'matches_baseline','first successful check established the baseline');
+   assert.ok(ownerCheck.results[0].current_schema_hash?.length===64);
+   assert.ok(!JSON.stringify(ownerCheck).includes('hacker-news.firebaseio.com'),'no upstream URL in Lab receipt');
+   const afterLab=await fetch(base+'/api/lab/servers/'+server.id,{headers:{cookie},signal:AbortSignal.timeout(9000)});
+   assert.equal(afterLab.status,200);
+   const savedLab=await afterLab.json();
+   assert.ok(savedLab.checks.some(c=>c.id===ownerCheck.results[0].id),'receipt persisted in PostgreSQL');
+   assert.equal(savedLab.doctor.independent_certification,false,'no false external certification');
+   const baseline=await post('/api/lab/servers/'+server.id+'/baselines/'+add.tool.id+'/accept',{
+     expected_schema_hash:ownerCheck.results[0].current_schema_hash
+   });
+   assert.equal(baseline.accepted,true,'owner explicitly accepted the current source shape');
+   const ranked=await post('/api/lab/curate',{tools:before.tools});
+   assert.ok(ranked.suggestions.some(t=>t.name==='max_hn_item'),'curation uses actual owned definitions');
+   const privatePassport=await fetch(base+'/api/passport/'+slug,{signal:AbortSignal.timeout(9000)});
+   assert.equal(privatePassport.status,404,'private integration never has public Passport');
    const other=await fetch(base+'/api/servers/'+server.id+'/diagnostics',{signal:AbortSignal.timeout(9000)});
    assert.equal(other.status,401,'no anonymous access to diagnostics');
    // A newly staged tool must not affect the live published MCP tool list.

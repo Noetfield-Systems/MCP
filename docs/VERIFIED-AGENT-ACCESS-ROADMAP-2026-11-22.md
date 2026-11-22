@@ -34,3 +34,12 @@
 - Keep app DB and customer tenancy independent from Fieldwork, Founder OS, ARQANT, Shopify trial store and the Judge.me pilot.
 - No new paid service or model gateway is a prerequisite. Keep the single web service and existing dedicated DB.
 - Actual outreach, client activations and paid receipts are parallel business outcomes; a technical PR never substitutes for them.
+
+## Phase 2 implementation delta (MCP Test Lab)
+- Owner-protected /lab uses existing Foundry account, server, source execution and provider authorization.
+- POST /api/lab/servers/:id/checks executes up to five bounded GETs and stores real outcomes and response shape signatures in PostgreSQL. Owner receives a categorical result and duration, never a stored URL/body/query/secret.
+- GET /api/lab/servers/:id returns tenant-scoped test receipts, accepted schema shapes, observed MCP execution summary and remedial recommendations. Anonymous and cross-account clients are rejected.
+- POST /api/lab/servers/:id/baselines/:toolId/accept requires matching latest successful schema hash and explicit owner action; it never republishes a server.
+- POST /api/lab/curate supplies deterministic, review-required tool recommendations; not AI authorship or automatic publication.
+- New /lab page is linked from Agent Launch. No new service, OAuth provider, database instance or cron.
+- The Change Watch is on-demand now; scheduled checks and notifications remain unshipped. Investor attribution, agency billing, generic OAuth brokerage and production MCP App visual host checks still require specific implementation and evidence.

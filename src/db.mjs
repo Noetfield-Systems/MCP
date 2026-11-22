@@ -235,6 +235,29 @@ export async function initDb(){
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
   );
+  CREATE TABLE IF NOT EXISTS integration_contract_baselines (
+    tool_id uuid PRIMARY KEY REFERENCES tools(id) ON DELETE CASCADE,
+    server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    shape jsonb NOT NULL,
+    schema_hash text NOT NULL CHECK (length(schema_hash)=64),
+    accepted_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS integration_test_receipts (
+    id uuid PRIMARY KEY,
+    server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    tool_id uuid NOT NULL REFERENCES tools(id) ON DELETE CASCADE,
+    tool_name text NOT NULL,
+    outcome text NOT NULL CHECK (outcome IN ('passed','failed')),
+    error_code text,
+    duration_ms integer NOT NULL CHECK (duration_ms>=0),
+    shape jsonb,
+    schema_hash text,
+    baseline_hash text,
+    drift boolean NOT NULL DEFAULT false,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS integration_receipts_server_date_idx ON integration_test_receipts(server_id,created_at DESC);
+  CREATE INDEX IF NOT EXISTS integration_receipts_tool_date_idx ON integration_test_receipts(tool_id,created_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }

@@ -224,6 +224,18 @@ try{
  assert.ok([403,503].includes(anonymous.status()),'operator data inaccessible without secret');
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('#studio-app').isVisible(),true,'mobile workspace is visible');
+ // The Lab is a real authenticated UI, not a promotional screenshot. Verify
+ // the owner can load their existing server, and the mobile page does not overflow.
+ const lab=await page.goto(base+'/lab',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(lab.status(),200,'actual owner Test Lab page live');
+ await page.locator('#load-servers').click();
+ await page.waitForFunction(()=>document.querySelectorAll('#owner-server option').length>=2,undefined,{timeout:14000});
+ await page.locator('#owner-server').selectOption({index:1});
+ await page.locator('#owner-report h3').waitFor({state:'visible',timeout:14000});
+ assert.ok((await page.locator('#owner-report').innerText()).includes('Recorded MCP calls'),'actual owner-only telemetry rendered');
+ const labViewport=await page.evaluate(()=>({screen:innerWidth,content:document.documentElement.scrollWidth}));
+ assert.ok(labViewport.content<=labViewport.screen+3,'Lab mobile layout has no horizontal overflow: '+JSON.stringify(labViewport));
+ await page.screenshot({path:'artifacts/foundry-lab-mobile.png',fullPage:true,animations:'disabled'});
  assert.deepEqual(errors,[],'no uncaught production browser JavaScript error');
  console.log(JSON.stringify({result:'PASS',type:'REAL_CHROMIUM',signup:'PASS',starter:'PASS',overview:'PASS',source_test:'PASS',premium_hero:'PASS',canonical_12_page_design:'PASS',tablet_12_page_design:'PASS',two_market_growth:'PASS',partner_roles:'PASS',openapi_yaml_preview:'PASS',openapi_yaml_import:'PASS',faq:'PASS',mobile_menu:'PASS',published:'PASS',client_config:'PASS',observed_activation:'PASS',operator_scope:'PASS',mobile:'PASS',external_customer:false}));
 }finally{
