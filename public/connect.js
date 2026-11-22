@@ -3,6 +3,10 @@ const $=s=>document.querySelector(s);
 function render(){
  const slug=$('#client-slug').value.trim().toLowerCase();
  const endpoint=location.origin+'/mcp/'+slug;
+ const publicLink=/^[a-z][a-z0-9-]{2,48}$/.test(slug)&&!$('#client-private').checked;
+ $('#passport-link').href=publicLink?'/passport?server='+encodeURIComponent(slug):'/passport';
+ $('#doctor-link').href=publicLink?'/doctor?server='+encodeURIComponent(slug):'/doctor';
+ $('#receipt-hint').textContent=publicLink?'Public evidence links ready. Verify the server has been published before sharing.':'For a private server use owner-only Studio diagnostics; no public receipts are shared.';
  try{
  const data=generateClientInstall($('#client-host').value,endpoint,{privateServer:$('#client-private').checked});
  $('#client-code').textContent=data.text;
