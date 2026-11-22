@@ -18,6 +18,7 @@ import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-intelligence.mjs';
+import {verificationLabRouter} from './verification-lab.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -220,6 +221,7 @@ app.use(opportunityRouter({operator}));
 app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(judgemeRouter({auth}));
+app.use(verificationLabRouter({auth}));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);
