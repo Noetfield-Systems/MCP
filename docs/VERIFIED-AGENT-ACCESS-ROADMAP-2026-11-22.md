@@ -34,3 +34,6 @@
 - Keep app DB and customer tenancy independent from Fieldwork, Founder OS, ARQANT, Shopify trial store and the Judge.me pilot.
 - No new paid service or model gateway is a prerequisite. Keep the single web service and existing dedicated DB.
 - Actual outreach, client activations and paid receipts are parallel business outcomes; a technical PR never substitutes for them.
+
+## Phase 2 implementation boundary
+The next increment adds owner-authorized live source GET test receipts, explicit OpenAPI baseline pin/check and deterministic GET tool ranking with selected import. Manual contract checks are not an always-on monitor; upstream test results are not evidence of external client installation. Run the read-only source Lab through /lab. Do not claim feature completion until CI and live acceptance pass.

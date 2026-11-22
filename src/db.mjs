@@ -235,6 +235,24 @@ export async function initDb(){
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
   );
+  CREATE TABLE IF NOT EXISTS integration_test_runs (
+    id uuid PRIMARY KEY,server_id uuid NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+    account_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    published_revision integer,draft_changed boolean NOT NULL DEFAULT false,
+    tool_count integer NOT NULL CHECK(tool_count BETWEEN 1 AND 8),
+    passed_count integer NOT NULL CHECK(passed_count>=0 AND passed_count<=tool_count),
+    status text NOT NULL CHECK(status IN ('pass','fail')),
+    results jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS integration_test_runs_owner_time ON integration_test_runs(account_id,server_id,created_at DESC);
+  CREATE TABLE IF NOT EXISTS source_contract_watches (
+    server_id uuid PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    spec_url text NOT NULL,base_url text NOT NULL,
+    baseline_signature jsonb NOT NULL,last_fingerprint text NOT NULL,
+    checked_at timestamptz NOT NULL DEFAULT now(),changes_seen integer NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS source_contract_watches_owner ON source_contract_watches(owner_id,checked_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }

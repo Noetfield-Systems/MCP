@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1121"><meta name="description" content="Live read-only MCP tool tests, public OpenAPI contract drift checks and bounded source-backed curation."><title>Integration Operations Lab — MCP Foundry</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/ui-system.css?v=20261118-graphite">
+<style>
+body{background:#0b1121;color:#eaf2f7}.lab-wrap{max-width:1120px;margin:60px auto 100px;padding:0 22px}.lab-wrap h1{font-size:clamp(36px,5vw,64px);line-height:1.07;letter-spacing:-.05em}.lab-wrap .lede{max-width:800px;color:#b1c0d0;font-size:18px}.lab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.lab-card{background:#13202e;border:1px solid #304657;border-radius:18px;padding:24px;min-width:0}.lab-card h2{font-size:25px;margin:4px 0 12px}.lab-card p,.lab-note{color:#acbdcc}.lab-card label{display:block;font-size:14px;margin-top:15px;color:#dce8ec}.lab-card select,.lab-card input,.lab-card textarea{display:block;width:100%;margin-top:7px;padding:12px 13px;border-radius:10px;background:#0c1724;color:white;border:1px solid #526475;font:inherit}.lab-card textarea{min-height:110px;resize:vertical}.lab-btn{border:0;border-radius:10px;background:#a0dccf;color:#0c2824;padding:12px 18px;font-weight:700;cursor:pointer;margin:14px 10px 5px 0}.lab-btn.secondary{background:#263b4d;color:#ecf3f8}.lab-btn:disabled{opacity:.42;cursor:not-allowed}.lab-output{white-space:pre-wrap;word-break:break-word;border:1px solid #315063;background:#091724;padding:16px;border-radius:10px;min-height:75px;color:#bbd8dc;font-size:13px;max-height:410px;overflow:auto}.lab-span{grid-column:1 / -1}.lab-note{font-size:14px}.lab-link{color:#91ddcd}.lab-preview{margin-top:14px}.lab-preview label{display:flex;align-items:flex-start;gap:12px}.lab-preview input{width:auto;margin:4px 0 0}.lab-brow{color:#80d6c8;letter-spacing:.15em;font-size:12px;text-transform:uppercase;font-weight:700}@media(max-width:750px){.lab-grid{grid-template-columns:1fr}.lab-span{grid-column:1}.lab-card{padding:18px}.lab-wrap{padding:0 14px;margin-top:32px}.lab-btn{width:100%}}
+</style></head><body><header class="nav foundry-nav">
+ <a href="/" class="foundry-brand" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
+ <nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions">For APIs</a><a href="/web3">Web3</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
+ <div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio <span aria-hidden="true">↗</span></a></div>
+ <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button>
+</header><main class="lab-wrap">
+<a class="lab-link" href="/">MCP Foundry / Platform</a><p class="lab-brow">Owner-authorized · Source-backed engineering · No simulated results</p><h1>Integration Operations Lab</h1>
+<p class="lede">Test read-only source tools with real upstream data, pin a public OpenAPI contract and detect drift, and choose high-value tool candidates before import. All actions operate inside your existing Foundry tenancy.</p>
+<p id="lab-auth" role="status" class="lab-note">Checking your signed-in workspace…</p>
+<label for="lab-server">Choose one of your existing servers</label><select id="lab-server" style="max-width:700px;padding:13px;border-radius:10px;background:#132438;color:white;width:100%;margin:8px 0 25px"><option value="">Loading owned servers…</option></select>
+<div class="lab-grid">
+<section class="lab-card"><div class="lab-brow">01 / SOURCE TEST LAB</div><h2>Prove a real upstream response.</h2><p>Test up to eight selected GET tools. Results are saved with timestamps and response digests, but never request inputs, credentials or raw response bodies. This does not claim an external MCP-host installation.</p>
+<label for="lab-samples">Optional JSON of arguments by tool name</label><textarea id="lab-samples" spellcheck="false" placeholder='{"search_dex_pairs":{"q":"SOL/USDC"}}'>{}</textarea>
+<p class="lab-note">For tools with no required parameters, leave the JSON as {}. Parameter names containing token, password or secret are rejected.</p>
+<button type="button" id="lab-run" class="lab-btn">Run live GET tests</button>
+<button type="button" id="lab-history" class="lab-btn secondary">Last test receipts</button>
+<pre class="lab-output" id="lab-run-output" aria-live="polite">Awaiting a test run.</pre>
+</section>
+<section class="lab-card"><div class="lab-brow">02 / OPENAPI CHANGE WATCH</div><h2>Detect breaking changes.</h2><p>Register a public, unauthenticated OpenAPI specification as your pinned baseline. Re-fetch and compare supported operation signatures on demand. No continuous monitoring is implied.</p>
+<label for="lab-spec">Public HTTPS OpenAPI specification URL</label><input id="lab-spec" type="url" placeholder="https://example.com/openapi.json">
+<label for="lab-base">Public HTTPS API base URL</label><input id="lab-base" type="url" placeholder="https://api.example.com">
+<p class="lab-note">Neither URL may contain query tokens, user credentials or fragments. A registered baseline is updated only by explicit action.</p>
+<button type="button" id="lab-pin" class="lab-btn">Pin baseline</button>
+<button type="button" id="lab-check" class="lab-btn secondary">Check current contract</button>
+<pre class="lab-output" id="lab-contract-output" aria-live="polite">No contract check performed.</pre></section>
+<section class="lab-card lab-span"><div class="lab-brow">03 / SMART TOOL CURATOR</div><h2>Import the useful operations, not every endpoint.</h2>
+<p>Use the public spec URL and API base above. The deterministic recommender ranks supported GET tools for simple first use. Inspect the real operations and select the names you want to import into your draft. Scores are not AI predictions of demand.</p>
+<button type="button" id="lab-curate" class="lab-btn">Preview recommended tools</button>
+<div class="lab-preview" id="lab-suggestions"></div>
+<button type="button" id="lab-import" class="lab-btn secondary" disabled>Import selected draft tools</button>
+<pre class="lab-output" id="lab-curator-output" aria-live="polite">Choose a source and preview first.</pre>
+<p class="lab-note">Publishing remains a separate explicit step in Studio or Agent Launch Kit. Upstream keys and private-network APIs are out of scope.</p>
+</section></div>
+<p class="lab-note">Continue via <a class="lab-link" href="/launch">Agent Launch Kit</a>, <a class="lab-link" href="/#studio">Studio</a> or <a class="lab-link" href="/doctor">MCP Doctor</a>. All three capabilities are best-effort source operations and do not constitute an uptime SLA.</p></main><footer class="foundry-footer">
+ <div class="foundry-footer-inner">
+ <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
+ <p>Turn working APIs into tools AI clients can actually use. Build, test, publish and deliver.</p></div>
+ <div class="foundry-footer-links">
+ <div><strong>PRODUCT</strong><a href="/">Platform</a><a href="/#studio">Studio</a><a href="/marketplace">Marketplace</a><a href="/connect">Client connection</a></div>
+ <div><strong>SOLUTIONS</strong><a href="/solutions">For API businesses</a><a href="/web3">For Web3</a><a href="/#quickstart">Public API Quickstart</a><a href="/collaborate">Work with us</a></div>
+ <div><strong>RESOURCES</strong><a href="/developers">Developer docs</a><a href="/team">Teams</a><a href="/oauth">OAuth</a><a href="/privacy">Privacy &amp; data</a></div>
+ </div></div>
+ <div class="foundry-footer-bottom"><span>© 2026 MCP Foundry · An independent Noetfield Systems Inc. product.</span><span><a href="https://github.com/Noetfield-Systems/MCP" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;·&nbsp; <a href="https://registry.modelcontextprotocol.io/v0.1/servers/io.github.Noetfield-Systems%2Fmcp-foundry/versions/0.1.0" target="_blank" rel="noopener noreferrer">MCP Registry</a></span></div>
+</footer><script src="/site-shell.js?v=20261118-b" defer></script>
+<script type="module" src="/lab.js"></script></body></html>

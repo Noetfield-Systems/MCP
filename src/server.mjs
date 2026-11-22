@@ -18,6 +18,7 @@ import {opportunityRouter} from './opportunities.mjs';
 import {prospectRouter,seedProspectAccounts} from './prospects.mjs';
 import {resolveOpenapiInput,openapiPreview} from './openapi.mjs';
 import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-intelligence.mjs';
+import {operationsRouter} from './operations-routes.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -339,6 +340,15 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    ({origin}=resolved);
    entries=openapiPreview(resolved.document,req.body?.baseUrl).tools;
  }catch(e){return j(res,400,String(e?.message||'IMPORT_FAILED').slice(0,120));}
+ const found_total=entries.length;
+ const requestedNames=req.body?.selected_tool_names;
+ if(requestedNames!==undefined){
+   if(!Array.isArray(requestedNames)||requestedNames.length<1||requestedNames.length>10||
+       requestedNames.some(x=>typeof x!=='string'||x.length>60)||new Set(requestedNames).size!==requestedNames.length)
+     return j(res,400,'INVALID_TOOL_NAME_SELECTION');
+   entries=entries.filter(t=>requestedNames.includes(t.name));
+   if(entries.length!==requestedNames.length)return j(res,400,'SELECTED_TOOL_NOT_IN_SOURCE');
+ }
  if(!entries.length)return j(res,400,'NO_GET_OPERATIONS_FOUND');
  let added=0;
  const existing=await q('SELECT count(*)::int n FROM tools WHERE server_id=$1',[server.id]);
@@ -350,7 +360,7 @@ app.post('/api/servers/:id/import-openapi',auth,async(req,res)=>{
    if(added>= (req.user.plan==='pro'?50:10))break;
  }
  if(added){await markDraftChanged(server.id);await recordActivation('tool_added',req.user.id,server.id);}
- res.json({found:entries.length,added,origin,skipped:entries.length-added});
+ res.json({found:found_total,selected:entries.length,added,origin,skipped:entries.length-added});
 });
 app.post('/api/servers/:id/unpublish',auth,async(req,res)=>{
  const server=await ownedServer(req.params.id,req.user.id);if(!server)return j(res,404,'SERVER_NOT_FOUND');
@@ -419,6 +429,8 @@ app.get('/api/servers/:id/diagnostics',auth,async(req,res)=>{
  res.json({window:'rolling_30_days',summary:summary.rows[0],tools:perTool.rows,errors:perError.rows,
   recent:recent.rows,redacted:true,note:'Owner-only observed executions; never stores arguments, bodies, tokens, hostnames or request URLs. Tests from the Studio playground are not counted as managed MCP invocations.'});
 });
+// Owner-only regression, public-source drift and curation, using the existing authenticated tenant.
+app.use(operationsRouter(auth));
 app.get('/api/keys',auth,async(req,res)=>{
  const {rows}=await q('SELECT id,prefix,label,created_at,revoked_at FROM api_keys WHERE owner_id=$1 ORDER BY created_at DESC',[req.user.id]);res.json({keys:rows});
 });
