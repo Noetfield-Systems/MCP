@@ -49,3 +49,6 @@ The Test Lab checks actual source response shape. A separate owner-approved publ
 
 ## Phase 3 — owner-scoped Agency Portfolio v1
 The owner-only `/agency` page groups this account's existing servers under manually supplied client labels, with per-server recorded calls, published revision and collaborator counts and explicit host handoff links. `/api/agency/portfolio` and `/api/agency/servers/:id/client-label` reuse PostgreSQL tenancy and authentication. Client labels do not establish verified customer relationships, invoices, independent organizations, cross-account access or transferred ownership. Multi-organization billing and verified agency customers are future work.
+
+## Phase 4 — source-observed Agent Channel OS
+The existing referral code attribution on signup is summarized on protected `/channel` and `/api/growth/channel`. Source counts include actual referred signups, referred server publications, successful recorded executions, and multi-day use. It uses existing PostgreSQL records and no trackers, services or subscription. The funnel does not prove client installations, human identity, paying customers, independent organizations or financial revenue.
