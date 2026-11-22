@@ -58,7 +58,7 @@ try{
  assert.ok(viewport.content<=viewport.screen+3,'mobile page does not overflow horizontally: '+JSON.stringify(viewport));
  // Canonical design system acceptance: every public page uses the same
  // header, footer, typography, focusable mobile menu and no horizontal overflow.
- const publicRoutes=['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/marketplace',
+ const publicRoutes=['/','/solutions','/providers','/readiness','/blueprints','/web3','/collaborate','/marketplace',
   '/connect','/developers','/team','/oauth','/operator','/order','/privacy'];
  const expectedNav=['Platform','For APIs','Web3','Marketplace','Developers','Work with us'];
  for(const route of publicRoutes){
