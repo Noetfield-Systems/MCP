@@ -19,7 +19,7 @@ id('lookup').addEventListener('submit',async event=>{
     '<li>Third-party host execution: not certified by this passport</li>'+
     '<li>External provider approval: not claimed</li></ul>'+
     '<div class="launch-actions"><a class="launch-button" href="'+esc(p.install_url)+'">Open client install guide</a>'+
-    '<a class="launch-link" href="'+esc(p.mcp_endpoint)+'">MCP endpoint</a></div>'+
+    '<code>'+esc(p.mcp_endpoint)+'</code></div>'+
     '<p class="launch-small">A tool name alone does not prove usability in every MCP client. Owner test receipts are different from external host acceptance.</p>';
  }catch(e){showError('No public published passport: '+e.message);}
 });
