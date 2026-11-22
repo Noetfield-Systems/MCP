@@ -1,8 +1,9 @@
 import {App} from '@modelcontextprotocol/ext-apps';
+import {publicToolCards,publicHostEndpoint} from './inspector.mjs';
 
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const status=message=>{$('#status').textContent=String(message).slice(0,260)};
-const app=new App({name:'MCP Foundry Studio',version:'0.2.0'});
+const app=new App({name:'MCP Foundry Studio',version:'0.3.0'});
 function parseResult(result){
  if(result?.isError)throw Error(result.content?.find(x=>x.type==='text')?.text||'MCP_TOOL_ERROR');
  return result?.structuredContent||JSON.parse(result.content?.find(x=>x.type==='text')?.text||'{}');
@@ -16,6 +17,33 @@ async function search(){
  $('#search-results').innerHTML=rows.length?rows.map(s=>'<article class="card"><b>'+esc(s.name)+'</b><small>/mcp/'+esc(s.slug)+'</small><p>'+esc(s.description)+'</p><button class="secondary" data-inspect="'+esc(s.slug)+'">View tools</button></article>').join(''):'<div class="card">No matching published servers. This is a real directory empty state.</div>';
  status(rows.length+' public server(s) returned by MCP Foundry.');
 }
+function inspectTools(slug,result){
+ const tools=publicToolCards(Array.isArray(result)?result:result?.tools||[]);
+ const root=$('#inspect-tools');root.replaceChildren();
+ for(const t of tools){
+  const card=document.createElement('article');card.className='inspector-card';
+  const title=document.createElement('h3');title.textContent=t.name;
+  const description=document.createElement('p');description.textContent=t.description||'No publisher description supplied.';
+  card.append(title,description);
+  if(!t.parameters.length){const note=document.createElement('small');note.textContent='No declared input parameters.';card.append(note);}
+  for(const p of t.parameters){
+   const param=document.createElement('small');
+   param.textContent=p.name+' · '+p.type+' · '+p.where+(p.required?' · required':' · optional');
+   card.append(param);
+  }
+  root.append(card);
+ }
+ if(!tools.length){
+  const empty=document.createElement('p');empty.textContent='No public published tools returned for this server.';root.append(empty);
+ }
+ $('#inspect-title').textContent=slug+' · Published tools';
+ $('#inspect-server').textContent=tools.length+' source-backed tool(s) returned by the Foundry MCP directory.';
+ $('#inspect-endpoint').textContent=publicHostEndpoint(slug);
+ $('#inspect-docs').href='https://mcp-foundry-web-production.up.railway.app/connect?server='+encodeURIComponent(slug);
+ $('#inspect-section').classList.remove('hidden');
+ status('Loaded '+tools.length+' actual published tool definition(s), without upstream URLs or credential data.');
+}
+$('#inspect-close').addEventListener('click',()=>$('#inspect-section').classList.add('hidden'));
 async function mine(){
  const data=await call('list_my_servers');
  const rows=data.servers||[];
@@ -32,8 +60,7 @@ $('#create-form').addEventListener('submit',async e=>{e.preventDefault();const b
 document.addEventListener('click',async e=>{
  const inspect=e.target.closest('[data-inspect]'),publish=e.target.closest('[data-publish]');
  try{
- if(inspect){const result=await call('get_server_tools',{slug:inspect.dataset.inspect});const rows=Array.isArray(result)?result:[];
- status(rows.length+' actual GET tool(s): '+rows.map(x=>x.tool_name).join(', '));}
+ if(inspect){const result=await call('get_server_tools',{slug:inspect.dataset.inspect});inspectTools(inspect.dataset.inspect,result);}
  if(publish){if(!confirm('Publish this server and its existing tools to the public MCP endpoint?'))return;
  const result=await call('publish_server',{server_id:publish.dataset.publish,visibility:'public'});
  status('Published endpoint: '+result.endpoint);await mine();}
