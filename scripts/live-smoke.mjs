@@ -35,6 +35,12 @@ const run=async()=>{
     body:JSON.stringify({track:'web3_builder',contact_consent:false,project_brief:'not consented'}),
     signal:AbortSignal.timeout(12000)});
   assert.equal(invalid.status,400,'no nonconsented partner lead accepted');
+  const providerPortal=await fetch(base+'/providers',{signal:AbortSignal.timeout(12000)});
+  assert.equal(providerPortal.status,200,'real publisher partner portal live');
+  const providerHtml=await providerPortal.text();
+  assert.match(providerHtml,/publisher-controlled program/i,'honest provider acquisition proposition');
+  const privateInvestor=await fetch(base+'/api/admin/investor-evidence',{signal:AbortSignal.timeout(12000)});
+  assert.ok([403,503].includes(privateInvestor.status),'investor evidence never public without operator token');
   const robots=await fetch(base+'/robots.txt',{signal:AbortSignal.timeout(12000)});
   assert.equal(robots.status,200,'robots indexing metadata HTTP 200');
   const cat=await fetch(base+'/api/catalog',{signal:AbortSignal.timeout(12000)});
