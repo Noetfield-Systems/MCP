@@ -25,7 +25,7 @@ try{
   await page.locator('[data-wb-tab="result"]').click();
   assert.equal(await page.locator('#wb-code-kind').innerText(),'ILLUSTRATIVE JSON','Builder preview tabs work without claiming live requests');
   await page.locator('[data-wb-tab="definition"]').click();
- assert.equal(await page.locator('.showcase-card').count(),3);
+ assert.equal(await page.locator('.showcase-section .showcase-card').count(),3,'three original workflow showcase cards plus additional launch features');
  assert.equal(await page.locator('.faq-item').count(),10);
  await page.locator('.faq-item').first().locator('summary').click();
  assert.equal(await page.locator('.faq-item').first().evaluate(el=>el.open),true,'FAQ opens using native details');
@@ -59,6 +59,7 @@ try{
  // Canonical design system acceptance: every public page uses the same
  // header, footer, typography, focusable mobile menu and no horizontal overflow.
  const publicRoutes=['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/marketplace',
+  '/launch','/doctor','/passport','/lab',
   '/connect','/developers','/team','/oauth','/operator','/order','/privacy'];
  const expectedNav=['Platform','For APIs','Web3','Marketplace','Developers','Work with us'];
  for(const route of publicRoutes){
@@ -146,7 +147,7 @@ try{
    }
  }
  await page.setViewportSize({width:1440,height:900});
- for(const route of ['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy']){
+ for(const route of ['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy','/launch','/doctor','/passport','/lab']){
    const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
    assert.equal(response.status(),200,'desktop page '+route);
    const metrics=await page.evaluate(()=>({
