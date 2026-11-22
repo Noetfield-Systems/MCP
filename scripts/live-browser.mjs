@@ -59,6 +59,7 @@ try{
  // Canonical design system acceptance: every public page uses the same
  // header, footer, typography, focusable mobile menu and no horizontal overflow.
  const publicRoutes=['/','/solutions','/providers','/readiness','/blueprints','/web3','/collaborate','/marketplace',
+  '/channel',
   '/agency',
   '/launch','/passport','/doctor','/lab',
   '/connect','/developers','/team','/oauth','/operator','/order','/privacy'];
@@ -148,7 +149,7 @@ try{
    }
  }
  await page.setViewportSize({width:1440,height:900});
- for(const route of ['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy','/providers','/launch','/passport','/doctor','/lab','/agency']){
+ for(const route of ['/','/solutions','/readiness','/blueprints','/web3','/collaborate','/developers','/marketplace','/connect','/team','/oauth','/operator','/order','/privacy','/providers','/launch','/passport','/doctor','/lab','/agency','/channel']){
    const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:20000});
    assert.equal(response.status(),200,'desktop page '+route);
    const metrics=await page.evaluate(()=>({
