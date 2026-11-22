@@ -43,3 +43,6 @@
 - POST /api/lab/curate supplies deterministic, review-required tool recommendations; not AI authorship or automatic publication.
 - New /lab page is linked from Agent Launch. No new service, OAuth provider, database instance or cron.
 - The Change Watch is on-demand now; scheduled checks and notifications remain unshipped. Investor attribution, agency billing, generic OAuth brokerage and production MCP App visual host checks still require specific implementation and evidence.
+
+## OpenAPI source contract comparison (incremental)
+The Test Lab checks actual source response shape. A separate owner-approved public OpenAPI watch now pins the GET-operation schema from a validated HTTPS spec URL and explicitly compares later changes; it does not poll in the background or fetch authenticated provider specifications. Selected import permits deliberate choice of GET operations before Test → Publish. No external host compatibility, paid buyer, provider integration or uptime is inferred.

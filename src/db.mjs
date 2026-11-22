@@ -258,6 +258,14 @@ export async function initDb(){
   );
   CREATE INDEX IF NOT EXISTS integration_receipts_server_date_idx ON integration_test_receipts(server_id,created_at DESC);
   CREATE INDEX IF NOT EXISTS integration_receipts_tool_date_idx ON integration_test_receipts(tool_id,created_at DESC);
+  CREATE TABLE IF NOT EXISTS openapi_spec_baselines (
+    server_id uuid PRIMARY KEY REFERENCES servers(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    spec_url text NOT NULL,base_url text NOT NULL,
+    baseline_signature jsonb NOT NULL,last_sha256 text NOT NULL,
+    checked_at timestamptz NOT NULL DEFAULT now(),drift_observations integer NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS openapi_spec_baselines_owner ON openapi_spec_baselines(owner_id,checked_at DESC);
   CREATE TABLE IF NOT EXISTS billing_events (event_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
   `);
 }
