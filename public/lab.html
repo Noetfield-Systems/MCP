@@ -46,6 +46,18 @@
   <div id="spec-curated-list" class="launch-tools"></div>
   <button id="spec-watch-import" type="button" class="launch-button alt" disabled>Import selected into editable draft</button>
   <p class="launch-small">Public HTTPS only; URLs with embedded credentials, query strings or fragments are rejected. Suggested rankings are deterministic heuristics, not evidence of customer demand or provider approval.</p>
+</section>
+<section class="launch-panel" aria-labelledby="repair-title" style="max-width:1120px;margin:24px auto">
+ <div class="launch-kicker">SELF-HEALING / NO AUTOMATIC PUBLICATION</div>
+ <h2 id="repair-title">Prepare a safe repair draft.</h2>
+ <p>Compare this server's draft GET tools with the latest pinned public OpenAPI source. Review specific change proposals, then explicitly apply up to five selected corrections to your editable draft. The live published revision stays unchanged until you run real source tests and choose Publish.</p>
+ <div class="launch-actions">
+  <button id="repair-preview" class="launch-button" type="button">Inspect source repair proposals</button>
+  <button id="repair-apply" class="launch-button alt" type="button" disabled>Apply selected repairs to Draft</button>
+ </div>
+ <div class="launch-result" id="repair-output" role="status" aria-live="polite">Select an owned server and pin a public OpenAPI baseline in the section above.</div>
+ <div id="repair-proposals" class="launch-tools"></div>
+ <p class="launch-small">Two short-lived fingerprints protect against source/draft changes after preview. Nothing modifies a published endpoint, external provider credentials or unrelated customer data. Changes must be tested and republished explicitly.</p>
 </section></main><footer class="foundry-footer">
  <div class="foundry-footer-inner">
  <div class="foundry-footer-intro"><a href="/" class="foundry-brand"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>

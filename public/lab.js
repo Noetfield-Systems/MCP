@@ -220,3 +220,51 @@ $('spec-watch-import').addEventListener('click',async()=>{
  finally{button.disabled=false;}
 });
 $('owner-server').addEventListener('change',()=>{openapiRecommendations=[];$('spec-curated-list').replaceChildren();$('spec-watch-import').disabled=true;setTimeout(()=>refreshPublicSpec().catch(()=>{}),300);});
+
+
+/* Owner-approved draft repair: source and draft fingerprints prevent stale,
+ arbitrary changes. Successful apply never publishes or modifies upstream data. */
+let repairState=null;
+const repairMessage=value=>{$('repair-output').textContent=typeof value==='string'?value:JSON.stringify(value,null,2);};
+function clearRepair(){
+ repairState=null;$('repair-apply').disabled=true;$('repair-proposals').replaceChildren();
+}
+$('repair-preview').addEventListener('click',async()=>{
+ const button=$('repair-preview');button.disabled=true;clearRepair();
+ repairMessage('Fetching pinned public OpenAPI contract and comparing draft definitions…');
+ try{
+  const result=await api('/api/lab/servers/'+specServer()+'/repair-preview',{
+   method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  repairState={source:result.source_sha256,draft:result.draft_sha256};
+  const region=$('repair-proposals');
+  for(const proposal of result.candidates||[]){
+   const label=document.createElement('label'),checkbox=document.createElement('input'),summary=document.createElement('span');
+   label.className='launch-tool';checkbox.type='checkbox';checkbox.className='repair-select-tool';
+   checkbox.value=proposal.tool_name;checkbox.checked=false;
+   const types=Object.entries(proposal.changes||{}).filter(([,changed])=>changed).map(([key])=>key.replaceAll('_',' '));
+   summary.textContent=proposal.tool_name+' · '+types.join(', ');
+   label.append(checkbox,summary);region.append(label);
+  }
+  $('repair-apply').disabled=!(result.candidates||[]).length;
+  repairMessage({candidates:result.candidates.length,source_sha256:result.source_sha256,
+   draft_sha256:result.draft_sha256,published_revision_unchanged:result.published_revision_unchanged,
+   next:'Select specific draft changes; test them in this Lab after applying; publish separately in Studio.'});
+ }catch(error){repairMessage('Repair preview not available: '+error.message);}
+ finally{button.disabled=false;}
+});
+$('repair-apply').addEventListener('click',async()=>{
+ const selected=[...document.querySelectorAll('.repair-select-tool:checked')].map(x=>x.value);
+ if(!repairState){repairMessage('Preview current source and draft before applying.');return;}
+ if(selected.length<1||selected.length>5){repairMessage('Select between one and five specific repair candidates.');return;}
+ const button=$('repair-apply');button.disabled=true;
+ repairMessage('Applying only the selected owner-approved changes to the editable draft…');
+ try{
+  const result=await api('/api/lab/servers/'+specServer()+'/repair-draft',{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({selected_tool_names:selected,
+    expected_source_sha256:repairState.source,expected_draft_sha256:repairState.draft})});
+  clearRepair();repairMessage(result);
+  await loadDetails();
+ }catch(error){repairMessage('Draft repair not applied: '+error.message+'; preview the current state again.');clearRepair();}
+});
+$('owner-server').addEventListener('change',clearRepair);
