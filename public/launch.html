@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-CA"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1121">
+<meta name="description" content="Launch and verify a real MCP integration with owner-scoped test receipts, API contract checks and a public installation passport.">
+<title>Verified Agent Launch — MCP Foundry</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/premium.css"><link rel="stylesheet" href="/ui-system.css">
+<link rel="stylesheet" href="/launch.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/launch.js" defer></script><script src="/site-shell.js" defer></script>
+</head><body class="launch-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="nav foundry-nav"><a class="foundry-brand" href="/" aria-label="MCP Foundry home"><span class="foundry-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>MCP <b>Foundry</b></span></a>
+<nav aria-label="Primary navigation" id="primary-nav"><a href="/">Platform</a><a href="/solutions">For APIs</a><a href="/launch" aria-current="page">Agent Launch</a><a href="/marketplace">Marketplace</a><a href="/developers">Developers</a><a href="/collaborate">Work with us</a></nav>
+<div class="nav-actions"><a class="foundry-launch" href="/#studio">Open Studio</a></div>
+<button class="menu-toggle" type="button" id="menu-toggle" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span class="nav-hamburger" aria-hidden="true"></span></button></header>
+<main id="main" class="launch-main">
+<div class="launch-hero"><div><div class="launch-kicker">Agent Launch / Proof before claims</div><h1>Your API.<br>Working in AI.</h1><p class="launch-lead">Take your existing MCP server from published configuration to owner-tested evidence and a shareable installation passport. No synthetic user activity, unverified partner badges or secret-bearing links.</p><div class="launch-actions"><a class="launch-button" href="/#studio">Create or import your API</a><a class="launch-button alt" href="/#quickstart">CA$199 API Quickstart</a></div></div>
+<aside class="launch-hero-aside"><div class="launch-kicker">What the results mean</div><h2>Evidence, not decoration.</h2><p>Published means a stored server revision exists. An owner test proves a particular bounded upstream GET. External MCP client execution requires a separate test receipt. Copying an install link never counts as a successful connection.</p><div class="launch-chips"><span>Read-only tests</span><span>Real PostgreSQL receipts</span><span>No stored arguments</span></div></aside></div>
+<div class="launch-steps" aria-label="Launch workflow">
+<div class="launch-step"><b>01 / BUILD</b><strong>Define useful tools</strong></div><div class="launch-step"><b>02 / VERIFY</b><strong>Run live upstream tests</strong></div><div class="launch-step"><b>03 / PUBLISH</b><strong>Release a revision in Studio</strong></div><div class="launch-step"><b>04 / DISTRIBUTE</b><strong>Share a credential-free install page</strong></div></div>
+<div class="launch-grid">
+<section class="launch-panel" aria-labelledby="public-inspect-title">
+<div class="launch-kicker">Public / Integration passport</div><h2 id="public-inspect-title">Inspect a published server.</h2><p>Enter a public Foundry server slug. Passport content is read from its published revision—not from a marketing claim or unpublished draft.</p>
+<form id="passport-search" class="launch-fields"><label class="launch-field">Public server slug<input id="passport-slug" pattern="[a-z][a-z0-9-]{2,48}" placeholder="my-public-server" maxlength="49" required spellcheck="false"></label><button class="launch-button" type="submit">Inspect passport</button></form>
+<div id="passport-output" class="launch-result" role="status" aria-live="polite">No server selected.</div>
+</section>
+<section class="launch-panel" aria-labelledby="doctor-title">
+<div class="launch-kicker">Free / MCP Doctor</div><h2 id="doctor-title">Diagnose the public configuration.</h2><p>Check whether a Foundry server has a valid published tool snapshot. This is a configuration check—not an external-network scan or independent host certification.</p>
+<form id="doctor-form" class="launch-fields"><label class="launch-field">Published public slug<input id="doctor-slug" pattern="[a-z][a-z0-9-]{2,48}" placeholder="my-public-server" maxlength="49" required spellcheck="false"></label><button class="launch-button" type="submit">Run Doctor</button></form>
+<div id="doctor-output" class="launch-result" role="status" aria-live="polite">Enter a public server slug to inspect.</div>
+</section>
+<section class="launch-panel wide" aria-labelledby="lab-title">
+<div class="launch-kicker">Private / Owner workbench</div><h2 id="lab-title">Test Lab + API Contract Watch</h2>
+<p>Select one of your existing servers and run up to five bounded GET tests. We record categorical outcomes, durations and response *structure only*. Private arguments, response bodies and upstream URLs are not stored as test receipts.</p>
+<div class="launch-actions"><button class="launch-button alt" type="button" id="load-servers">Load my servers</button><a class="launch-link" href="/#studio">Sign in or create a server in Studio</a></div>
+<div class="launch-fields" style="margin-top:18px"><label class="launch-field">Your server<select id="owner-server"><option value="">Load your servers first</option></select></label><button class="launch-button alt" type="button" id="reload-owner" disabled>Refresh evidence</button></div>
+<p class="launch-feedback" id="owner-feedback" role="status" aria-live="polite"></p>
+<div id="owner-report" class="launch-result">No owner server selected.</div>
+<div id="tool-lab" class="launch-tools"></div>
+<div class="launch-actions"><button class="launch-button" type="button" id="run-tests" disabled>Run selected GET tests</button><button class="launch-button alt" type="button" id="rank-tools" disabled>Curate useful tools</button></div>
+<div id="test-results" class="launch-result" role="status" aria-live="polite"></div>
+</section>
+<section class="launch-panel" aria-labelledby="distribution-title">
+<div class="launch-kicker">Distribution / API businesses</div><h2 id="distribution-title">Make installation easy.</h2>
+<p>Give your existing developer community an install link from your own documentation. Public pages expose no API secrets. A link click is not a tool-use receipt.</p>
+<div id="distribution-output" class="launch-result">Select a published public server above to generate a distribution link.</div>
+</section>
+<section class="launch-panel" aria-labelledby="offers-title"><div class="launch-kicker">Commercial / Real deliverables</div><h2 id="offers-title">Want us to ship it?</h2>
+<p>For a supported public API, the one-time Quickstart covers up to three GET tools with an actual source test and client handoff. Larger or private integrations receive a scoped proposal before work.</p>
+<div class="launch-actions"><a class="launch-button" href="https://buy.stripe.com/5kQ7sMaLm81SeWSfPu1Nu0j" target="_blank" rel="noopener noreferrer">CA$199 Quickstart</a><a class="launch-button alt" href="/?service=launch#implementation">Request Agent Launch</a></div><p class="launch-small">A checkout link is not proof of a payment or an accepted customer deliverable.</p>
+</section>
+</div>
+<p class="launch-footnote">MCP Foundry is an independent product. Reports are limited to the selected server's observed, attributable events. Third-party approval, active customers, paid orders and successful installations are never inferred from sample tests.</p>
+</main></body></html>
