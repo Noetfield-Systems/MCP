@@ -21,6 +21,7 @@ import {integrationPassport,integrationDoctor,validPublicSlug} from './launch-in
 import {outcomeEvidenceRouter} from './outcome-evidence.mjs';
 import {verificationLabRouter} from './verification-lab.mjs';
 import {openapiWatchRouter} from './openapi-watch.mjs';
+import {agencyRouter} from './agency.mjs';
 
 const app=express(),port=Number(process.env.PORT||3000);
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
@@ -226,6 +227,7 @@ app.use(judgemeRouter({auth}));
 app.use(outcomeEvidenceRouter({operator}));
 app.use(verificationLabRouter({auth}));
 app.use(openapiWatchRouter(auth));
+app.use(agencyRouter(auth));
 app.use(upstreamKeyRouter({auth}));
 app.get('/api/catalog',async(req,res)=>{
  const term=string(req.query.q,100);const {rows}=await q("SELECT s.slug,s.name,s.description,s.updated_at,jsonb_array_length(s.published_snapshot->'tools')::int AS tool_count FROM servers s WHERE s.status='published' AND s.visibility='public' AND s.published_snapshot IS NOT NULL AND (s.name ILIKE $1 OR s.description ILIKE $1) ORDER BY s.updated_at DESC LIMIT 50",['%'+term+'%']);

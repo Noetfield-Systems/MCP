@@ -46,3 +46,6 @@
 
 ## OpenAPI source contract comparison (incremental)
 The Test Lab checks actual source response shape. A separate owner-approved public OpenAPI watch now pins the GET-operation schema from a validated HTTPS spec URL and explicitly compares later changes; it does not poll in the background or fetch authenticated provider specifications. Selected import permits deliberate choice of GET operations before Test → Publish. No external host compatibility, paid buyer, provider integration or uptime is inferred.
+
+## Phase 3 — owner-scoped Agency Portfolio v1
+The owner-only `/agency` page groups this account's existing servers under manually supplied client labels, with per-server recorded calls, published revision and collaborator counts and explicit host handoff links. `/api/agency/portfolio` and `/api/agency/servers/:id/client-label` reuse PostgreSQL tenancy and authentication. Client labels do not establish verified customer relationships, invoices, independent organizations, cross-account access or transferred ownership. Multi-organization billing and verified agency customers are future work.
