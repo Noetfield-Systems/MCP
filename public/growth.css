@@ -114,3 +114,18 @@
 .template-choice.recommended:before{content:'MATCHED TO YOUR USE CASE';display:block;font-size:9px;letter-spacing:.13em;font-weight:700;color:#e5cb9f;margin-bottom:9px}
 @media(max-width:850px){.growth-bridge-grid{grid-template-columns:1fr 1fr}.growth-bridge-top{display:block}.growth-bridge-top p{text-align:left}}
 @media(max-width:600px){.growth-bridge-grid{grid-template-columns:1fr}.growth-bridge{padding-top:18px;padding-bottom:40px}.growth-bridge-top p{margin-top:9px}.growth-bridge-card{padding:24px}.growth-bridge-card strong{font-size:29px}}
+
+
+/* Native API owner acquisition — accessible conversion FAQ, no speculative testimonials. */
+.foundry-buyer-faq{padding-block:45px}
+.foundry-buyer-faq .foundry-faq-list{display:grid;gap:11px;margin:22px 0 25px}
+.foundry-buyer-faq details{background:linear-gradient(120deg,#14212c,#101c28);border:1px solid #34505c;border-radius:13px;padding:0 19px;color:#ecf3f7;transition:border-color .2s ease,background .2s ease}
+.foundry-buyer-faq details:hover,.foundry-buyer-faq details[open]{border-color:#7395a2}
+.foundry-buyer-faq summary{padding:18px 28px 18px 0;cursor:pointer;font-weight:740;line-height:1.5;position:relative;list-style:none}
+.foundry-buyer-faq summary::-webkit-details-marker{display:none}
+.foundry-buyer-faq summary:after{content:"+";position:absolute;right:1px;top:13px;font-size:24px;font-weight:300;color:#c2d7df}
+.foundry-buyer-faq details[open] summary:after{content:"−"}
+.foundry-buyer-faq details p{border-top:1px solid #29414b;padding:13px 0 20px;margin:0;color:#bfcdd4;font-size:14px;line-height:1.8}
+.foundry-buyer-faq details a{color:#b1e1ee;text-decoration:underline;text-underline-offset:3px}
+.foundry-buyer-faq details:focus-within{outline:2px solid #8bb5c4;outline-offset:2px}
+@media(max-width:680px){.foundry-buyer-faq details{padding-inline:14px}.foundry-buyer-faq summary{font-size:14px}.foundry-buyer-faq details p{font-size:13px}}
