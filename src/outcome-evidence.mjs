@@ -1,4 +1,5 @@
 import express from 'express';
+import {createHash,timingSafeEqual} from 'node:crypto';
 import {q} from './db.mjs';
 
 // An operator-only source-backed investor evidence readout; observations are
@@ -36,8 +37,43 @@ export function summarizeOutcomes(rows){
  };
 }
 
+export function nativePaymentEvidence(rows){
+ const amounts=Array.isArray(rows)?rows.map(row=>{
+  const currency=String(row.currency||'').toUpperCase();
+  if(!['CAD','USD'].includes(currency))throw Error('INVALID_NATIVE_CURRENCY');
+  const count=Number(row.order_count),fulfilled=Number(row.fulfilled_count),minor=Number(row.amount_cents);
+  if(![count,fulfilled,minor].every(x=>Number.isSafeInteger(x)&&x>=0)||fulfilled>count)throw Error('INVALID_NATIVE_PAYMENT_AGGREGATE');
+  return {currency,source_recorded_paid_orders:count,source_recorded_accepted_orders:fulfilled,source_recorded_gross_minor:minor};
+ }):[];
+ return {schema:'sina.foundry.payment-evidence.v1',source:'MCP_FOUNDRY_PILOT_ORDER_LEDGER',
+  generated_at:new Date().toISOString(),currency_groups:amounts,
+  evidence_state:'SOURCE_RECORDED_CHECKOUT_PAYMENT_NOT_PROVIDER_RECONCILED',
+  provider_reconciled_revenue:null,provider_live_mode_confirmed:false,
+  standalone_payment_link_included:false,customer_records_included:false,read_only:true};
+}
+
+export function nativeEvidenceAuthorized(header,expected){
+ if(typeof expected!=='string'||expected.length<40||expected.length>512)return false;
+ if(typeof header!=='string'||!/^Bearer /i.test(header)||header.length>519)return false;
+ const supplied=header.slice(7);
+ if(!supplied)return false;
+ const digest=x=>createHash('sha256').update(x).digest();
+ return timingSafeEqual(digest(supplied),digest(expected));
+}
+
 export function outcomeEvidenceRouter({operator}){
  const router=express.Router();
+ router.get('/api/integrations/founder/payment-evidence',async(req,res)=>{
+  res.setHeader('Cache-Control','no-store');
+  const expected=process.env.FOUNDRY_PORTFOLIO_READ_TOKEN||'';
+  if(expected.length<40||expected.length>512)return res.status(503).json({error:'NATIVE_EVIDENCE_TOKEN_NOT_CONFIGURED'});
+  if(!nativeEvidenceAuthorized(req.get('authorization'),expected))return res.status(403).json({error:'NATIVE_EVIDENCE_AUTH_REQUIRED'});
+  try{
+   const result=await q("SELECT o.currency,count(*)::int order_count,count(*) FILTER (WHERE o.status='fulfilled' AND o.accepted_at IS NOT NULL AND o.customer_acceptance_reference IS NOT NULL AND o.delivery_reference IS NOT NULL)::int fulfilled_count,coalesce(sum(o.amount_cents),0)::bigint amount_cents FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id WHERE o.status IN ('paid','fulfilled') AND o.stripe_checkout_session_id IS NOT NULL AND o.stripe_payment_intent_id IS NOT NULL AND o.completed_at IS NOT NULL AND l.email NOT LIKE '%@foundry.invalid' GROUP BY o.currency ORDER BY o.currency");
+   return res.json(nativePaymentEvidence(result.rows));
+  }catch(e){return res.status(503).json({error:'NATIVE_PAYMENT_EVIDENCE_UNAVAILABLE'});}
+ });
+
  router.get('/api/admin/investor-evidence',operator,async(_req,res)=>{
   const [accounts,servers,traffic,retention,leads,lab,orders]=await Promise.all([
    q("SELECT count(*)::int registered_accounts FROM accounts WHERE email NOT LIKE '%@foundry.invalid'"),
