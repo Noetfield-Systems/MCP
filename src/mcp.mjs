@@ -5,6 +5,7 @@ import {toNodeHandler} from '@modelcontextprotocol/node';
 import * as z from 'zod/v4';
 import {q} from './db.mjs';
 import {recordActivation} from './activation.mjs';
+import {commercialOffers,recommendOffer} from './agent-commerce.mjs';
 import {parseOpenapi,openapiPreview} from './openapi.mjs';
 import {safeGet,toolUrl,validatedTarget,specTools} from './security.mjs';
 import {guardedManagedGet} from './oauth.mjs';
@@ -76,6 +77,19 @@ export function foundryMcp(principal=null){
       const {rows}=await q("SELECT name,published_snapshot->'tools' AS tools FROM servers WHERE slug=$1 AND status='published' AND visibility='public' AND published_snapshot IS NOT NULL",[slug]);
       const tools=rows[0]?.tools||[];
       return {content:[{type:'text',text:JSON.stringify(tools.map(t=>({name:rows[0].name,tool_name:t.name,description:t.description,params:t.params})))}]};
+    });
+    mcp.registerTool('get_commercial_offers',{
+      description:'Read native Foundry integration offers, scope, prices and purchase links. No purchase or order is created.',
+      inputSchema:z.object({}),annotations:{readOnlyHint:true,openWorldHint:false}
+    },async()=>{
+      const data=commercialOffers();return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
+    });
+    mcp.registerTool('recommend_commercial_offer',{
+      description:'Match a self-reported API scope to existing Foundry offers or scope review. No purchase, contact submission or guaranteed compatibility.',
+      inputSchema:z.object({public_https:z.boolean(),requires_auth:z.boolean(),requires_write:z.boolean(),get_tools:z.number().int().min(1).max(100),api_count:z.number().int().min(1).max(100),prefer_self_serve:z.boolean().optional()}),
+      annotations:{readOnlyHint:true,openWorldHint:false}
+    },async(args)=>{
+      const data=recommendOffer(args);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
     });
     // Anonymous clients can discover servers; authenticated API key holders can build and publish.
     // Each tool checks the owner and persists changes in the existing Foundry database.
