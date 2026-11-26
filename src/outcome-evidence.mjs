@@ -2,6 +2,7 @@ import express from 'express';
 import {createHash,timingSafeEqual} from 'node:crypto';
 import {q} from './db.mjs';
 import {reconcileOrders} from './provider-reconciliation.mjs';
+import {reconcileQuickstart} from './quickstart-reconciliation.mjs';
 
 // An operator-only source-backed investor evidence readout; observations are
 // not audited customers, processor-settled revenue or financial statements.
@@ -82,7 +83,8 @@ export function outcomeEvidenceRouter({operator,stripe}){
   if(!nativeEvidenceAuthorized(req.get('authorization'),expected))return res.status(403).json({error:'NATIVE_EVIDENCE_AUTH_REQUIRED'});
   try{
    const result=await q("SELECT o.id,o.currency,o.amount_cents,o.status,o.stripe_checkout_session_id,o.stripe_payment_intent_id,o.accepted_at,o.delivery_reference,o.customer_acceptance_reference FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id WHERE o.status IN ('paid','fulfilled','refunded') AND o.completed_at>=now()-interval '30 days' AND l.email NOT LIKE '%@foundry.invalid' ORDER BY o.completed_at DESC,o.id LIMIT 26");
-   return res.json(await reconcileOrders(result.rows,stripe));
+   const scoped=await reconcileOrders(result.rows,stripe);
+   return res.json({...scoped,standalone_quickstart:await reconcileQuickstart(stripe)});
   }catch{return res.status(503).json({error:'PROVIDER_RECONCILIATION_UNAVAILABLE'});}
  });
 
