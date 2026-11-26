@@ -1,0 +1,39 @@
+name: Native commercial health
+on:
+  schedule:
+    - cron: '41 15 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/native-commercial-routine.mjs'
+      - 'tests/native-commercial-routine.test.mjs'
+      - '.github/workflows/native-commercial-health.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: foundry-native-commercial-health
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/native-commercial-routine.test.mjs
+      - run: node scripts/native-commercial-routine.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundry-commercial-health-${{ github.run_id }}
+          path: dist/commercial-health.json
+          retention-days: 7
+          if-no-files-found: warn
