@@ -226,7 +226,7 @@ app.use(opportunityRouter({operator}));
 app.use(prospectRouter({operator}));
 app.use(oauthRouter({auth}));
 app.use(judgemeRouter({auth}));
-app.use(outcomeEvidenceRouter({operator}));
+app.use(outcomeEvidenceRouter({operator,stripe}));
 app.use(verificationLabRouter({auth}));
 app.use(openapiWatchRouter(auth));
 app.use(agencyRouter(auth));

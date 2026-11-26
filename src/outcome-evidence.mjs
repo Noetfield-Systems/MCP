@@ -1,6 +1,7 @@
 import express from 'express';
 import {createHash,timingSafeEqual} from 'node:crypto';
 import {q} from './db.mjs';
+import {reconcileOrders} from './provider-reconciliation.mjs';
 
 // An operator-only source-backed investor evidence readout; observations are
 // not audited customers, processor-settled revenue or financial statements.
@@ -61,7 +62,7 @@ export function nativeEvidenceAuthorized(header,expected){
  return timingSafeEqual(digest(supplied),digest(expected));
 }
 
-export function outcomeEvidenceRouter({operator}){
+export function outcomeEvidenceRouter({operator,stripe}){
  const router=express.Router();
  router.get('/api/integrations/founder/payment-evidence',async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
@@ -72,6 +73,17 @@ export function outcomeEvidenceRouter({operator}){
    const result=await q("SELECT o.currency,count(*)::int order_count,count(*) FILTER (WHERE o.status='fulfilled' AND o.accepted_at IS NOT NULL AND o.customer_acceptance_reference IS NOT NULL AND o.delivery_reference IS NOT NULL)::int fulfilled_count,coalesce(sum(o.amount_cents),0)::bigint amount_cents FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id WHERE o.status IN ('paid','fulfilled') AND o.stripe_checkout_session_id IS NOT NULL AND o.stripe_payment_intent_id IS NOT NULL AND o.completed_at IS NOT NULL AND l.email NOT LIKE '%@foundry.invalid' GROUP BY o.currency ORDER BY o.currency");
    return res.json(nativePaymentEvidence(result.rows));
   }catch(e){return res.status(503).json({error:'NATIVE_PAYMENT_EVIDENCE_UNAVAILABLE'});}
+ });
+
+ router.get('/api/integrations/founder/provider-reconciliation',async(req,res)=>{
+  res.setHeader('Cache-Control','no-store');
+  const expected=process.env.FOUNDRY_PORTFOLIO_READ_TOKEN||'';
+  if(expected.length<40||expected.length>512)return res.status(503).json({error:'NATIVE_EVIDENCE_TOKEN_NOT_CONFIGURED'});
+  if(!nativeEvidenceAuthorized(req.get('authorization'),expected))return res.status(403).json({error:'NATIVE_EVIDENCE_AUTH_REQUIRED'});
+  try{
+   const result=await q("SELECT o.id,o.currency,o.amount_cents,o.status,o.stripe_checkout_session_id,o.stripe_payment_intent_id,o.accepted_at,o.delivery_reference,o.customer_acceptance_reference FROM pilot_orders o JOIN pilot_leads l ON l.id=o.lead_id WHERE o.status IN ('paid','fulfilled','refunded') AND o.completed_at>=now()-interval '30 days' AND l.email NOT LIKE '%@foundry.invalid' ORDER BY o.completed_at DESC,o.id LIMIT 26");
+   return res.json(await reconcileOrders(result.rows,stripe));
+  }catch{return res.status(503).json({error:'PROVIDER_RECONCILIATION_UNAVAILABLE'});}
  });
 
  router.get('/api/admin/investor-evidence',operator,async(_req,res)=>{
