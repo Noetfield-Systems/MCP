@@ -18,7 +18,7 @@ concurrency:
 jobs:
   observe:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/native-commercial-routine.test.mjs
+      - run: npm install --no-audit --no-fund
       - run: node scripts/native-commercial-routine.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -34,6 +35,8 @@ jobs:
         if: always()
         with:
           name: foundry-commercial-health-${{ github.run_id }}
-          path: dist/commercial-health.json
+          path: |
+            dist/commercial-health.json
+            dist/buyer-proof.json
           retention-days: 7
           if-no-files-found: warn
